@@ -680,6 +680,8 @@
     direction: ltr;
     unicode-bidi: isolate;
   }
+  /* agorot, a step smaller than the shekels (statement rows) */
+  .cents { font-size: 0.8em; }
 
   .skeleton {
     border-radius: 0.375rem;

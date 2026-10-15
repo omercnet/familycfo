@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { CreditCard, Gauge as GaugeIcon, Landmark, LayoutDashboard, PiggyBank, Receipt, Sparkles, TriangleAlert, Users, Wallet } from 'lucide-react';
+import { CircleAlert, Clock, CreditCard, Gauge as GaugeIcon, Info, Landmark, PiggyBank, Receipt, Sparkles, TriangleAlert, Users, Wallet } from 'lucide-react';
 import { api, qs, type CycleSummary, type InstallmentPlan, type Summary } from '../api';
 import { useFilters, useLookups } from '../state';
-import { day, monthName } from '../format';
-import { ErrorBox, Loading, MemberBadge, Money, MoreLink, PageHeader, Progress, SectionTitle, SeverityDot, Stat } from '../components/ui';
-import { BarList, CashflowBars, DonutChart, ForecastChart, Gauge } from '../components/charts';
+import { day, money, monthName } from '../format';
+import { ErrorBox, Loading, MemberBadge, Money, MoreLink, Progress, SectionTitle, Stat } from '../components/ui';
+import { BarList, BudgetRing, CashflowBars, ForecastChart } from '../components/charts';
 import { DayDetails } from '../components/DayDetails';
 import { ScrapeButton } from '../components/ScrapeButton';
-import { categoryIcon, hueFor, MemberAvatar } from '@/lib/visuals';
+import { categoryIcon, MemberAvatar } from '@/lib/visuals';
+import { AllCaughtUp, EmptyBudget, IllustrationPanel, OverviewHero } from '@/illustrations';
 
 const shortMonth = (key: string) => new Intl.DateTimeFormat('he-IL', { month: 'short' }).format(new Date(`${key}-01T12:00:00`));
 
@@ -49,12 +50,39 @@ export default function Dashboard() {
   const members = Object.entries(cycle.byMember).map(([id, v]) => ({ id: Number(id), ...v })).filter(m => m.spend > 0 || m.income > 0);
   const budgetTotal = data.budgets.reduce((s, b) => s + (b.budget ?? 0), 0);
   const budgetSpent = data.budgets.reduce((s, b) => s + b.spent, 0);
+  const needAttention = data.budgets.filter(b => b.status === 'over' || b.status === 'warning').length;
+
+  // the month in one sentence, from the forecast and the next card bill
+  // the people, not the household's shared bucket (a member named משותף by default)
+  const names = (meta?.members ?? []).map(m => m.name).filter(n => n !== 'משותף');
+  const greeting = names.length ? `שלום, ${names.length > 1 ? `${names.slice(0, -1).join(', ')} ו${names[names.length - 1]}` : names[0]}` : 'שלום';
+  const endBalance = forecast.total.endOfCycle;
+  const onTrack = endBalance >= forecast.buffer;
+  const nextCharge = data.cardCharges[0];
+  const nextChargeAmount = nextCharge
+    ? (nextCharge.transactions > 0 || nextCharge.projectedInstallments > 0 || nextCharge.projectedFixed > 0 || nextCharge.projectedPlanned > 0
+      ? Math.max(nextCharge.expectedAmount, nextCharge.knownAmount + nextCharge.projectedInstallments + nextCharge.projectedFixed + nextCharge.projectedPlanned)
+      : nextCharge.expectedAmount)
+    : 0;
 
   return (
     <>
-      <PageHeader title="סקירה" icon={LayoutDashboard} subtitle={`מחזור ${monthName(cycle.cycle.key)} · ${day(cycle.cycle.start)} – ${day(cycle.cycle.end)}`} actions={<ScrapeButton />} />
+      <IllustrationPanel variant="hero" as="h1"
+        eyebrow={<>מחזור {monthName(cycle.cycle.key)} · {day(cycle.cycle.start)} – {day(cycle.cycle.end)}</>}
+        title={greeting}
+        text={<>
+          {onTrack ? 'המחזור בדרך הנכונה' : 'המחזור צפוי להיות לחוץ'}. בסוף {periodName} צפויה יתרה של <b className="num">{money(endBalance)}</b> בבנקים
+          {forecast.total.lowest.amount < 0 && <>, והנקודה הנמוכה היא <b className="num">{money(forecast.total.lowest.amount)}</b> ב-{day(forecast.total.lowest.date)}</>}.
+          {nextCharge && <> החיוב הבא: {nextCharge.displayName}, <b className="num">{money(nextChargeAmount)}</b> ב-{day(nextCharge.chargeDate)}.</>}
+        </>}
+        actions={<>
+          <ScrapeButton />
+          <Link to="/cashflow" className="btn rounded-full px-5">לתזרים המלא</Link>
+          <Link to="/fixed" className="btn rounded-full px-5">הוצאה צפויה חדשה</Link>
+        </>}
+        illustration={<OverviewHero />} />
 
-      <div className="grid grid-cols-2 gap-3 max-[22.5rem]:grid-cols-1 md:gap-4 lg:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-3 max-[22.5rem]:grid-cols-1 md:gap-4 lg:grid-cols-4">
         <Stat index={0} icon={Landmark} color="var(--chart-5)" label="יתרה בבנקים עכשיו" value={bankTotal} tone={bankTotal < 0 ? 'bad' : undefined}
           spark={balanceSpark} hint={forecast.total.stale ? 'חלק מהיתרות לא עודכנו לאחרונה' : undefined} />
         <Stat index={1} icon={GaugeIcon} label={`יתרה צפויה בסוף ${periodName}`} value={forecast.total.endOfCycle}
@@ -86,13 +114,13 @@ export default function Dashboard() {
           <div className="mt-4 border-t border-border/65 pt-3 text-xs text-muted-foreground">מהיום עד סוף {periodName}:</div>
           <div className="mt-2 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
             {[
-              { label: 'הכנסות צפויות', value: forecast.remaining.income, color: 'var(--positive)' },
-              { label: 'הלוואות וקבועות מהבנק', value: -forecast.remaining.scheduledOut, color: 'var(--chart-1)' },
-              { label: 'חיובי כרטיסים', value: -forecast.remaining.cardCharges, color: 'var(--chart-6)' },
-              { label: 'שוטף מהבנק (הערכה)', value: -forecast.remaining.dynamic, color: 'var(--chart-3)' },
+              { label: 'הכנסות צפויות', value: forecast.remaining.income },
+              { label: 'הלוואות וקבועות מהבנק', value: -forecast.remaining.scheduledOut },
+              { label: 'חיובי כרטיסים', value: -forecast.remaining.cardCharges },
+              { label: 'שוטף מהבנק (הערכה)', value: -forecast.remaining.dynamic },
             ].map(x => (
               <div key={x.label} className="rounded-lg bg-muted/60 px-3 py-2">
-                <div className="label mb-1 flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full" style={{ background: x.color }} />{x.label}</div>
+                <div className="label mb-1">{x.label}</div>
                 <Money value={x.value} animated className={`font-semibold ${x.value > 0 ? 'text-positive' : ''}`} />
               </div>
             ))}
@@ -107,7 +135,9 @@ export default function Dashboard() {
                 <div className="min-w-0">
                   <div className="truncate font-medium">{a.displayName}</div>
                   <div className="text-xs text-muted-foreground">
-                    {a.stale ? <span className="text-amber-600">עודכן {day(a.balanceDate)}</span> : `עודכן ${day(a.balanceDate)}`}
+                    {a.stale
+                      ? <span className="inline-flex items-center gap-1 font-medium text-warning"><Clock className="h-3 w-3" aria-hidden />לא עודכן מאז {day(a.balanceDate)}</span>
+                      : `עודכן ${day(a.balanceDate)}`}
                     {' · '}סוף {periodName} <Money value={a.endOfCycle} />
                   </div>
                 </div>
@@ -171,53 +201,51 @@ export default function Dashboard() {
             : <div className="skeleton h-60 w-full" />}
         </div>
         <div className="card min-w-0 lg:col-span-2">
-          <SectionTitle icon={Wallet} color="var(--chart-6)" action={<MoreLink to="/transactions">תנועות</MoreLink>}>לאן הלך הכסף</SectionTitle>
-          <DonutChart centerLabel="הוצאות המחזור"
-            data={categories.map(c => {
-              const Icon = categoryIcon(c.name);
-              return { key: c.key, name: c.name, value: c.spend, href: catHref(c), icon: <Icon /> };
-            })} />
+          <SectionTitle icon={Wallet} action={<MoreLink to="/transactions">תנועות</MoreLink>}>לאן הלך הכסף</SectionTitle>
+          <div className="mb-3 font-rounded text-2xl font-semibold"><Money value={cycle.spend} /> <span className="font-sans text-xs font-normal text-muted-foreground">הוצאות המחזור עד היום</span></div>
+          {categories.length === 0 ? <div className="text-sm text-muted-foreground">אין עדיין הוצאות במחזור</div> : (
+            <BarList items={[
+              ...categories.slice(0, 7).map(c => {
+                const Icon = categoryIcon(c.name);
+                return { key: c.key, label: c.name, value: c.spend, icon: <Icon />, href: catHref(c) };
+              }),
+              ...(categories.length > 7 ? [{ key: 'other', label: 'אחר', value: categories.slice(7).reduce((s, c) => s + c.spend, 0), color: 'var(--chart-3)' }] : []),
+            ]} />
+          )}
         </div>
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <div className="card min-w-0">
           <SectionTitle icon={GaugeIcon} action={<MoreLink to="/budgets">הכל</MoreLink>}>תקציב</SectionTitle>
-          {data.budgets.length === 0 && <div className="text-sm text-muted-foreground">עוד לא הוגדרו תקציבים. <Link className="text-link" to="/budgets">להגדרה</Link></div>}
-          {data.budgets.length > 0 && (
-            <div className="mb-4 flex items-center gap-4 rounded-xl bg-muted/50 p-3">
-              <Gauge value={budgetSpent} max={budgetTotal} size={96} label="נוצל"
-                status={budgetSpent > budgetTotal ? 'over' : budgetSpent > budgetTotal * 0.8 ? 'warning' : 'ok'} />
-              <div className="min-w-0 text-sm">
-                <div className="text-xs text-muted-foreground">הוצא מתוך התקציבים שבסקירה</div>
-                <div className="mt-1 text-lg font-bold"><Money value={budgetSpent} animated /></div>
-                <div className="text-xs text-muted-foreground">מתוך <Money value={budgetTotal} /></div>
+          {data.budgets.length === 0 ? (
+            <IllustrationPanel title="עוד לא הוגדרו תקציבים" text="קבעו כמה מותר להוציא בכל קטגוריה, והסקירה תראה מה נשאר בכל אחת."
+              actions={<Link to="/budgets" className="btn btn-primary rounded-full px-5">הגדרת תקציב</Link>} illustration={<EmptyBudget />} />
+          ) : (
+            <>
+              <div className="mb-3 text-sm">
+                <Money value={budgetSpent} className="font-semibold" /> <span className="text-muted-foreground">מתוך <Money value={budgetTotal} /></span>
+                {needAttention > 0 && (
+                  <span className="ms-2 inline-flex items-center gap-1 text-xs font-semibold text-warning"><CircleAlert className="h-3.5 w-3.5" aria-hidden />{needAttention} דורשים תשומת לב</span>
+                )}
               </div>
-            </div>
+              <div className="grid grid-cols-3 gap-1">
+                {data.budgets.map(b => (
+                  <BudgetRing key={b.categoryId} name={b.categoryName} spent={b.spent} budget={b.budget ?? 0}
+                    href={`/transactions?category=${b.categoryId}&cycle=${cycle.cycle.key}`} />
+                ))}
+              </div>
+            </>
           )}
-          <div className="space-y-3">
-            {data.budgets.map(b => {
-              const Icon = categoryIcon(b.categoryName);
-              return (
-                <div key={b.categoryId}>
-                  <div className="mb-1.5 flex items-center justify-between gap-2 text-sm">
-                    <span className="flex min-w-0 items-center gap-2"><Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{b.categoryName}</span></span>
-                    <span className="shrink-0 text-xs text-muted-foreground"><Money value={b.spent} /> / <Money value={b.budget} /></span>
-                  </div>
-                  <Progress value={b.spent} max={b.budget ?? 0} status={b.status} />
-                </div>
-              );
-            })}
-          </div>
         </div>
 
         <div className="card min-w-0">
-          <SectionTitle icon={Users} color="var(--chart-5)">הוצאות לפי בן משפחה</SectionTitle>
+          <SectionTitle icon={Users}>הוצאות לפי בן משפחה</SectionTitle>
           {members.length === 0 ? <div className="text-sm text-muted-foreground">אין עדיין הוצאות במחזור</div> : (
             <BarList items={members.sort((a, b) => b.spend - a.spend).map(m => {
               const mm = member(m.id);
               return {
-                key: String(m.id), value: m.spend, color: hueFor(m.id),
+                key: String(m.id), value: m.spend,
                 label: <span className="inline-flex items-center gap-2">{mm && <MemberAvatar name={mm.name} color={mm.color} size={20} />}{mm?.name ?? 'משותף'}</span>,
                 sub: m.income > 0 ? <>הכנסות <Money value={m.income} /></> : undefined,
               };
@@ -225,7 +253,7 @@ export default function Dashboard() {
           )}
           <div className="mt-5 border-t border-border/65 pt-4">
             <div className="label">הקטגוריות הגדולות</div>
-            <BarList color="var(--chart-6)" items={categories.slice(0, 5).map(c => {
+            <BarList items={categories.slice(0, 5).map(c => {
               const Icon = categoryIcon(c.name);
               return { key: c.key, label: c.name, value: c.spend, icon: <Icon />, href: catHref(c) };
             })} />
@@ -233,19 +261,28 @@ export default function Dashboard() {
         </div>
 
         <div className="card min-w-0">
-          <SectionTitle icon={TriangleAlert} color="var(--negative)" action={<MoreLink to="/insights">הכל</MoreLink>}>התראות</SectionTitle>
-          {data.alerts.length === 0 && <div className="text-sm text-muted-foreground">אין התראות פתוחות 🎉</div>}
-          <div className="stagger space-y-1">
-            {data.alerts.map((a, i) => (
-              <Link key={a.id} to={a.action?.href ?? '/insights'} style={{ ['--i' as string]: i }} className="flex gap-2.5 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent/50">
-                <SeverityDot severity={a.severity} />
-                <div className="min-w-0">
-                  <div className="font-medium">{a.title}</div>
-                  <div className="text-xs leading-relaxed text-muted-foreground">{a.message}</div>
-                  {a.action && <div className="mt-0.5 text-xs font-medium text-link">{a.action.label} ←</div>}
-                </div>
-              </Link>
-            ))}
+          <SectionTitle icon={TriangleAlert} action={<MoreLink to="/insights">הכל</MoreLink>}>דורש תשומת לב</SectionTitle>
+          {data.alerts.length === 0 && (
+            <IllustrationPanel title="הכל מסודר" text="אין התראות פתוחות במחזור הזה." illustration={<AllCaughtUp />} />
+          )}
+          <div className="space-y-0.5">
+            {data.alerts.map(a => {
+              const tone = a.severity === 'critical' ? { Icon: CircleAlert, cls: 'bg-negative text-primary-foreground', word: 'דחוף' }
+                : a.severity === 'warning' ? { Icon: TriangleAlert, cls: 'bg-warning text-primary-foreground', word: 'אזהרה' }
+                  : { Icon: Info, cls: 'bg-fill-2 text-foreground', word: 'לידיעה' };
+              return (
+                <Link key={a.id} to={a.action?.href ?? '/insights'} className="flex items-start gap-3 rounded-xl px-2 py-2 text-sm transition-colors hover:bg-fill">
+                  <span className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full ${tone.cls}`}>
+                    <tone.Icon className="h-4 w-4" aria-hidden /><span className="sr-only">{tone.word}</span>
+                  </span>
+                  <div className="min-w-0">
+                    <div className="font-medium">{a.title}</div>
+                    <div className="text-xs leading-relaxed text-muted-foreground">{a.message}</div>
+                    {a.action && <div className="mt-0.5 text-xs font-medium text-link">{a.action.label} ←</div>}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

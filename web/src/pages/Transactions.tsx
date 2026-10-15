@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  ArrowDownLeft, ArrowLeftRight, ArrowUpRight, CalendarDays, ChevronDown, ChevronUp, CreditCard, EyeOff, Hash, Inbox,
+  ArrowDownLeft, ArrowLeftRight, ArrowUpRight, CalendarDays, ChevronDown, ChevronUp, CreditCard, EyeOff, Hash,
   MoreHorizontal, PenLine, PieChart, PiggyBank, Plus, Receipt, Scale, ShoppingBag, TrendingUp, Undo2, X,
 } from 'lucide-react';
 import { api, qs, type Tx } from '../api';
@@ -14,7 +14,8 @@ import {
 } from '../components/ui';
 import { CategoryReport } from '../components/CategoryReport';
 import { ManualEntry } from '../components/ManualEntry';
-import { MemberAvatar } from '@/lib/visuals';
+import { categoryIcon, MemberAvatar } from '@/lib/visuals';
+import { EmptyTransactions, IllustrationPanel } from '@/illustrations';
 
 interface TxPage { total: number; totals: { income: number; spend: number; businessIncome: number; businessSpend: number; moved: number }; rows: Tx[] }
 type SortKey = 'date' | 'description' | 'amount' | 'category' | 'member' | 'business' | 'account';
@@ -144,6 +145,21 @@ export default function Transactions() {
       {label}{sort.key === key && <span className="ms-1 inline-flex align-middle text-muted-foreground">{sort.dir === 1 ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}</span>}
     </th>
   );
+  // statement grouping: when sorted by date, rows are grouped by day with that day's total
+  const byDay = sort.key === 'date';
+  const dayTotals = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const t of rows) if (!t.excluded) m.set(t.effectiveDate, (m.get(t.effectiveDate) ?? 0) + t.amount);
+    return m;
+  }, [rows]);
+  const dayGroups = useMemo(() => {
+    const g: { day: string; rows: Tx[] }[] = [];
+    for (const t of rows) {
+      if (g.length && g[g.length - 1].day === t.effectiveDate) g[g.length - 1].rows.push(t);
+      else g.push({ day: t.effectiveDate, rows: [t] });
+    }
+    return g;
+  }, [rows]);
   const allSelected = rows.length > 0 && rows.every(r => selected.has(r.id));
   const toggle = (id: number) => setSelected(s => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const cycles = useMemo(() => cycleOptions(), []);
@@ -219,7 +235,7 @@ export default function Transactions() {
       </div>
 
       {selected.size > 0 && (
-        <div className="card animate-rise-in sticky top-[calc(var(--header-h)+0.5rem)] z-20 mb-3 flex flex-wrap items-center gap-2 border-primary/25 bg-accent/95 p-3 shadow-(--shadow-overlay) backdrop-blur-md md:p-3 dark:bg-zinc-900/95">
+        <div className="card animate-rise-in sticky top-[calc(var(--header-h)+0.5rem)] z-20 mb-3 flex flex-wrap items-center gap-2 border-primary/25 bg-accent/95 p-3 shadow-(--shadow-overlay) backdrop-blur-md md:p-3">
           <span className="min-w-14 px-1 text-sm font-semibold tabular-nums text-accent-foreground">{selected.size} נבחרו</span>
           <CategorySelect className="input w-44 max-sm:w-[calc(50%-0.25rem)]" value={null} onChange={id => bulk.mutate({ categoryId: id })} />
           <MemberSelect className="input w-36 max-sm:w-[calc(50%-0.25rem)]" value={null} emptyLabel="שייך לבן משפחה…" onChange={id => bulk.mutate({ memberId: id })} />
@@ -237,8 +253,42 @@ export default function Transactions() {
           אין עדיין פירוט של החיוב הזה — הכרטיס לא דיווח אילו עסקאות ייכנסו לחיוב של {day(charge)} (הסכום בתחזית הוא הערכה לפי חיובים קודמים).
           <div className="mt-2"><button className="btn" onClick={() => { setCharge(null); setCycle(''); }}>הצג את כל העסקאות בכרטיס</button></div>
         </Empty>
-      ) : <Empty><Inbox className="mx-auto mb-2 h-6 w-6 opacity-50" />אין תנועות לתצוגה</Empty>) : (
-        <div className="card animate-fade-in scroll-x p-0 max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
+      ) : (
+        <IllustrationPanel title="אין תנועות לתצוגה" illustration={<EmptyTransactions />}
+          text={search || category != null || account || kind || review ? 'אין תנועות שמתאימות לסינון. אפשר לנקות חלק מהמסננים או לבחור תקופה אחרת.' : 'עוד אין תנועות בתקופה הזו. אחרי עדכון מהבנקים הן יופיעו כאן.'}
+          actions={<button className="btn btn-primary rounded-full px-5" onClick={() => setManual('new')}><Plus />הוספת הוצאה ידנית</button>} />
+      )) : (<>
+        {/* phones: a grouped list, tap a row to edit it */}
+        <div className="space-y-4 sm:hidden">
+          {dayGroups.map(g => (
+            <section key={g.day} aria-label={day(g.day)}>
+              <div className="mb-1.5 flex justify-between px-4 text-sm text-muted-foreground">
+                <span>{day(g.day)}</span><Money value={dayTotals.get(g.day) ?? 0} cents flow />
+              </div>
+              <ul className="overflow-hidden rounded-(--radius-group) bg-card">
+                {g.rows.map(t => {
+                  const Icon = t.amount > 0 ? ArrowDownLeft : categoryIcon(t.categoryName);
+                  return (
+                    <li key={t.id} className="border-t border-border/65 first:border-t-0">
+                      <button type="button" onClick={() => (t.accountKind === 'manual' ? setManual(t) : setEditing(t))}
+                        className={`flex w-full items-center gap-3 px-3.5 py-2.5 text-start transition-colors hover:bg-fill ${t.excluded ? 'opacity-40' : ''}`}>
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-fill text-muted-foreground"><Icon className="h-4.5 w-4.5" aria-hidden /></span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate font-medium">{t.description}</span>
+                          <span className="block truncate text-xs text-muted-foreground">
+                            {[t.categoryName ?? 'ללא קטגוריה', t.accountName, t.installmentTotal ? `תשלום ${t.installmentNumber} מתוך ${t.installmentTotal}` : null].filter(Boolean).join(' · ')}
+                          </span>
+                        </span>
+                        <Money value={t.amount} cents flow className="shrink-0 font-medium" />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
+        <div className="card animate-fade-in scroll-x p-0 max-sm:hidden">
           <table className="table">
             <thead>
               <tr>
@@ -255,8 +305,15 @@ export default function Transactions() {
               </tr>
             </thead>
             <tbody>
-              {rows.map(t => (
-                <tr key={t.id} className={`transition-opacity ${t.excluded ? 'opacity-40' : ''} ${selected.has(t.id) ? 'bg-accent' : ''}`}>
+              {rows.map((t, i) => (<Fragment key={t.id}>
+                {byDay && (i === 0 || rows[i - 1].effectiveDate !== t.effectiveDate) && (
+                  <tr>
+                    <td colSpan={9} className="bg-muted/60 py-1.5 text-xs font-semibold text-muted-foreground">
+                      <div className="flex justify-between gap-3"><span>{day(t.effectiveDate)}</span><Money value={dayTotals.get(t.effectiveDate) ?? 0} cents flow /></div>
+                    </td>
+                  </tr>
+                )}
+                <tr className={`transition-opacity ${t.excluded ? 'opacity-40' : ''} ${selected.has(t.id) ? 'bg-accent' : ''}`}>
                   <td><input type="checkbox" checked={selected.has(t.id)} onChange={() => toggle(t.id)} /></td>
                   <td className="whitespace-nowrap text-muted-foreground">
                     {day(t.date)}
@@ -287,7 +344,7 @@ export default function Transactions() {
                         onChange={v => v && patch.mutate({ id: t.id, body: { addTagIds: [Number(v)] } })} />
                     </div>
                   </td>
-                  <td className="text-end font-medium whitespace-nowrap"><Money value={t.amount} cents colored /></td>
+                  <td className="text-end font-medium whitespace-nowrap"><Money value={t.amount} cents flow /></td>
                   <td className="min-w-44">
                     <CategorySelect className="input py-1" value={t.categoryId} onChange={id => patch.mutate({ id: t.id, body: { categoryId: id } })} />
                   </td>
@@ -304,11 +361,11 @@ export default function Transactions() {
                   <td className="whitespace-nowrap text-xs text-muted-foreground">{t.accountName}</td>
                   <td><button className="btn-ghost btn-icon" aria-label="עריכה" onClick={() => (t.accountKind === 'manual' ? setManual(t) : setEditing(t))}><MoreHorizontal /></button></td>
                 </tr>
-              ))}
+              </Fragment>))}
             </tbody>
           </table>
         </div>
-      )}
+      </>)}
 
       {suggestRule && (
         <Modal title="להחיל על תנועות דומות?" onClose={() => setSuggestRule(null)} footer={<>
@@ -346,7 +403,7 @@ function TxDrawer({ tx, onClose, onSave }: { tx: Tx; onClose: () => void; onSave
       <button className="btn btn-primary" onClick={() => onSave(form)}>שמור</button>
     </>}>
       <div className="grid grid-cols-2 gap-3 text-sm">
-        <div><div className="label">סכום</div><Money value={tx.amount} cents colored /></div>
+        <div><div className="label">סכום</div><Money value={tx.amount} cents flow /></div>
         <div><div className="label">תאריך / חיוב</div>{day(tx.date)} / {day(tx.processedDate)}</div>
       </div>
       <Field label="קטגוריה"><CategorySelect value={form.categoryId} onChange={categoryId => set({ categoryId })} /></Field>

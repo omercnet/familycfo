@@ -338,6 +338,45 @@ export function Gauge({ value, max, label, sub, size = 132, status }: { value: n
   );
 }
 
+/**
+ * One budget as a ring: the tint while there is room, orange above 85%, a red overflow arc when
+ * over. The state is also written under the ring, and the whole ring is one labelled image.
+ */
+export function BudgetRing({ name, spent, budget, href }: { name: string; spent: number; budget: number; href?: string }) {
+  const p = budget > 0 ? spent / budget : 0;
+  const over = p > 1, warn = !over && p > 0.85;
+  const left = budget - spent;
+  const r = 26, c = 2 * Math.PI * r;
+  const first = Math.min(1, p), extra = over ? Math.min(1, p - 1) : 0;
+  const m = money; // spoken label only; the visible amount below renders with .num
+  const label = `${name}: ${over ? `חריגה של ${m(-left)}` : `נשארו ${m(left)}`} מתוך ${m(budget)}`;
+  const body = (
+    <>
+      <svg viewBox="0 0 64 64" className="h-16 w-16 -rotate-90" aria-hidden>
+        <circle cx="32" cy="32" r={r} fill="none" stroke="var(--fill)" strokeWidth="8" />
+        {first > 0 && (
+          <motion.circle cx="32" cy="32" r={r} fill="none" stroke={warn ? 'var(--warning)' : 'var(--chart-1)'} strokeWidth="8" strokeLinecap="round"
+            strokeDasharray={c} initial={{ strokeDashoffset: c }} animate={{ strokeDashoffset: c * (1 - first) }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} />
+        )}
+        {over && (
+          <motion.circle cx="32" cy="32" r={r} fill="none" stroke="var(--negative)" strokeWidth="8" strokeLinecap="round"
+            strokeDasharray={c} initial={{ strokeDashoffset: c }} animate={{ strokeDashoffset: c * (1 - extra) }}
+            transition={{ duration: 0.9, delay: 0.5, ease: [0.22, 1, 0.36, 1] }} />
+        )}
+      </svg>
+      <span className="max-w-full truncate text-xs font-semibold" aria-hidden>{name}</span>
+      <span className={cn('text-2xs', over ? 'font-semibold text-negative' : warn ? 'font-semibold text-warning' : 'text-muted-foreground')} aria-hidden>
+        {over ? 'חריגה ' : warn ? 'כמעט ריקה, ' : 'נשארו '}<span className="num">{money(Math.abs(left))}</span>
+      </span>
+    </>
+  );
+  const cls = 'flex min-w-0 flex-col items-center gap-1 rounded-xl p-1.5 text-center';
+  return href
+    ? <Link to={href} aria-label={label} className={cn(cls, 'transition-colors hover:bg-fill')}>{body}</Link>
+    : <div role="img" aria-label={label} className={cls}>{body}</div>;
+}
+
 /** Simple column chart (one series). */
 export function Columns({ data, height = 180, color = 'var(--chart-1)', format = money, highlightLast, valueLabel = 'סכום' }: {
   data: { label: string; value: number }[]; height?: number; color?: string; format?: (n: number) => string; highlightLast?: boolean; valueLabel?: string;

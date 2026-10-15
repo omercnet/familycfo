@@ -35,13 +35,25 @@ export function AnimatedNumber({ value, format, className }: { value: number; fo
   return <span ref={ref} className={className}>{format(value)}</span>;
 }
 
-export function Money({ value, cents, colored, animated, className = '' }: {
-  value: number | null | undefined; cents?: boolean; colored?: boolean; animated?: boolean; className?: string;
+/**
+ * An amount. `colored`: the sign is the message (net, delta), so negative is red and positive green.
+ * `flow`: a row in a statement, where spending is not bad news: money in is green with a "+",
+ * money out stays in the text color. With `cents` the agorot are set a step smaller.
+ */
+export function Money({ value, cents, colored, flow, animated, className = '' }: {
+  value: number | null | undefined; cents?: boolean; colored?: boolean; flow?: boolean; animated?: boolean; className?: string;
 }) {
-  const color = colored && value != null ? (value < 0 ? 'text-negative' : value > 0 ? 'text-positive' : '') : '';
+  const color = value == null ? '' : value > 0 && (colored || flow) ? 'text-positive' : value < 0 && colored ? 'text-negative' : '';
   const fmt = useMemo(() => (n: number) => money(n, cents), [cents]);
   if (animated && value != null) return <AnimatedNumber value={value} format={fmt} className={`num ${color} ${className}`} />;
-  return <span className={`num ${color} ${className}`}>{money(value, cents)}</span>;
+  const text = money(value, cents);
+  const parts = cents && value != null ? /^(.*\d)([.,]\d{2})(.*)$/.exec(text) : null;
+  return (
+    <span className={`num ${color} ${className}`}>
+      {flow && value != null && value > 0 && '+'}
+      {parts ? <>{parts[1]}<span className="cents">{parts[2]}</span>{parts[3]}</> : text}
+    </span>
+  );
 }
 
 // ---- KPI cards -------------------------------------------------------------------------
