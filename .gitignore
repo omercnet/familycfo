@@ -16,3 +16,11 @@ data/
 # local tool settings
 .claude/settings.local.json
 .DS_Store
+
+# database backups made next to the file
+*.db.bak*
+
+# Claude Code session worktrees and local launch config
+.claude/worktrees/
+.claude/launch.json
+.omo/
