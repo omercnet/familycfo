@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { AlertTriangle, Bell, Info, Palette, Plus, Shapes, Trash2, Type, Wallet } from 'lucide-react';
+import { AlertTriangle, Bell, Info, Palette, Plus, Shapes, Sparkles, Trash2, Type, Wallet } from 'lucide-react';
 import {
   Empty, ErrorBox, Field, Loading, Modal, Money, MoreLink, PageHeader, Picker, Progress, SectionTitle, Segmented, SeverityDot, Stat,
 } from '../components/ui';
 import { BarList, DonutChart, Gauge, Legend, Sparkline } from '../components/charts';
 import { categoryIcon, MemberAvatar } from '@/lib/visuals';
+import {
+  AllCaughtUp, ConnectBankSpot, EmptyBudget, EmptyTransactions, IllustrationPanel, OverviewHero, PlannedExpenseSpot,
+} from '@/illustrations';
 
 /**
  * Living reference of the design system (route /kit, not in the nav). Static sample data only,
@@ -337,6 +340,37 @@ export default function Kit() {
                 { key: '1', name: 'משכנתא', value: 5200 }, { key: '2', name: 'סופר', value: 2512 },
                 { key: '3', name: 'רכב', value: 1998 }, { key: '4', name: 'חינוך', value: 368 },
               ]} />
+            </div>
+          </Demo>
+        </div>
+      </Section>
+
+      <Section icon={Sparkles} title="איורים" note="web/src/illustrations: רק בפתיח של הסקירה, בפאנלים שמזמינים לפעולה ובמצבים ריקים. דקורטיביים (aria-hidden); צבעים ממשתני --ill-*.">
+        <div className="space-y-5">
+          <Demo label="<IllustrationPanel variant='hero'> + <OverviewHero>">
+            <IllustrationPanel variant="hero" as="h2" eyebrow="אוקטובר 2026" title="בוקר טוב"
+              text="החודש בדרך הנכונה. צפוי להישאר עודף בסוף החודש, והחיוב הבא הוא בעוד שבועיים."
+              actions={<><button type="button" className="btn btn-primary">הוספת הוצאה צפויה</button><button type="button" className="btn">לתזרים המלא</button></>}
+              illustration={<OverviewHero />} />
+          </Demo>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Demo label="<IllustrationPanel> + <PlannedExpenseSpot>">
+              <IllustrationPanel title="מתכננים חופשה?" text="הוסיפו אותה כהוצאה צפויה, והתזרים יתחשב בה עוד לפני שהכרטיס יחויב."
+                actions={<button type="button" className="btn btn-sm">הוספת הוצאה צפויה</button>} illustration={<PlannedExpenseSpot />} />
+            </Demo>
+            <Demo label="<IllustrationPanel> + <ConnectBankSpot>">
+              <IllustrationPanel title="חיבור בנק" text="חברו חשבון בנק או כרטיס, והתנועות ייכנסו לבד אחרי כל סריקה."
+                actions={<button type="button" className="btn btn-sm">חיבור חשבון</button>} illustration={<ConnectBankSpot />} />
+            </Demo>
+          </div>
+          <Demo label="<EmptyTransactions> · <EmptyBudget> · <AllCaughtUp> (w-40, w-56)">
+            <div className="flex flex-wrap items-end gap-6">
+              <EmptyTransactions className="w-40" />
+              <EmptyBudget className="w-40" />
+              <AllCaughtUp className="w-40" />
+              <EmptyTransactions className="w-56" />
+              <EmptyBudget className="w-56" />
+              <AllCaughtUp className="w-56" />
             </div>
           </Demo>
         </div>

@@ -1,0 +1,61 @@
+/* Illustration layer (docs/design-system-plan.md, "Illustration layer").
+   The palette is separate from the UI tokens. Defaults sit in :where(:root) (zero specificity), so
+   index.css can override any of them without caring about import order. Literal colors live here
+   only: check-design.mjs flags them in .tsx.
+   Dark mode mirrors index.css's `dark` variant (OS setting unless <html data-theme> forces one):
+   the panel darkens, the objects keep their light fills, and strokes drawn straight on the panel
+   (sparkles, motion trails) switch to a light line so they stay visible. */
+
+:where(:root) {
+  --ill-ink: #1d1d1f;          /* every outline, offset shadows */
+  --ill-blue: #4b87f5;
+  --ill-blue-2: #a9c7fb;
+  --ill-yellow: #fbbc04;
+  --ill-paper: #ffffff;
+  --ill-cloud: rgba(255, 255, 255, 0.85);
+  --ill-free-line: var(--ill-ink); /* strokes with no fill behind them: sparkles, trails */
+  --ill-sky: #dcecfd;           /* panel background */
+  --ill-panel-line: #1d1d1f;    /* panel outline */
+}
+
+:where(:root[data-theme="dark"]) {
+  --ill-cloud: rgba(255, 255, 255, 0.08);
+  --ill-free-line: rgba(255, 255, 255, 0.72);
+  --ill-sky: #13263d;
+  --ill-panel-line: rgba(255, 255, 255, 0.28);
+}
+@media (prefers-color-scheme: dark) {
+  :where(:root:not([data-theme="light"])) {
+    --ill-cloud: rgba(255, 255, 255, 0.08);
+    --ill-free-line: rgba(255, 255, 255, 0.72);
+    --ill-sky: #13263d;
+    --ill-panel-line: rgba(255, 255, 255, 0.28);
+  }
+}
+
+/* In the components layer, so Tailwind utilities on the same element (w-40, rounded-*) win. This file
+   can load before index.css, so it repeats Tailwind's layer order: otherwise `components` would be
+   declared first and preflight (base) would beat it. */
+@layer theme, base, components, utilities;
+@layer components {
+  /* the svg: scales to its container; outlines are 2px at any size */
+  .ill {
+    display: block;
+    width: 100%;
+    height: auto;
+    fill: none;
+    stroke: var(--ill-ink);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .ill * { vector-effect: non-scaling-stroke; }
+
+  .ill-panel {
+    background: var(--ill-sky);
+    border: 1.5px solid var(--ill-panel-line);
+    border-radius: 32px;
+    overflow: hidden;
+    color: var(--foreground);
+  }
+}
