@@ -3,6 +3,7 @@ import { categorizeTransactions, deriveKinds } from './ingest/classify.js';
 import { matchImmediateCardDebits, matchInternalTransfers, reconcileCardBills } from './ingest/transfers.js';
 import { refreshRecurring } from './analytics/recurring.js';
 import { suggestScheduledItems } from './analytics/scheduled.js';
+import { detectLiabilities } from './analytics/loans.js';
 import { suggestPaybacks } from './analytics/paybacks.js';
 import { refreshAlerts } from './analytics/alerts.js';
 import { refreshBoiRates } from './analytics/fx.js';
@@ -34,9 +35,10 @@ export async function runPipeline(db: DB = getDb(), opts: PipelineOptions = {}):
   const planned = matchPlanned(db);
   const recurring = refreshRecurring(db).length;
   const scheduled = suggestScheduledItems(db);
+  const loans = detectLiabilities(db);
   const paybacks = suggestPaybacks(db);
   const alerts = refreshAlerts(db);
-  return { categorized: ids.length, cardBillsKept: cardBills.kept, cardBillsDemoted: cardBills.demoted, immediateDebits: debits.matched, debitCards: debits.debitCards.length, transfers, plannedMatched: planned.matched, plannedAmbiguous: planned.ambiguous, recurring, scheduled, paybacks, alerts };
+  return { categorized: ids.length, cardBillsKept: cardBills.kept, cardBillsDemoted: cardBills.demoted, immediateDebits: debits.matched, debitCards: debits.debitCards.length, transfers, plannedMatched: planned.matched, plannedAmbiguous: planned.ambiguous, recurring, scheduled, loansDetected: loans.created, paybacks, alerts };
 }
 
 // `npm run pipeline` — reprocess the database without scraping (set CATEGORY_API_URL to categorize via the API)

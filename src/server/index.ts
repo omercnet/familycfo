@@ -34,7 +34,7 @@ registerCrud(app, db, { table: 'asset_snapshots', path: 'asset-snapshots', colum
 registerCrud(app, db, {
   table: 'liabilities', path: 'liabilities', orderBy: 'type, name',
   columns: ['name', 'type', 'lender', 'ownerMemberId', 'originalPrincipal', 'interestRate', 'indexType', 'startDate',
-    'endDate', 'monthlyPayment', 'paymentDay', 'bankAccountId', 'matchPattern', 'notes', 'archived'],
+    'endDate', 'monthlyPayment', 'paymentDay', 'bankAccountId', 'matchPattern', 'notes', 'archived', 'source'],
 });
 registerCrud(app, db, { table: 'liability_snapshots', path: 'liability-snapshots', columns: ['liabilityId', 'date', 'balance'], orderBy: 'date DESC' });
 registerCrud(app, db, {

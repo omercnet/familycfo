@@ -69,7 +69,8 @@ export default function Loans() {
                     </span>
                     <div className="min-w-0">
                       <div className="text-base font-semibold tracking-tight">{l.name}</div>
-                      <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm text-zinc-500">{l.lender} · {l.type === 'mortgage' ? 'משכנתא' : 'הלוואה'} <MemberBadge id={l.ownerMemberId} /></div>
+                      <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm text-zinc-500">{l.lender} · {l.type === 'mortgage' ? 'משכנתא' : 'הלוואה'} <MemberBadge id={l.ownerMemberId} />
+                        {l.source === 'detected' && <span className="chip" title="נוצרה מההחזרים בדף הבנק — ההחזר החודשי מתעדכן אוטומטית">זוהתה מהבנק</span>}</div>
                     </div>
                   </div>
                   <button className="btn-ghost btn-icon -me-2 -mt-1" aria-label="עריכה" onClick={() => setEditing(l)}><Pencil /></button>
@@ -100,7 +101,7 @@ export default function Loans() {
         <Modal title={editing.id ? 'עריכה' : 'הלוואה / משכנתא חדשה'} onClose={() => setEditing(null)} footer={<>
           <button className="btn" onClick={() => setEditing(null)}>ביטול</button>
           {editing.id && <button className="btn" onClick={() => save.mutate({ id: editing.id, archived: 1 })}>סיום / ארכיון</button>}
-          <button className="btn btn-primary" disabled={!editing.name} onClick={() => save.mutate(editing)}>שמור</button>
+          <button className="btn btn-primary" disabled={!editing.name} onClick={() => save.mutate(editing.id ? { ...editing, source: 'manual' } : editing)}>שמור</button>
         </>}>
           <div className="grid grid-cols-2 gap-3">
             <Field label="שם"><input className="input" value={editing.name ?? ''} onChange={e => setEditing({ ...editing, name: e.target.value })} placeholder="משכנתא — לאומי" /></Field>

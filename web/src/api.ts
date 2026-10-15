@@ -123,7 +123,7 @@ export interface Liability {
   id: number; name: string; type: string; lender: string | null; ownerMemberId: number | null; originalPrincipal: number | null;
   interestRate: number | null; indexType: string | null; startDate: string | null; endDate: string | null;
   monthlyPayment: number | null; paymentDay: number | null; bankAccountId: string | null; matchPattern: string | null;
-  notes: string | null; archived: number;
+  notes: string | null; archived: number; source: 'manual' | 'detected';
 }
 export interface Link {
   id: number; fromTxnId: number; toTxnId: number; type: string; amount: number; status: string;

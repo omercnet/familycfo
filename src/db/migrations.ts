@@ -633,6 +633,15 @@ export const migrations: Migration[] = [
       for (const [from, to] of Object.entries(SCRAPER_CATEGORY_ALIASES)) alias.run(from, to);
     },
   },
+  {
+    version: 15,
+    name: 'loans detected from bank repayments',
+    up(db) {
+      // 'detected' = created by the pipeline from repayment rows (src/analytics/loans.ts) and kept in sync with them;
+      // it becomes 'manual' once the user edits it on the Loans page
+      db.exec(`ALTER TABLE liabilities ADD COLUMN source TEXT NOT NULL DEFAULT 'manual'`);
+    },
+  },
 ];
 
 type CategoryKind = 'expense' | 'income' | 'transfer' | 'card_payment' | 'savings';
@@ -683,6 +692,9 @@ const COMPANY_NAMES: Record<string, string> = {
   pagi: 'פאגי', visaCal: 'כאל', isracard: 'ישראכרט', amex: 'אמריקן אקספרס', max: 'מקס', beyahadBishvilha: 'ביחד בשבילך',
   behatsdaa: 'בהצדעה',
 };
+
+/** "leumi:680-1234" → "לאומי" */
+export const companyName = (accountId: string): string => COMPANY_NAMES[accountId.split(':')[0]] ?? accountId.split(':')[0];
 
 /** "hapoalim:12-345-678901" → "הפועלים ···8901" */
 export function friendlyAccountName(accountId: string): string {

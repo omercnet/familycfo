@@ -175,11 +175,14 @@ export function suggestCardCommitments(db: DB, txs: Tx[], asOf = today()): numbe
  * payment that already went out this month isn't subtracted again.
  */
 export function supersedeByLiabilities(db: DB): number {
-  const manual = db.prepare(`SELECT * FROM scheduled_items WHERE liability_id IS NOT NULL AND status != 'dismissed'
-    AND kind IN ('loan','mortgage') AND bank_account_id IS NOT NULL`).all() as ScheduledItem[];
+  const manual = db.prepare(`SELECT s.* FROM scheduled_items s JOIN liabilities l ON l.id = s.liability_id
+    WHERE l.source != 'detected' AND s.status != 'dismissed'
+    AND s.kind IN ('loan','mortgage') AND s.bank_account_id IS NOT NULL`).all() as ScheduledItem[];
   // dismissed ones too: they still tell what the payment looks like on the bank statement
-  const detected = db.prepare(`SELECT * FROM scheduled_items WHERE liability_id IS NULL
-    AND kind IN ('loan','mortgage') AND bank_account_id IS NOT NULL`).all() as ScheduledItem[];
+  // (repayments linked to a loan the pipeline created count as detected: src/analytics/loans.ts)
+  const detected = db.prepare(`SELECT s.* FROM scheduled_items s LEFT JOIN liabilities l ON l.id = s.liability_id
+    WHERE (s.liability_id IS NULL OR l.source = 'detected')
+    AND s.kind IN ('loan','mortgage') AND s.bank_account_id IS NOT NULL`).all() as ScheduledItem[];
   const dismiss = db.prepare(`UPDATE scheduled_items SET status = 'dismissed' WHERE id = ?`);
   const setPattern = db.prepare(`UPDATE scheduled_items SET match_pattern = ? WHERE id = ?`);
   const near = (a: number, b: number, tol: number) => Math.abs(Math.abs(a) - Math.abs(b)) <= Math.abs(b) * tol;
