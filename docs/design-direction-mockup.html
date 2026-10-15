@@ -1,0 +1,770 @@
+<title>FamilyCFO Apple Direction</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Color rule: one tint (blue) for interaction and the main data series, status colors only where something is wrong, everything else in label grays. Contrast values are opaque and AA-checked.
+   Layout: Apple's grouped background with a floating glass sidebar and toolbar; an illustrated hero (outlined flat vectors on a pastel panel); Health-style tiles, Apple Card activity, Fitness rings, Wallet-style lists. */
+:root {
+  /* Apple system colors (HIG reference values; the platform may shift them between releases) */
+  --bg: #f2f2f7;
+  --card: #ffffff;
+  --elevated: #ffffff;
+  --label: #000000;
+  --label-2: #636366;           /* opaque secondary label: 5.4:1 on the page, 6.0:1 on cards */
+  --label-3: #8e8e93;           /* non-text marks only (chevrons, ticks): 3.3:1 on cards */
+  --separator: rgba(60, 60, 67, 0.18);
+  --fill: rgba(120, 120, 128, 0.12);
+  --fill-2: rgba(120, 120, 128, 0.2);
+  --glass: rgba(255, 255, 255, 0.62);
+  --glass-strong: rgba(250, 250, 252, 0.82);
+  --glass-edge: rgba(255, 255, 255, 0.75);
+  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  --blue: #007aff;
+  --green: #34c759;
+  --red: #ff3b30;
+  --orange: #ff9500;
+  --yellow: #ffcc00;
+  --pink: #ff2d55;
+  --purple: #af52de;
+  --indigo: #5856d6;
+  --teal: #30b0c7;
+  --mint: #00c7be;
+  --gray: #8e8e93;
+  /* text-safe variants (Apple's increased-contrast values) for colored text */
+  --tint: #0068d6;              /* buttons, links, focus, selection: white on it 5.3:1 */
+  --tint-text: #0058b8;
+  --green-text: #1f7a35;
+  --red-text: #d70015;
+  --blue-text: #0040dd;
+  --orange-text: #c93400;
+
+  /* illustration layer: outlined flat vectors on pastel panels */
+  --ink-line: #1d1d1f;
+  --panel-sky: #dcecfd;
+  --panel-line: #1d1d1f;
+  --ill-blue: #4b87f5;
+  --ill-blue-2: #a9c7fb;
+  --ill-yellow: #fbbc04;
+  --ill-paper: #ffffff;
+  --ill-cloud: rgba(255, 255, 255, 0.85);
+
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Hebrew", system-ui, "Segoe UI", "Arial Hebrew", sans-serif;
+  --font-rounded: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --r-card: 20px;
+  --r-group: 14px;
+  --r-panel: 32px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000; --card: #1c1c1e; --elevated: #2c2c2e; --label: #ffffff;
+    --label-2: #a1a1a8; --label-3: #7c7c80;
+    --separator: rgba(84, 84, 88, 0.55); --fill: rgba(120, 120, 128, 0.24); --fill-2: rgba(120, 120, 128, 0.36);
+    --glass: rgba(44, 44, 46, 0.55); --glass-strong: rgba(28, 28, 30, 0.78); --glass-edge: rgba(255, 255, 255, 0.12);
+    --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+    --blue: #0a84ff; --green: #30d158; --red: #ff453a; --orange: #ff9f0a; --yellow: #ffd60a; --pink: #ff375f;
+    --purple: #bf5af2; --indigo: #5e5ce6; --teal: #40c8e0; --mint: #63e6e2; --gray: #8e8e93;
+    --green-text: #30d158; --red-text: #ff6961; --blue-text: #409cff; --orange-text: #ffb340; --tint: #0068d6; --tint-text: #409cff;
+    --panel-sky: #13263d; --panel-line: rgba(255, 255, 255, 0.28); --ill-cloud: rgba(255, 255, 255, 0.08);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #000000; --card: #1c1c1e; --elevated: #2c2c2e; --label: #ffffff;
+  --label-2: #a1a1a8; --label-3: #7c7c80;
+  --separator: rgba(84, 84, 88, 0.55); --fill: rgba(120, 120, 128, 0.24); --fill-2: rgba(120, 120, 128, 0.36);
+  --glass: rgba(44, 44, 46, 0.55); --glass-strong: rgba(28, 28, 30, 0.78); --glass-edge: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --blue: #0a84ff; --green: #30d158; --red: #ff453a; --orange: #ff9f0a; --yellow: #ffd60a; --pink: #ff375f;
+  --purple: #bf5af2; --indigo: #5e5ce6; --teal: #40c8e0; --mint: #63e6e2; --gray: #8e8e93;
+  --green-text: #30d158; --red-text: #ff6961; --blue-text: #409cff; --orange-text: #ffb340; --tint: #0068d6; --tint-text: #409cff;
+  --panel-sky: #13263d; --panel-line: rgba(255, 255, 255, 0.28); --ill-cloud: rgba(255, 255, 255, 0.08);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--label);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+.num { font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+:focus-visible { outline: 2px solid var(--tint); outline-offset: 2px; border-radius: 8px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+/* accessibility settings: no glass when transparency is reduced, stronger lines when more contrast is asked for */
+@media (prefers-reduced-transparency: reduce) {
+  .glass, .sidebar-inner { background: var(--card) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+}
+@media (prefers-contrast: more) {
+  :root { --label-2: var(--label); --separator: var(--label-3); }
+  .card, .group, .tile { outline: 1px solid var(--label-3); }
+}
+svg.i { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: inset 0 0 0 0.5px var(--glass-edge), var(--glass-shadow);
+}
+
+.app { display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: 100%; }
+
+/* ---- sidebar: floating, more opaque glass ---- */
+.sidebar { position: sticky; top: 0; align-self: start; height: 100vh; padding: 10px; }
+.sidebar-inner {
+  height: 100%; border-radius: 22px; padding: 14px 10px; overflow-y: auto;
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
+  box-shadow: inset 0 0 0 0.5px var(--glass-edge), var(--glass-shadow);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.who { display: flex; align-items: center; gap: 10px; padding: 4px 8px 8px; }
+.who .avatars { display: flex; }
+.who .avatars span { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--fill-2); color: var(--label); font-weight: 600; font-size: 13px; border: 2px solid var(--card); }
+.who .avatars span + span { margin-inline-start: -10px; }
+.who b { font-size: 14px; display: block; }
+.who small { color: var(--label-2); font-size: 12px; }
+.nav-sec { display: flex; flex-direction: column; gap: 1px; }
+.nav-sec h4 { margin: 0 0 3px; padding-inline: 10px; font-size: 11px; font-weight: 600; color: var(--label-2); }
+.nav-sec a { display: flex; align-items: center; gap: 9px; padding: 5px 8px; border-radius: 8px; color: var(--label); text-decoration: none; font-size: 13px; }
+.nav-sec a:hover { background: var(--fill); }
+.nav-sec a[aria-current="page"] { background: var(--fill-2); font-weight: 600; }
+.tile-ic { width: 22px; height: 22px; display: grid; place-items: center; color: var(--label-2); font-size: 17px; flex-shrink: 0; }
+.nav-sec a[aria-current="page"] .tile-ic { color: var(--tint-text); }
+.nav-sec a .badge { margin-inline-start: auto; color: var(--label-2); font-size: 12px; }
+
+/* ---- main ---- */
+main {
+  padding-block: 10px 96px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  min-width: 0;
+}
+@media (min-width: 900px) { main { padding-inline: 20px 28px; } }
+.content { max-width: 1120px; margin-inline: auto; display: flex; flex-direction: column; gap: 22px; }
+
+.toolbar {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 10px); z-index: 5;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 6px; border-radius: 999px; width: fit-content; max-width: 100%; margin-inline-start: auto;
+}
+.seg { display: inline-flex; padding: 2px; border-radius: 999px; background: var(--fill); }
+.seg button { padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--elevated); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12); font-weight: 600; }
+.icon-btn { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; }
+.icon-btn:hover { background: var(--fill); }
+.month-nav { display: inline-flex; align-items: center; gap: 2px; font-weight: 600; font-size: 13px; }
+.btn-prominent { padding: 7px 16px; border-radius: 999px; background: var(--tint); color: #fff; font-weight: 600; font-size: 13px; }
+
+/* ---- illustrated hero (outlined vector style) ---- */
+.hero {
+  background: var(--panel-sky); border: 1.5px solid var(--panel-line); border-radius: var(--r-panel);
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center; gap: 12px;
+  padding: 28px 32px 0; overflow: hidden;
+}
+.hero-text { padding-bottom: 28px; display: flex; flex-direction: column; gap: 12px; }
+.hero .eyebrow { display: inline-flex; align-items: center; gap: 8px; width: fit-content; padding: 5px 12px; border-radius: 10px; background: var(--card); font-size: 13px; font-weight: 500; }
+.hero h1 { font-size: 36px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; }
+.hero p { margin: 0; font-size: 17px; line-height: 1.45; max-width: 46ch; }
+.hero p .hl { font-weight: 600; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.pill { padding: 11px 22px; border-radius: 999px; font-size: 15px; font-weight: 500; border: 1.5px solid var(--panel-line); }
+.pill-fill { background: var(--tint); border-color: var(--tint); color: #fff; }
+.pill-line { background: var(--card); }
+.hero-art { align-self: end; }
+.hero-art svg { width: 100%; height: auto; display: block; }
+.example { color: var(--label-2); font-size: 12px; }
+@media (max-width: 860px) {
+  .hero { grid-template-columns: minmax(0, 1fr); padding: 22px 20px 0; }
+  .hero h1 { font-size: 30px; }
+  .hero-art { max-width: 420px; margin-inline: auto; width: 100%; }
+}
+
+/* ---- Health-style tiles ---- */
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 1100px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .tiles { grid-template-columns: minmax(0, 1fr); } }
+.tile { background: var(--card); border-radius: var(--r-card); padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; text-align: start; width: 100%; }
+.tile:hover { background: color-mix(in srgb, var(--card) 94%, var(--label)); }
+.tile-head { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; }
+.tile-head > svg { color: var(--label-2); }
+.status { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; }
+.status.warn { color: var(--orange-text); }
+.status.bad { color: var(--red-text); }
+.tile-head .meta { margin-inline-start: auto; display: inline-flex; align-items: center; gap: 4px; color: var(--label-2); font-weight: 400; font-size: 12px; }
+.value { font-family: var(--font-rounded); font-weight: 600; font-size: 30px; line-height: 1.1; letter-spacing: -0.01em; }
+.value small { font-family: var(--font); font-size: 15px; color: var(--label-2); font-weight: 500; margin-inline-start: 3px; }
+.tile-foot { font-size: 12px; color: var(--label-2); }
+.pair { display: grid; gap: 5px; margin-top: 2px; }
+.pair .row { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 8px; font-size: 12px; color: var(--label-2); }
+.bar { height: 6px; border-radius: 3px; background: var(--fill); overflow: hidden; position: relative; }
+.bar span { position: absolute; inset-block: 0; inset-inline-start: 0; border-radius: 3px; }
+.spark { width: 100%; height: 40px; display: block; }
+
+/* ---- cards ---- */
+.grid-2 { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 1100px) { .grid-2 { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--card); border-radius: var(--r-card); padding: 16px; min-width: 0; position: relative; }
+.card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.card-head h2 { font-size: 17px; font-weight: 600; }
+.card-head .meta { color: var(--label-2); font-size: 12px; }
+.card-head a { color: var(--tint-text); text-decoration: none; font-size: 13px; }
+.card-head a:hover { text-decoration: underline; }
+.big-line { font-family: var(--font-rounded); font-size: 26px; font-weight: 600; }
+.big-line small { font-family: var(--font); font-size: 13px; color: var(--label-2); font-weight: 400; margin-inline-start: 6px; }
+.activity svg, .forecast svg { width: 100%; height: auto; display: block; overflow: visible; }
+.ranked { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; }
+@media (max-width: 520px) { .ranked { grid-template-columns: minmax(0, 1fr); } }
+.ranked li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; font-size: 13px; }
+.ranked li .bar { grid-column: 1 / -1; height: 4px; }
+.ranked li .bar span { background: var(--label-3); }
+.ranked li:first-child .bar span { background: var(--blue); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px; font-size: 12px; color: var(--label-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.tip { position: absolute; pointer-events: none; z-index: 3; padding: 8px 10px; border-radius: 12px; font-size: 12px; white-space: nowrap; transform: translate(-50%, -110%); min-width: 120px; }
+.tip b { font-family: var(--font-rounded); font-size: 15px; display: block; }
+.tip .r { display: flex; justify-content: space-between; gap: 12px; color: var(--label-2); }
+
+.rings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 8px; }
+.ring { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; min-width: 0; }
+.ring svg { width: 64px; height: 64px; transform: rotate(-90deg); }
+.ring { cursor: default; }
+.ring .n { font-size: 12px; font-weight: 600; }
+.ring .l { font-size: 11px; color: var(--label-2); }
+.ring .l.over { color: var(--red-text); font-weight: 600; }
+.ring .l.warn { color: var(--orange-text); font-weight: 600; }
+
+.group { background: var(--card); border-radius: var(--r-group); overflow: hidden; }
+.group-label { font-size: 13px; color: var(--label-2); padding: 0 16px 6px; display: flex; justify-content: space-between; }
+.cell { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto 14px; align-items: center; gap: 12px; padding: 9px 14px; position: relative; width: 100%; text-align: start; }
+.cell + .cell::before { content: ""; position: absolute; top: 0; inset-inline-end: 0; inset-inline-start: 60px; border-top: 0.5px solid var(--separator); }
+.cell:hover { background: var(--fill); }
+.cell .ic { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--fill); color: var(--label-2); font-size: 17px; }
+.cell .ic.bad { background: var(--red); color: #fff; }
+.cell .ic.warn { background: var(--orange); color: #000; }
+.cell .t { min-width: 0; }
+.cell .t b { display: block; font-weight: 500; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell .t small { display: block; color: var(--label-2); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell .amt { font-size: 14px; font-weight: 500; text-align: end; }
+.cell .amt.in { color: var(--green-text); }
+.cell .chev { color: var(--label-3); font-size: 13px; }
+.issuer { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-inline-end: 5px; vertical-align: 1px; }
+.cents { font-size: 0.8em; }
+.lists { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+@media (max-width: 1100px) { .lists { grid-template-columns: minmax(0, 1fr); } }
+.stack { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+
+/* spot panel (illustration style, smaller) */
+.spot {
+  background: var(--panel-sky); border: 1.5px solid var(--panel-line); border-radius: 26px;
+  padding: 18px 18px 0; display: flex; flex-direction: column; gap: 8px; overflow: hidden;
+}
+.spot h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.015em; }
+.spot p { margin: 0; font-size: 14px; color: var(--label); opacity: 0.8; }
+.spot .pill { width: fit-content; padding: 8px 16px; font-size: 14px; margin-top: 4px; }
+.spot svg { width: 100%; height: auto; display: block; margin-top: 4px; }
+
+/* phone: sidebar becomes a glass tab bar */
+.tabbar { display: none; }
+@media (max-width: 760px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .sidebar { display: none; }
+  .toolbar { margin-inline-start: 0; }
+  .tabbar {
+    display: flex; position: fixed; z-index: 6; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+    justify-content: space-around; padding: 6px; border-radius: 999px;
+  }
+  .tabbar a { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: var(--label); text-decoration: none; padding: 4px 10px; border-radius: 999px; }
+  .tabbar a svg { font-size: 20px; }
+  .tabbar a[aria-current="page"] { color: var(--tint-text); background: var(--fill); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tile, .cell, .seg button, .nav-sec a, .pill { transition: background-color 160ms ease-out, transform 160ms ease-out; }
+  .pill:active { transform: scale(0.97); }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><path d="M4 5h16v15H4zM4 10h16M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-pie" viewBox="0 0 24 24"><path d="M20 13A8 8 0 1 1 11 4v9z"/><path d="M15 3.5A8 8 0 0 1 20.5 9H15z"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M3 15c3-6 5-6 7 0s4 6 7 0 3-4 4-4"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><path d="M7.5 7.5h.01"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7h15a3 3 0 0 1 3 3v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l12-4v4M16.5 14h.01"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 20V11M11 20V5M17 20v-6M3 20h18"/></symbol>
+    <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10h18L12 4zM5.5 10v8M10 10v8M14 10v8M18.5 10v8M3 20h18"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3 4h2l2.4 11h11L21 7H6.2"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17.5" cy="19.5" r="1.3"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 16V10l2-5h10l2 5v6M3 16h18v3H3zM7.5 13h.01M16.5 13h.01"/></symbol>
+    <symbol id="i-cup" viewBox="0 0 24 24"><path d="M4 8h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM17 10h1.5a2 2 0 0 1 0 4H17M8 3v2M12 3v2"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+    <symbol id="i-kid" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M8 21l2-7-3-3 5-2 5 2-3 3 2 7"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><path d="M3 6h18v12H3zM3 10h18M7 15h4"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 8v5M12 16.5h.01"/><circle cx="12" cy="12" r="9"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></symbol>
+  </defs>
+</svg>
+
+<div class="app" dir="rtl" lang="he">
+  <aside class="sidebar" aria-label="ניווט ראשי">
+    <div class="sidebar-inner">
+      <div class="who">
+        <div class="avatars"><span>ד</span><span>י</span></div>
+        <div><b>הכספים של הבית</b><small>דנה ויואב</small></div>
+      </div>
+      <nav class="nav-sec">
+        <h4>החודש</h4>
+        <a href="#" aria-current="page"><span class="tile-ic"><svg class="i"><use href="#i-home"/></svg></span>סקירה</a>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-list"/></svg></span>תנועות<span class="badge num">212</span></a>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-cal"/></svg></span>קבועות החודש</a>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-pie"/></svg></span>תקציב</a>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-wave"/></svg></span>תזרים</a>
+      </nav>
+      <nav class="nav-sec">
+        <h4>תכנון</h4>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-trend"/></svg></span>מגמות</a>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-bulb"/></svg></span>תובנות והתראות</a>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-tag"/></svg></span>אירועים ותגיות</a>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-wallet"/></svg></span>חסכונות והון</a>
+      </nav>
+      <nav class="nav-sec">
+        <h4>לטווח ארוך</h4>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-chart"/></svg></span>השקעות</a>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-sparkle"/></svg></span>פנסיה וגמל</a>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-bank"/></svg></span>הלוואות ומשכנתא</a>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-shield"/></svg></span>ביטוחים</a>
+      </nav>
+      <nav class="nav-sec">
+        <h4>הגדרות</h4>
+        <a href="#"><span class="tile-ic"><svg class="i"><use href="#i-sliders"/></svg></span>הגדרות</a>
+      </nav>
+    </div>
+  </aside>
+
+  <main>
+    <div class="content">
+      <div class="toolbar glass">
+        <div class="seg" role="group" aria-label="בן משפחה">
+          <button type="button" aria-pressed="true">כולם</button>
+          <button type="button" aria-pressed="false">דנה</button>
+          <button type="button" aria-pressed="false">יואב</button>
+        </div>
+        <div class="month-nav">
+          <button type="button" class="icon-btn" aria-label="החודש הקודם"><svg class="i"><use href="#i-chev-r"/></svg></button>
+          <span>אוקטובר 2026</span>
+          <button type="button" class="icon-btn" aria-label="החודש הבא"><svg class="i"><use href="#i-chev"/></svg></button>
+        </div>
+        <button type="button" class="icon-btn" id="theme" aria-label="ערכת צבע: מערכת" title="ערכת צבע"><svg class="i"><use href="#i-moon"/></svg></button>
+        <button type="button" class="btn-prominent">עדכון מהבנקים</button>
+      </div>
+
+      <section class="hero" aria-labelledby="hero-h">
+        <div class="hero-text">
+          <span class="eyebrow">אוקטובר 2026 · <span class="example">נתוני דוגמה</span></span>
+          <h1 id="hero-h">בוקר טוב, דנה ויואב</h1>
+          <p>החודש בדרך הנכונה. צפוי להישאר <span class="num hl" data-money="4120"></span> בסוף אוקטובר, והחיוב הבא הוא כאל ב-2 בנובמבר.</p>
+          <div class="actions">
+            <button type="button" class="pill pill-fill">הוספת הוצאה צפויה</button>
+            <button type="button" class="pill pill-line">לתזרים המלא</button>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <svg viewBox="0 0 420 250" dir="ltr">
+            <!-- clouds (no outline, like the reference) -->
+            <path d="M24 92c0-14 12-24 26-22 5-12 24-14 32-2 12-2 22 8 20 20H24z" fill="var(--ill-cloud)"/>
+            <path d="M300 54c0-10 9-17 19-15 4-9 18-10 23-1 9-1 16 6 15 14h-57z" fill="var(--ill-cloud)"/>
+            <!-- green hill -->
+            <path d="M268 250c4-46 26-74 56-74 28 0 40 22 44 44 14-6 34-2 40 30z" fill="var(--ill-blue-2)" stroke="var(--ink-line)" stroke-width="2" stroke-linejoin="round"/>
+            <!-- bar-chart sheet -->
+            <g stroke="var(--ink-line)" stroke-width="2" stroke-linejoin="round">
+              <path d="M96 250V112h66l22 22v116" fill="var(--ill-paper)"/>
+              <path d="M162 112v22h22" fill="var(--ill-blue-2)"/>
+              <rect x="112" y="176" width="16" height="50" fill="var(--ill-yellow)"/>
+              <rect x="134" y="152" width="16" height="74" fill="var(--ill-blue)"/>
+              <rect x="156" y="190" width="16" height="36" fill="var(--ill-blue-2)"/>
+              <path d="M110 140h36M110 128h22" fill="none"/>
+            </g>
+            <!-- envelope (budget) -->
+            <g stroke="var(--ink-line)" stroke-width="2" stroke-linejoin="round">
+              <rect x="176" y="150" width="120" height="84" fill="var(--ill-blue-2)"/>
+              <path d="M176 150l60 46 60-46" fill="none"/>
+              <path d="M176 234l46-40M296 234l-46-40" fill="none"/>
+            </g>
+            <!-- card -->
+            <g transform="rotate(-12 268 118)" stroke="var(--ink-line)" stroke-width="2" stroke-linejoin="round">
+              <rect x="222" y="92" width="96" height="60" rx="8" fill="var(--ill-blue)"/>
+              <rect x="234" y="106" width="18" height="13" rx="2" fill="var(--ill-yellow)"/>
+              <path d="M234 136h40" fill="none"/>
+            </g>
+            <!-- coins with a solid offset shadow -->
+            <g stroke="var(--ink-line)" stroke-width="2">
+              <ellipse cx="72" cy="214" rx="30" ry="12" fill="var(--ink-line)"/>
+              <ellipse cx="72" cy="206" rx="30" ry="12" fill="var(--ill-yellow)"/>
+              <ellipse cx="78" cy="190" rx="30" ry="12" fill="var(--ink-line)"/>
+              <ellipse cx="78" cy="182" rx="30" ry="12" fill="var(--ill-yellow)"/>
+            </g>
+            <text x="78" y="187" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink-line)" font-family="system-ui, sans-serif">₪</text>
+            <!-- issuer disc with solid shadow -->
+            <g stroke="var(--ink-line)" stroke-width="2">
+              <circle cx="356" cy="122" r="25" fill="var(--ink-line)"/>
+              <circle cx="352" cy="117" r="25" fill="var(--ill-paper)"/>
+              <circle cx="352" cy="117" r="11" fill="none" stroke="var(--ill-blue)" stroke-width="5"/>
+            </g>
+            <!-- sparkles -->
+            <g stroke="var(--ink-line)" stroke-width="2" stroke-linecap="round">
+              <path d="M54 40v16M46 48h16"/>
+              <path d="M212 40v14M205 47h14"/>
+              <path d="M392 196v14M385 203h14"/>
+              <path d="M150 74v12M144 80h12"/>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <div class="tiles">
+        <button type="button" class="tile">
+          <div class="tile-head"><svg class="i"><use href="#i-wave"/></svg>צפוי להישאר<span class="meta">עד 31.10<svg class="i"><use href="#i-chev"/></svg></span></div>
+          <div class="value"><span class="num">4,120</span><small>₪</small></div>
+          <div class="pair">
+            <div class="row"><span>נכנס</span><div class="bar"><span style="width:93%;background:var(--blue)"></span></div><span class="num">31,480 / 33,880</span></div>
+            <div class="row"><span>יצא</span><div class="bar"><span style="width:77%;background:var(--blue)"></span></div><span class="num">22,915 / 29,760</span></div>
+          </div>
+        </button>
+        <button type="button" class="tile">
+          <div class="tile-head"><svg class="i"><use href="#i-bank"/></svg>עו״ש הפועלים<span class="meta">היום 07:40<svg class="i"><use href="#i-chev"/></svg></span></div>
+          <div class="value"><span class="num">3,850</span><small>₪</small></div>
+          <svg class="spark" id="spark" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true"></svg>
+          <div class="tile-foot">היה מתחת לאפס 3 ימים, בתוך המסגרת</div>
+        </button>
+        <button type="button" class="tile">
+          <div class="tile-head"><svg class="i"><use href="#i-card"/></svg>החיוב הבא<span class="meta">בעוד 18 ימים<svg class="i"><use href="#i-chev"/></svg></span></div>
+          <div class="value"><span class="num">2,480</span><small>₪</small></div>
+          <div class="tile-foot">כאל ·· 3310, ב-2 בנובמבר<br>כולל 3 תשלומים בסך <span class="num" data-money="640"></span></div>
+        </button>
+        <button type="button" class="tile">
+          <div class="tile-head"><svg class="i"><use href="#i-pie"/></svg>מעטפות<span class="meta">16 ימים לסוף החודש<svg class="i"><use href="#i-chev"/></svg></span></div>
+          <div class="value"><span class="num">2</span><small>מתוך 6 דורשות תשומת לב</small></div>
+          <span class="status bad"><svg class="i"><use href="#i-alert"/></svg>מסעדות חרגה ב-<span class="num" data-money="340"></span></span>
+          <span class="status warn"><svg class="i"><use href="#i-clock"/></svg>ילדים וחוגים כמעט ריקה</span>
+        </button>
+      </div>
+
+      <div class="grid-2">
+        <section class="card activity" aria-labelledby="act-h" id="activity">
+          <div class="card-head">
+            <h2 id="act-h">הוצאות שוטפות</h2>
+            <span class="meta">לפי יום, לא כולל קבועות</span>
+          </div>
+          <div class="big-line"><span class="num" id="act-total"></span><small>עד היום, 1–15 באוקטובר</small></div>
+          <svg id="act-svg" dir="ltr" style="direction:ltr" viewBox="0 0 640 190" role="img" aria-label="הוצאות שוטפות לפי יום וקטגוריה, 1 עד 15 באוקטובר"></svg>
+          <ol class="ranked" id="act-legend" aria-label="לפי קטגוריה"></ol>
+          <table class="sr-only" id="act-table"><caption>הוצאות שוטפות לפי יום</caption><thead><tr><th>יום</th><th>סכום</th></tr></thead><tbody></tbody></table>
+          <div class="tip glass" id="act-tip" hidden></div>
+        </section>
+        <section class="card" aria-labelledby="env-h">
+          <div class="card-head">
+            <h2 id="env-h">מעטפות</h2>
+            <a href="#">לכל התקציב</a>
+          </div>
+          <div class="rings" id="rings"></div>
+        </section>
+      </div>
+
+      <section class="card forecast" aria-labelledby="fc-h" id="forecast">
+        <div class="card-head">
+          <h2 id="fc-h">יתרת העו״ש לאורך החודש</h2>
+          <span class="meta">הפועלים · חשבון משותף · עודכן היום 07:40</span>
+        </div>
+        <svg id="fc-svg" dir="ltr" style="direction:ltr" viewBox="0 0 760 220" role="img" aria-label="יתרת העו״ש לאורך אוקטובר: נמוכה ביותר מינוס 1,830 ש״ח ב-11 באוקטובר, צפי לסוף החודש 4,120 ש״ח"></svg>
+        <div class="tip glass" id="fc-tip" hidden></div>
+      </section>
+
+      <div class="lists">
+        <div class="stack" id="txns"></div>
+        <div class="stack">
+          <div>
+            <div class="group-label"><span>דורש תשומת לב</span></div>
+            <div class="group">
+              <button type="button" class="cell">
+                <span class="ic bad"><svg class="i"><use href="#i-alert"/></svg></span>
+                <span class="t"><b>מסעדות ובתי קפה</b><small>חרגתם ב-<span class="num" data-money="340"></span> מהמעטפה</small></span>
+                <span></span><svg class="i chev"><use href="#i-chev"/></svg>
+              </button>
+              <button type="button" class="cell">
+                <span class="ic warn"><svg class="i"><use href="#i-clock"/></svg></span>
+                <span class="t"><b>מקס ·· 8821 לא עודכן</b><small>לפני 6 ימים</small></span>
+                <span></span><svg class="i chev"><use href="#i-chev"/></svg>
+              </button>
+              <button type="button" class="cell">
+                <span class="ic"><svg class="i"><use href="#i-up"/></svg></span>
+                <span class="t"><b>נטפליקס התייקר</b><small><span class="num" data-money="59.9" data-cents="1"></span> ← <span class="num" data-money="69.9" data-cents="1"></span> בחודש</small></span>
+                <span></span><svg class="i chev"><use href="#i-chev"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <section class="spot" aria-labelledby="spot-h">
+            <h3 id="spot-h">מתכננים חופשה בדצמבר?</h3>
+            <p>הוסיפו אותה כהוצאה צפויה, והתזרים יתחשב בה עוד לפני שהכרטיס יחויב.</p>
+            <button type="button" class="pill pill-line">הוספת הוצאה צפויה</button>
+            <svg viewBox="0 0 320 130" dir="ltr" aria-hidden="true">
+              <g stroke="var(--ink-line)" stroke-width="2" stroke-linejoin="round">
+                <!-- calendar page -->
+                <rect x="40" y="38" width="110" height="92" rx="6" fill="var(--ill-paper)"/>
+                <path d="M40 60h110" fill="none"/>
+                <rect x="40" y="38" width="110" height="22" rx="6" fill="var(--ill-blue)"/>
+                <path d="M64 30v16M126 30v16" fill="none" stroke-linecap="round"/>
+                <rect x="58" y="74" width="16" height="14" fill="var(--ill-blue-2)"/>
+                <rect x="86" y="74" width="16" height="14" fill="var(--ill-yellow)"/>
+                <rect x="114" y="74" width="16" height="14" fill="var(--ill-paper)"/>
+                <rect x="58" y="98" width="16" height="14" fill="var(--ill-paper)"/>
+                <rect x="86" y="98" width="16" height="14" fill="var(--ill-paper)"/>
+                <!-- plane -->
+                <path d="M196 70l78-34c10-4 18 4 12 12l-50 46-6-14-22 4z" fill="var(--ill-paper)"/>
+                <path d="M230 80l-34-10 14-8 34 4z" fill="var(--ill-blue)"/>
+                <path d="M236 94l-4 22 12-10 4-22z" fill="var(--ill-yellow)"/>
+                <path d="M186 104l-14 12M196 110l-10 10M178 96l-12 8" fill="none" stroke-dasharray="3 4" stroke-linecap="round"/>
+              </g>
+              <!-- island -->
+              <path d="M220 130c6-16 20-22 34-22 16 0 26 8 30 22z" fill="var(--ill-blue-2)" stroke="var(--ink-line)" stroke-width="2" stroke-linejoin="round"/>
+              <g stroke="var(--ink-line)" stroke-width="2" stroke-linecap="round">
+                <path d="M290 34v12M284 40h12"/>
+                <path d="M174 30v10M169 35h10"/>
+              </g>
+            </svg>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="tabbar glass" aria-label="ניווט">
+    <a href="#" aria-current="page"><svg class="i"><use href="#i-home"/></svg>סקירה</a>
+    <a href="#"><svg class="i"><use href="#i-list"/></svg>תנועות</a>
+    <a href="#"><svg class="i"><use href="#i-pie"/></svg>תקציב</a>
+    <a href="#"><svg class="i"><use href="#i-wave"/></svg>תזרים</a>
+    <a href="#"><svg class="i"><use href="#i-sliders"/></svg>עוד</a>
+  </nav>
+</div>
+
+<script>
+(() => {
+  const ils = new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 });
+  const ils2 = new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const money = (n, cents) => (cents ? ils2 : ils).format(n);
+  const fmt = n => (n < 0 ? '−' : '') + money(Math.abs(n));
+  document.querySelectorAll('[data-money]').forEach(el => { el.textContent = money(Number(el.dataset.money), el.dataset.cents); });
+
+  const root = document.documentElement, tbtn = document.getElementById('theme');
+  const modes = ['system', 'light', 'dark'], names = { system: 'מערכת', light: 'בהיר', dark: 'כהה' };
+  let mode = 'system';
+  tbtn.addEventListener('click', () => {
+    mode = modes[(modes.indexOf(mode) + 1) % 3];
+    if (mode === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', mode);
+    tbtn.setAttribute('aria-label', 'ערכת צבע: ' + names[mode]);
+  });
+  document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () =>
+    b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)))));
+
+  // ---- categories (Apple system hues, fixed order) ----
+  const CATS = [
+    { k: 'סופר', icon: 'i-cart', total: 2160 },
+    { k: 'מסעדות', icon: 'i-cup', total: 1540 },
+    { k: 'ילדים וחוגים', icon: 'i-kid', total: 1720 },
+    { k: 'רכב ודלק', icon: 'i-car', total: 980 },
+    { k: 'חשבונות', icon: 'i-bolt', total: 743 },
+    { k: 'בילויים', icon: 'i-sparkle', total: 310 },
+  ];
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const days = Array.from({ length: 15 }, () => CATS.map(() => 0));
+  CATS.forEach((cat, ci) => {
+    const n = 4 + Math.floor(rnd() * 5);
+    const picks = Array.from({ length: n }, () => Math.floor(rnd() * 15));
+    const w = picks.map(() => 0.4 + rnd());
+    const sw = w.reduce((a, b) => a + b, 0);
+    let left = cat.total;
+    picks.forEach((d, i) => { const v = i === n - 1 ? left : Math.round(cat.total * w[i] / sw); days[d][ci] += v; left -= v; });
+  });
+  const total = CATS.reduce((s, c) => s + c.total, 0);
+  document.getElementById('act-total').textContent = money(total);
+  const topCat = Math.max(...CATS.map(c => c.total));
+  document.getElementById('act-legend').innerHTML = [...CATS].sort((a, b) => b.total - a.total).map(c =>
+    `<li><span>${c.k}</span><span class="num">${money(c.total)}</span><span class="bar"><span style="width:${(c.total / topCat * 100).toFixed(0)}%"></span></span></li>`).join('');
+  document.querySelector('#act-table tbody').innerHTML = days.map((d, i) => `<tr><td>${i + 1}.10</td><td>${money(d.reduce((a, b) => a + b, 0))}</td></tr>`).join('');
+
+  const svg = document.getElementById('act-svg');
+  const W = 640, H = 190, m = { t: 8, r: 8, b: 22, l: 40 };
+  const max = Math.max(...days.map(d => d.reduce((a, b) => a + b, 0)));
+  const yMax = Math.ceil(max / 500) * 500;
+  const bw = (W - m.l - m.r) / 15;
+  const y = v => m.t + (1 - v / yMax) * (H - m.t - m.b);
+  let g = '';
+  [0, yMax / 2, yMax].forEach(v => {
+    g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--separator)" stroke-width="1" ${v ? 'stroke-dasharray="2 4"' : ''}/>`;
+    g += `<text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="var(--label-2)">${v ? (v / 1000).toLocaleString('he-IL') + 'K' : '0'}</text>`;
+  });
+  days.forEach((d, i) => {
+    const x0 = m.l + i * bw + bw * 0.22, w = bw * 0.56;
+    const v = d.reduce((a, b) => a + b, 0);
+    if (v > 0) {
+      const top = y(v), bot = y(0), r = Math.min(4, w / 2, bot - top);
+      g += `<path d="M${x0} ${bot}V${top + r}q0 -${r} ${r} -${r}h${w - 2 * r}q${r} 0 ${r} ${r}V${bot}z" fill="${i === 14 ? 'var(--tint)' : 'var(--blue)'}"/>`;
+    }
+    if (i % 2 === 0 || i === 14) g += `<text x="${x0 + w / 2}" y="${H - 6}" text-anchor="middle" font-size="11" fill="var(--label-2)">${i + 1}</text>`;
+    g += `<rect class="hit" data-d="${i}" x="${m.l + i * bw}" y="${m.t}" width="${bw}" height="${H - m.t - m.b}" fill="transparent"/>`;
+  });
+  svg.innerHTML = g;
+  const actTip = document.getElementById('act-tip'), actCard = document.getElementById('activity');
+  svg.querySelectorAll('.hit').forEach(h => {
+    h.addEventListener('pointerenter', () => {
+      const i = +h.dataset.d, d = days[i];
+      const rows = d.map((v, ci) => v ? `<div class="r"><span>${CATS[ci].k}</span><span class="num">${money(v)}</span></div>` : '').join('');
+      actTip.innerHTML = `${i + 1} באוקטובר<b class="num">${money(d.reduce((a, b) => a + b, 0))}</b>${rows || '<div class="r">אין הוצאות</div>'}`;
+      const sr = svg.getBoundingClientRect(), cr = actCard.getBoundingClientRect(), hr = h.getBoundingClientRect();
+      actTip.style.left = (hr.left - cr.left + hr.width / 2) + 'px';
+      actTip.style.top = (sr.top - cr.top + 10) + 'px';
+      actTip.hidden = false;
+    });
+    h.addEventListener('pointerleave', () => { actTip.hidden = true; });
+  });
+
+  // ---- envelopes as rings ----
+  const ENV = [
+    { k: 'סופר', spent: 2160, limit: 3200 },
+    { k: 'מסעדות', spent: 1540, limit: 1200 },
+    { k: 'ילדים וחוגים', spent: 1720, limit: 1900 },
+    { k: 'רכב ודלק', spent: 980, limit: 1400 },
+    { k: 'בילויים', spent: 310, limit: 800 },
+    { k: 'ביגוד', spent: 0, limit: 600 },
+  ];
+  const R = 26, C = 2 * Math.PI * R;
+  document.getElementById('rings').innerHTML = ENV.map(e => {
+    const p = e.spent / e.limit, over = p > 1;
+    const first = Math.min(1, p), extra = over ? Math.min(1, p - 1) : 0;
+    const left = e.limit - e.spent, warn = !over && p > 0.85;
+    const label = `${e.k}: ${over ? 'חריגה של' : 'נשארו'} ${money(Math.abs(left))} מתוך ${money(e.limit)}`;
+    return `<div class="ring" role="img" aria-label="${label}">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="${R}" fill="none" stroke="var(--fill-2)" stroke-width="8"/>
+        ${first > 0 ? `<circle cx="32" cy="32" r="${R}" fill="none" stroke="${warn ? 'var(--orange)' : 'var(--blue)'}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(first * C).toFixed(1)} ${C.toFixed(1)}"/>` : ''}
+        ${over ? `<circle cx="32" cy="32" r="${R}" fill="none" stroke="var(--red)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(extra * C).toFixed(1)} ${C.toFixed(1)}"/>` : ''}
+      </svg>
+      <span class="n" aria-hidden="true">${e.k}</span>
+      <span class="l${over ? ' over' : warn ? ' warn' : ''}" aria-hidden="true">${over ? 'חריגה ' : warn ? 'כמעט ריקה, ' : 'נשארו '}<span class="num">${money(Math.abs(left))}</span></span>
+    </div>`;
+  }).join('');
+
+  // ---- transactions as grouped lists ----
+  const ISS = { isracard: ['ישראכרט ·· 4417', '#f7941d'], max: ['מקס ·· 8821', '#0d6efd'], hapoalim: ['עו״ש הפועלים', '#e30613'] };
+  const cat = k => CATS.find(c => c.k === k) || { icon: 'i-card' };
+  const TX = [
+    { day: 'היום', rows: [
+      { d: 'שופרסל דיל', s: 'רמת גן', k: 'סופר', p: 'isracard', a: -486.3 },
+      { d: 'פז אקספרס', s: 'דלק', k: 'רכב ודלק', p: 'max', a: -312 },
+      { d: 'ארומה', s: '', k: 'מסעדות', p: 'isracard', a: -54 },
+    ]},
+    { day: 'אתמול', rows: [
+      { d: 'החזר ביטוח בריאות', s: 'הראל', k: 'הכנסה', p: 'hapoalim', a: 640, inc: true },
+      { d: 'חוג שחייה', s: 'תשלום 3 מתוך 10', k: 'ילדים וחוגים', p: 'isracard', a: -220 },
+      { d: 'חברת החשמל', s: 'הוראת קבע', k: 'חשבונות', p: 'hapoalim', a: -742.6 },
+    ]},
+  ];
+  const amount = n => {
+    const parts = ils2.formatToParts(Math.abs(n)).map(p => p.type === 'fraction' || p.type === 'decimal' ? `<span class="cents">${p.value}</span>` : p.value).join('');
+    return (n < 0 ? '−' : '+') + parts;
+  };
+  document.getElementById('txns').innerHTML = TX.map(grp => {
+    const sum = grp.rows.reduce((s, r) => s + r.a, 0);
+    return `<div>
+      <div class="group-label"><span>${grp.day}</span><span class="num">${amount(sum)}</span></div>
+      <div class="group">${grp.rows.map(r => {
+        const c = r.inc ? { icon: 'i-heart' } : cat(r.k);
+        return `<button type="button" class="cell">
+          <span class="ic"><svg class="i"><use href="#${c.icon}"/></svg></span>
+          <span class="t"><b>${r.d}</b><small>${ISS[r.p][0]}${r.s ? ' · ' + r.s : ''}</small></span>
+          <span class="amt num${r.a > 0 ? ' in' : ''}">${amount(r.a)}</span>
+          <svg class="i chev"><use href="#i-chev"/></svg>
+        </button>`;
+      }).join('')}</div>
+    </div>`;
+  }).join('');
+
+  // ---- forecast (Stocks-style line with area) ----
+  const today = 15;
+  const values = [12800, 10100, 9900, 9800, 8500, 8400, 8300, 7100, 6900, 2600, -1830, -1650, -400, 6900, 3850,
+    3700, 3600, 2800, 2700, 1200, 1100, 3100, 3050, 3000, 4500, 4450, 4400, 4300, 4250, 4180, 4120];
+  const daily = values.map((v, i) => ({ d: i + 1, v }));
+  const fsvg = document.getElementById('fc-svg');
+  const FW = 760, FH = 220, fm = { t: 14, r: 12, b: 26, l: 48 };
+  const fyMin = -11500, fyMax = 14000;
+  const fx = d => fm.l + (d - 1) / 30 * (FW - fm.l - fm.r);
+  const fy = v => fm.t + (fyMax - v) / (fyMax - fyMin) * (FH - fm.t - fm.b);
+  const path = pts => pts.map((p, i) => (i ? 'L' : 'M') + fx(p.d).toFixed(1) + ' ' + fy(p.v).toFixed(1)).join(' ');
+  const actual = daily.slice(0, today), future = daily.slice(today - 1);
+  let f = `<defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--blue)" stop-opacity="0.22"/><stop offset="1" stop-color="var(--blue)" stop-opacity="0"/></linearGradient></defs>`;
+  [-10000, -5000, 0, 5000, 10000].forEach(v => {
+    f += `<line x1="${fm.l}" x2="${FW - fm.r}" y1="${fy(v)}" y2="${fy(v)}" stroke="var(--separator)" ${v ? 'stroke-dasharray="2 4"' : ''}/>`;
+    f += `<text x="${fm.l - 8}" y="${fy(v) + 4}" text-anchor="end" font-size="11" fill="var(--label-2)">${v === 0 ? '0' : (v < 0 ? '−' : '') + Math.abs(v / 1000) + 'K'}</text>`;
+  });
+  f += `<path d="${path(actual)} L${fx(today)} ${fy(fyMin)} L${fx(1)} ${fy(fyMin)} Z" fill="url(#area)"/>`;
+  f += `<line x1="${fm.l}" x2="${FW - fm.r}" y1="${fy(-10000)}" y2="${fy(-10000)}" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="6 4"/>`;
+  f += `<text x="${fm.l + 6}" y="${fy(-10000) - 6}" font-size="11" fill="var(--red-text)" font-weight="600">מסגרת −₪10,000</text>`;
+  [1, 8, 15, 22, 29].forEach(d => { f += `<text x="${fx(d)}" y="${FH - 6}" text-anchor="middle" font-size="11" fill="var(--label-2)">${d}.10</text>`; });
+  [2, 10, 15].forEach(d => { f += `<circle cx="${fx(d)}" cy="${FH - fm.b + 1}" r="2.5" fill="var(--label-2)"/>`; });
+  f += `<path d="${path(actual)}" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  f += `<path d="${path(future)}" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-dasharray="1 5" stroke-linecap="round" stroke-opacity="0.7"/>`;
+  const low = daily[10];
+  f += `<circle cx="${fx(low.d)}" cy="${fy(low.v)}" r="5" fill="var(--card)" stroke="var(--label)" stroke-width="2"/>`;
+  f += `<text x="${fx(low.d) + 9}" y="${fy(low.v) + 18}" font-size="11" fill="var(--label)" font-weight="600">הנמוכה ביותר, 11.10</text>`;
+  f += `<circle cx="${fx(today)}" cy="${fy(daily[today - 1].v)}" r="5" fill="var(--blue)" stroke="var(--card)" stroke-width="2.5"/>`;
+  f += `<line id="fc-cross" x1="0" x2="0" y1="${fm.t}" y2="${FH - fm.b}" stroke="var(--label-3)" visibility="hidden"/>`;
+  f += `<circle id="fc-dot" r="5" fill="var(--blue)" stroke="var(--card)" stroke-width="2.5" visibility="hidden"/>`;
+  f += `<rect id="fc-hit" x="${fm.l}" y="${fm.t}" width="${FW - fm.l - fm.r}" height="${FH - fm.t - fm.b}" fill="transparent"/>`;
+  fsvg.innerHTML = f;
+  const ftip = document.getElementById('fc-tip'), fcard = document.getElementById('forecast');
+  const charge = { 2: 'כאל', 10: 'ישראכרט', 15: 'מקס' };
+  const cross = document.getElementById('fc-cross'), dot = document.getElementById('fc-dot');
+  document.getElementById('fc-hit').addEventListener('pointermove', e => {
+    const pt = fsvg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const loc = pt.matrixTransform(fsvg.getScreenCTM().inverse());
+    const d = Math.max(1, Math.min(31, Math.round((loc.x - fm.l) / (FW - fm.l - fm.r) * 30) + 1));
+    const p = daily[d - 1];
+    cross.setAttribute('x1', fx(d)); cross.setAttribute('x2', fx(d)); cross.setAttribute('visibility', 'visible');
+    dot.setAttribute('cx', fx(d)); dot.setAttribute('cy', fy(p.v)); dot.setAttribute('visibility', 'visible');
+    const sr = fsvg.getBoundingClientRect(), cr = fcard.getBoundingClientRect();
+    ftip.style.left = (sr.left - cr.left + fx(d) / FW * sr.width) + 'px';
+    ftip.style.top = (sr.top - cr.top + fy(p.v) / FH * sr.height - 8) + 'px';
+    ftip.innerHTML = `${d}.10 · ${d <= today ? 'בפועל' : 'צפי'}${charge[d] ? ' · חיוב ' + charge[d] : ''}<b class="num">${fmt(p.v)}</b>`;
+    ftip.hidden = false;
+  });
+  document.getElementById('fc-hit').addEventListener('pointerleave', () => { ftip.hidden = true; cross.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden'); });
+
+  // ---- spark in the checking tile ----
+  const sp = document.getElementById('spark');
+  const sx = i => i / 30 * 200, sy = v => 4 + (14000 - v) / 25500 * 32;
+  sp.innerHTML = `<line x1="0" x2="200" y1="${sy(0)}" y2="${sy(0)}" stroke="var(--separator)" stroke-dasharray="2 3"/>` +
+    `<path d="${values.slice(0, today).map((v, i) => (i ? 'L' : 'M') + sx(i).toFixed(1) + ' ' + sy(v).toFixed(1)).join(' ')}" fill="none" stroke="var(--blue)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>` +
+    `<path d="${values.slice(today - 1).map((v, i) => (i ? 'L' : 'M') + sx(i + today - 1).toFixed(1) + ' ' + sy(v).toFixed(1)).join(' ')}" fill="none" stroke="var(--blue)" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="1 4" vector-effect="non-scaling-stroke" stroke-linecap="round"/>`;
+})();
+</script>
