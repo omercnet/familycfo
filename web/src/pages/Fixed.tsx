@@ -305,7 +305,7 @@ export default function Fixed() {
 }
 
 const PLANNED_STATE = {
-  planned: { label: 'צפוי ⏳', cls: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300' },
+  planned: { label: 'צפוי ⏳', cls: 'bg-fill text-foreground' },
   overdue: { label: 'עוד לא חויב', cls: 'chip-warning' },
   choose: { label: 'לבחור חיוב', cls: 'chip-info' },
   matched: { label: 'חויב ✓', cls: '' },

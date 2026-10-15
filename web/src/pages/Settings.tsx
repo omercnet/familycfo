@@ -120,7 +120,7 @@ export default function Settings() {
                   <td>{category(r.setCategoryId)?.name ?? '—'}</td>
                   <td>{meta.businesses.find(b => b.id === r.setBusinessId)?.name ?? '—'}{r.setBusinessSharePct && r.setBusinessSharePct !== 100 ? ` (${r.setBusinessSharePct}%)` : ''}</td>
                   <td>{meta.members.find(m => m.id === r.setMemberId)?.name ?? '—'}</td>
-                  <td><button className="btn-ghost text-rose-600 hover:text-rose-700 dark:text-rose-400" onClick={() => remove.mutate(`/rules/${r.id}`)}>מחק</button></td>
+                  <td><button className="btn-ghost text-negative hover:text-negative-strong" onClick={() => remove.mutate(`/rules/${r.id}`)}>מחק</button></td>
                 </tr>
               ))}
             </tbody>
@@ -132,7 +132,7 @@ export default function Settings() {
       <Section title="תגיות" icon={Tags} color="var(--chart-6)">
         <div className="flex flex-wrap gap-2">
           {meta.tags.map(t => (
-            <span key={t.id} className="chip min-h-7 gap-1 pe-1">#{t.name}<button type="button" aria-label={`מחק #${t.name}`} className="flex h-5 w-5 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-zinc-200 hover:text-foreground dark:hover:bg-zinc-700" onClick={() => remove.mutate(`/tags/${t.id}`)}><X className="h-3 w-3" /></button></span>
+            <span key={t.id} className="chip min-h-7 gap-1 pe-1">#{t.name}<button type="button" aria-label={`מחק #${t.name}`} className="flex h-5 w-5 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-fill-2 hover:text-foreground" onClick={() => remove.mutate(`/tags/${t.id}`)}><X className="h-3 w-3" /></button></span>
           ))}
         </div>
         <div className="mt-4 flex gap-2">
@@ -148,7 +148,7 @@ export default function Settings() {
             {sync.data?.map(s => (
               <tr key={s.company}>
                 <td>{s.company}</td><td className="text-xs">{day(s.startedAt)}</td>
-                <td>{s.success ? <span className="text-emerald-600">✓</span> : <span className="text-rose-600" title={s.errorMessage ?? ''}>✗ {s.errorType}</span>}</td>
+                <td>{s.success ? <span className="text-positive">✓</span> : <span className="text-negative" title={s.errorMessage ?? ''}>✗ {s.errorType}</span>}</td>
                 <td className="text-xs">{day(s.lastSuccess)}</td><td className="text-end">{s.newTransactions}</td>
               </tr>
             ))}

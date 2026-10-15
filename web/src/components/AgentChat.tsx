@@ -62,7 +62,7 @@ function toolLabel(name: string, input: Record<string, unknown> | undefined): st
 function inline(text: string): ReactNode[] {
   return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).map((part, i) =>
     part.startsWith('**') && part.endsWith('**') ? <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>
-      : part.startsWith('`') && part.endsWith('`') ? <code key={i} className="rounded bg-muted px-1 text-[0.85em]">{part.slice(1, -1)}</code>
+      : part.startsWith('`') && part.endsWith('`') ? <code key={i} className="rounded bg-muted px-1 code-inline">{part.slice(1, -1)}</code>
       : <Fragment key={i}>{part}</Fragment>);
 }
 
@@ -243,7 +243,7 @@ export function AgentChat() {
         </button>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-[oklch(0.2_0.04_272/0.35)] backdrop-blur-[1px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-(--scrim) backdrop-blur-[1px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
         <Dialog.Content dir="rtl" aria-describedby={undefined}
           className="fixed inset-y-0 end-0 z-50 flex w-full flex-col border-e bg-background shadow-(--shadow-overlay) sm:w-[min(30rem,92vw)]
             pt-[env(safe-area-inset-top)] data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left data-[state=open]:animate-in data-[state=open]:slide-in-from-left data-[state=closed]:duration-200 data-[state=open]:duration-300">
@@ -288,14 +288,14 @@ export function AgentChat() {
                     <LoaderCircle className="h-3.5 w-3.5 animate-spin" />{m.tools.length ? 'בודק בנתונים…' : 'חושב…'}
                   </div>
                 )}
-                {m.error && <div className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-500/10 dark:text-red-300" dir="auto">{m.error}</div>}
+                {m.error && <div className="rounded-lg bg-negative-soft px-3 py-2 text-xs text-negative-strong" dir="auto">{m.error}</div>}
               </div>
             ))}
           </div>
 
           <form className="border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]" onSubmit={e => { e.preventDefault(); send(input); }}>
-            {micError && <div className="mb-2 text-xs text-red-600">{micError}</div>}
-            <div className={cn('flex items-end gap-2 rounded-2xl border bg-card p-1.5 transition-shadow focus-within:border-ring', listening && 'border-rose-400 shadow-[0_0_0_3px_color-mix(in_oklab,var(--color-rose-500)_20%,transparent)]')}>
+            {micError && <div className="mb-2 text-xs text-negative">{micError}</div>}
+            <div className={cn('flex items-end gap-2 rounded-2xl border bg-card p-1.5 transition-shadow focus-within:border-ring', listening && 'border-negative shadow-[0_0_0_3px_color-mix(in_oklab,var(--color-negative)_20%,transparent)]')}>
               <textarea ref={textarea} rows={1} value={input} dir="auto" placeholder={listening ? 'מקשיב… שחרר כדי לשלוח' : 'שאלה על הנתונים…'}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(input); } }}
@@ -305,7 +305,7 @@ export function AgentChat() {
                   onPointerDown={e => { e.preventDefault(); startListening(); }} onPointerUp={stopListening} onPointerLeave={stopListening}
                   onKeyDown={e => { if (e.key === ' ' && !e.repeat) { e.preventDefault(); startListening(); } }}
                   onKeyUp={e => { if (e.key === ' ') stopListening(); }}
-                  className={cn('btn-ghost btn-icon shrink-0 touch-none select-none', listening && 'animate-pulse bg-rose-500 text-white hover:bg-rose-500')}>
+                  className={cn('btn-ghost btn-icon shrink-0 touch-none select-none', listening && 'animate-pulse bg-negative text-primary-foreground hover:bg-negative')}>
                   <Mic />
                 </button>
               )}

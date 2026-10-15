@@ -75,7 +75,7 @@ export function ScrapeButton() {
     <div className="flex flex-col items-end gap-1">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <button type="button" className={cn('btn', data?.otp ? 'border-amber-400 text-amber-700 dark:text-amber-300 animate-pulse' : !running && 'btn-primary')}
+          <button type="button" className={cn('btn', data?.otp ? 'border-warning text-warning animate-pulse' : !running && 'btn-primary')}
             onClick={e => { if (!running && !data?.otp) { e.preventDefault(); start.mutate(); } }}
             disabled={start.isPending}>
             {data?.otp ? <KeyRound /> : <RefreshCw className={cn(running && 'animate-spin')} />}
@@ -87,7 +87,7 @@ export function ScrapeButton() {
             {running ? 'מעדכן נתונים מהבנקים' : data?.status === 'failed' ? 'העדכון לא הצליח' : 'העדכון הסתיים'}
           </div>
           {data?.otp && (
-            <form className="space-y-2 border-b bg-amber-50/60 px-4 py-3 dark:bg-amber-500/10"
+            <form className="space-y-2 border-b bg-warning-soft px-4 py-3"
               onSubmit={e => { e.preventDefault(); if (code) sendOtp.mutate(); }}>
               <label className="block text-sm" htmlFor="scrape-otp">
                 {companyName(data.otp.company)} שלח קוד אימות ב-SMS. הקלד אותו כאן:
@@ -98,7 +98,7 @@ export function ScrapeButton() {
                   onChange={e => setCode(e.target.value.replace(/\D/g, ''))} />
                 <button type="submit" className="btn btn-primary" disabled={code.length < 4 || sendOtp.isPending}>שליחה</button>
               </div>
-              {sendOtp.error && <div className="text-xs text-red-600">{(sendOtp.error as Error).message}</div>}
+              {sendOtp.error && <div className="text-xs text-negative">{(sendOtp.error as Error).message}</div>}
             </form>
           )}
           <ul className="divide-y text-sm">
@@ -106,9 +106,9 @@ export function ScrapeButton() {
               <li key={c.company} className="flex items-start gap-2.5 px-4 py-2.5">
                 <span className="mt-0.5 shrink-0">
                   {c.status === 'running' ? <LoaderCircle className="h-4 w-4 animate-spin text-link" />
-                    : c.status === 'done' ? <Check className="h-4 w-4 text-emerald-600" />
-                    : c.status === 'failed' ? <X className="h-4 w-4 text-red-600" />
-                    : <Circle className="h-4 w-4 text-zinc-300" />}
+                    : c.status === 'done' ? <Check className="h-4 w-4 text-positive" />
+                    : c.status === 'failed' ? <X className="h-4 w-4 text-negative" />
+                    : <Circle className="h-4 w-4 text-muted-foreground" />}
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex justify-between gap-2">
@@ -119,7 +119,7 @@ export function ScrapeButton() {
                         : c.status === 'failed' ? 'נכשל' : 'בתור'}
                     </span>
                   </div>
-                  {c.error && <div className="mt-0.5 line-clamp-2 text-xs text-red-600" title={c.error} dir="auto">{c.error}</div>}
+                  {c.error && <div className="mt-0.5 line-clamp-2 text-xs text-negative" title={c.error} dir="auto">{c.error}</div>}
                 </div>
               </li>
             ))}
@@ -132,7 +132,7 @@ export function ScrapeButton() {
           </div>
         </PopoverContent>
       </Popover>
-      {start.error && <span className="text-xs text-red-600">{(start.error as Error).message}</span>}
+      {start.error && <span className="text-xs text-negative">{(start.error as Error).message}</span>}
       {!running && data?.lastSuccessAt && <span className="text-xs text-muted-foreground">עודכן {ago(data.lastSuccessAt)}</span>}
     </div>
   );

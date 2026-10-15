@@ -150,7 +150,7 @@ function PolicyCard({ policy: p, onOpen }: { policy: InsurancePolicy; onOpen: ()
         <span>{p.premium != null ? <><Money value={p.premium} className="font-semibold text-foreground" /> {FREQUENCIES.find(f => f.value === p.premiumFrequency)?.label}</> : 'פרמיה לא הוזנה'}</span>
         {p.payments.count > 0 && <span title={`${p.payments.count} חיובים, אחרון ${day(p.payments.lastDate)}`}>בפועל <Money value={p.payments.last12} /> ב-12 ח׳</span>}
         {p.endDate && (
-          <span className={cn('chip text-2xs', expired ? 'text-muted-foreground' : p.renewalSoon && 'border-amber-300 bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300')}>
+          <span className={cn('chip text-2xs', expired ? 'text-muted-foreground' : p.renewalSoon && 'border-warning/40 bg-warning-soft text-warning-strong')}>
             <CalendarClock className="h-3 w-3" />{expired ? 'הסתיימה' : 'מתחדשת'} {day(p.endDate)}
           </span>
         )}

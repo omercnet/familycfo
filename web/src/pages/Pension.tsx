@@ -157,7 +157,7 @@ export default function Pension() {
                           <div className="text-xs text-muted-foreground">{p.employer} · {p.policyNumber}</div>
                         </td>
                         <td className="min-w-36 text-sm">{p.provider}</td>
-                        <td><span className={cn('chip text-2xs', p.status === 'active' ? 'border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300' : 'text-muted-foreground')}>
+                        <td><span className={cn('chip text-2xs', p.status === 'active' ? 'border-positive/40 bg-positive-soft text-positive-strong' : 'text-muted-foreground')}>
                           {p.status === 'active' ? 'פעיל' : 'לא פעיל'}</span></td>
                         <td className="text-end"><Money value={p.value} /></td>
                         <td className="whitespace-nowrap text-end text-xs">{p.managementFee ?? '—'}</td>

@@ -17,10 +17,10 @@ interface Source {
 }
 
 const STATE_LABEL: Record<Commitment['state'], { label: string; cls: string }> = {
-  paid: { label: 'ירד ✓', cls: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200' },
-  partial: { label: 'חלקי', cls: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' },
+  paid: { label: 'ירד ✓', cls: 'bg-positive-soft text-positive-strong' },
+  partial: { label: 'חלקי', cls: 'bg-warning-soft text-warning-strong' },
   pending: { label: 'צפוי', cls: '' },
-  missing: { label: 'עוד לא נראה', cls: 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-200' },
+  missing: { label: 'עוד לא נראה', cls: 'bg-negative-soft text-negative-strong' },
 };
 
 /**

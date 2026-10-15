@@ -16,7 +16,7 @@ export function PageHeader({ title, subtitle, actions, icon: Icon }: { title: st
           </span>
         )}
         <div className="min-w-0">
-          <h1 className="text-[1.375rem] font-bold leading-8 tracking-tight md:text-kpi">{title}</h1>
+          <h1 className="text-xl font-bold leading-8 tracking-tight md:text-kpi">{title}</h1>
           {subtitle && <p className="mt-0.5 max-w-3xl text-sm leading-relaxed text-muted-foreground">{subtitle}</p>}
         </div>
       </div>

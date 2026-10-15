@@ -97,7 +97,7 @@ function ScheduledTable({ items, all, dismissed, onPatch }: {
               <td className="min-w-20"><input className="input py-1 num" type="number" min={1} max={31} defaultValue={s.dayOfMonth} onBlur={e => Number(e.target.value) !== s.dayOfMonth && onPatch(path, { dayOfMonth: Number(e.target.value) })} /></td>
               <td className="min-w-36"><AccountSelect className="input py-1" kind="bank" value={s.bankAccountId} onChange={id => onPatch(path, { bankAccountId: id })} /></td>
               <td className="min-w-28"><MemberSelect className="input py-1" value={s.memberId} emptyLabel="משותף" onChange={id => onPatch(path, { memberId: id })} /></td>
-              <td className="min-w-32">{s.kind === 'card_charge' ? <span className="text-xs text-zinc-400">—</span> : (
+              <td className="min-w-32">{s.kind === 'card_charge' ? <span className="text-xs text-muted-foreground">—</span> : (
                 <input className="input py-1 text-xs" defaultValue={s.matchPattern ?? ''} placeholder="לפי השם"
                   onBlur={e => e.target.value !== (s.matchPattern ?? '') && onPatch(path, { matchPattern: e.target.value || null })} />
               )}</td>

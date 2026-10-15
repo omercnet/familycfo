@@ -104,9 +104,9 @@ function DayTooltip({ date, point, events, dailyRate }: { date: string; point?: 
     <TooltipCard
       title={<>{day(date)}{point && <span className="ms-2 font-normal text-muted-foreground">יתרה צפויה <span className="num font-semibold text-foreground">{money(point.expected)}</span></span>}</>}
       rows={events.length
-        ? events.map(e => ({ label: `${e.name}${e.estimated ? ' ~' : ''}`, value: <span className={e.amount < 0 ? 'text-negative' : 'text-positive'}>{money(e.amount)}</span>, color: e.amount < 0 ? 'var(--negative)' : 'var(--positive)' }))
+        ? events.map(e => ({ label: `${e.name}${e.estimated ? ' ~' : ''}`, value: <span className={`num ${e.amount < 0 ? 'text-negative' : 'text-positive'}`}>{money(e.amount)}</span>, color: e.amount < 0 ? 'var(--negative)' : 'var(--positive)' }))
         : [{ label: <span className="text-muted-foreground">אין חיובים מתוכננים ביום הזה</span>, value: '' }]}
-      footer={<>{dailyRate > 0 && <div>+ שוטף משוער ~{money(dailyRate)} ליום</div>}<div className="text-2xs">לחצו על היום לפירוט</div></>} />
+      footer={<>{dailyRate > 0 && <div>+ שוטף משוער ~<span className="num">{money(dailyRate)}</span> ליום</div>}<div className="text-2xs">לחצו על היום לפירוט</div></>} />
   );
 }
 

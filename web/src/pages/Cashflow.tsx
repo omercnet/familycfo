@@ -91,7 +91,7 @@ export default function Cashflow() {
                 {tight.cuts.map(c => (
                   <tr key={c.categoryId ?? c.name}>
                     <td>{c.name}</td><td className="text-end"><Money value={c.spentSoFar} /></td><td className="text-end"><Money value={c.typical} /></td>
-                    <td className="text-end"><Money value={c.projected} /></td><td className="text-end font-semibold text-rose-700"><Money value={c.suggestedCut} /></td>
+                    <td className="text-end"><Money value={c.projected} /></td><td className="text-end font-semibold text-negative"><Money value={c.suggestedCut} /></td>
                   </tr>
                 ))}
               </tbody>
@@ -120,7 +120,7 @@ export default function Cashflow() {
             )}
           </>
         )}
-        {f.warnings.length > 0 && <div className="mt-2 space-y-0.5 text-xs text-amber-700 dark:text-amber-300">{f.warnings.map(w => <div key={w} className="flex items-start gap-1.5"><TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />{w.replace(/^⚠\s*/, '')}</div>)}</div>}
+        {f.warnings.length > 0 && <div className="mt-2 space-y-0.5 text-xs text-warning">{f.warnings.map(w => <div key={w} className="flex items-start gap-1.5"><TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />{w.replace(/^⚠\s*/, '')}</div>)}</div>}
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-5">
@@ -134,7 +134,7 @@ export default function Cashflow() {
           </div>
           {memberTab !== 'all' && (
             <div className="animate-fade-in grid grid-cols-3 gap-2 px-4 pb-3 text-sm md:px-5">
-              <div><div className="label">נכנס</div><Money value={ledger.filter(e => e.amount > 0).reduce((s, e) => s + e.amount, 0)} className="font-semibold text-emerald-600" /></div>
+              <div><div className="label">נכנס</div><Money value={ledger.filter(e => e.amount > 0).reduce((s, e) => s + e.amount, 0)} className="font-semibold text-positive" /></div>
               <div><div className="label">יוצא</div><Money value={ledger.filter(e => e.amount < 0).reduce((s, e) => s + e.amount, 0)} className="font-semibold" /></div>
               <div><div className="label">נטו בתקופה</div><Money value={ledger.reduce((s, e) => s + e.amount, 0)} className="font-semibold" colored /></div>
             </div>
@@ -148,7 +148,7 @@ export default function Cashflow() {
             </tr></thead>
             <tbody>
               {ledger.map((e, i) => (
-                <tr key={i} className={e.balanceAfter < 0 ? 'bg-rose-50/60 dark:bg-rose-950/20' : ''}>
+                <tr key={i} className={e.balanceAfter < 0 ? 'bg-negative-soft' : ''}>
                   <td className="whitespace-nowrap">{day(e.date)}</td>
                   <td className="min-w-40">
                     {e.kind === 'card_charge' && e.cardAccountId
@@ -184,7 +184,7 @@ export default function Cashflow() {
               return (
                 <>
                   <SectionTitle icon={Banknote} color="var(--positive)">הכנסה ב{monthName(mi.cycle.key)}</SectionTitle>
-                  <Money value={mi.total} animated className="text-2xl font-semibold tracking-tight text-emerald-600 dark:text-emerald-400" />
+                  <Money value={mi.total} animated className="text-2xl font-semibold tracking-tight text-positive" />
                   <div className="mt-1 text-xs text-muted-foreground">נכנס <Money value={mi.received} /> · עוד צפוי <Money value={mi.pending} /></div>
                   <div className="mt-4 space-y-2.5 text-sm">
                     {mi.recurring.map(r => (

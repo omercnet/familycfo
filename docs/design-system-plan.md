@@ -1,6 +1,6 @@
 # Design system plan (web/)
 
-Status: direction approved 2026-10-15 (Apple-native, one tint plus status colors, AA-checked; see "Visual direction" and `docs/design-direction-mockup.html`). Phases 0 and 1 are implemented on branch `claude/lucid-vaughan-7f450d` (phase 0 merged in from `claude/charming-vaughan-b3db55`), not yet on main. Phase 2a (global tokens, system font, the hand-edit list below, accessibility settings, token contrast check) is implemented on top of it; phase 2b (Dashboard and transactions rebuild, illustrations) is not started.
+Status: direction approved 2026-10-15 (Apple-native, one tint plus status colors, AA-checked; see "Visual direction" and `docs/design-direction-mockup.html`). Phases 0 to 4 are implemented, including the illustration components in `web/src/illustrations/`; phase 5 (a visible theme toggle) is optional and not started.
 
 ## Problem
 
@@ -173,7 +173,7 @@ Phases 0 and 1 are designed to produce no visual change in light mode, which mak
 
 **Phase 3: composite consolidation (done).** `Modal` rebuilt on Radix Dialog (focus trap, scroll lock, inert background, Escape, focus return), and the bottom-sheet look on phones kept in CSS, so `kit/sheet` was not needed. `components/ui.tsx` split into `components/ui/{numbers,feedback,layout,overlays,forms}.tsx` behind `components/ui/index.ts`, so every `../components/ui` import is unchanged. Unused kit files (`dropdown-menu`, `select`, `sheet`) deleted; `npx shadcn add` restores any of them. `SectionTitle` already covers card headers, so `.card-title` was not pushed further.
 
-**Phase 4: page sweeps and lock.** Remaining arbitrary values and inline styles, largest files first: `Fixed` (398 lines), `Transactions` (358), `Dashboard` (323), `Insurance`, `Events`, `Pension`, `Investments`, `AgentChat`. Set all lint baselines to zero and flip to failing.
+**Phase 4: page sweeps and lock (done).** The remaining hand-rolled red/amber/green/zinc pairs and their `dark:` overrides (StartOfMonth, ScrapeButton, AgentChat, Cashflow, Categories, Fixed, Insights, Insurance, Pension, Settings and others) now use the tone tokens; the last arbitrary font sizes became `text-xl` and a `.code-inline` class; raw amounts in chart tooltips carry `.num`. Every rule's baseline is zero, so the design check (run by `npm --prefix web run typecheck`) fails on any new hit.
 
 **Phase 5 (optional):** visible theme toggle (open question 2).
 

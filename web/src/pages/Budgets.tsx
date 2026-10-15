@@ -146,7 +146,7 @@ export default function Budgets() {
                           }} />
                       </td>
                       <td className="text-end"><Money value={b.spent} /></td>
-                      <td className={`text-end ${b.budget != null && b.projected > b.budget ? 'text-rose-600' : ''}`}>
+                      <td className={`text-end ${b.budget != null && b.projected > b.budget ? 'text-negative' : ''}`}>
                         <Money value={b.projected} />
                         {b.planned > 0 && <div className="text-2xs text-muted-foreground" title="הוצאות שהזנת מראש ועוד לא חויבו">כולל צפוי <Money value={b.planned} /></div>}
                       </td>

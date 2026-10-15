@@ -80,7 +80,7 @@ export default function Insights() {
                   <span className={cn('icon-tile h-9 w-9', r.annualSaving > 0 && 'icon-tile-positive')}>{r.annualSaving > 0 ? <Sparkles /> : <Lightbulb />}</span>
                   <div className="min-w-0">
                     <div className="font-semibold">{r.title}</div>
-                    <p className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{r.detail}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{r.detail}</p>
                   </div>
                 </div>
                 {r.annualSaving > 0 && (
@@ -124,7 +124,7 @@ export default function Insights() {
                   <tr key={s.merchantKey + s.accountId}>
                     <td className="min-w-32 font-medium">{s.merchantKey}</td><td className="text-xs text-muted-foreground">{s.categoryName}</td>
                     <td className="text-end"><Money value={s.typicalAmount} cents /></td><td className="text-end"><Money value={s.typicalAmount * 12} /></td>
-                    <td className="whitespace-nowrap text-xs text-muted-foreground">{day(s.lastDate)}{s.lastAmount > s.typicalAmount * 1.05 && <span className="ms-1 text-rose-600">↑ <Money value={s.lastAmount} /></span>}</td>
+                    <td className="whitespace-nowrap text-xs text-muted-foreground">{day(s.lastDate)}{s.lastAmount > s.typicalAmount * 1.05 && <span className="ms-1 text-negative">↑ <Money value={s.lastAmount} /></span>}</td>
                   </tr>
                 ))}
               </tbody>

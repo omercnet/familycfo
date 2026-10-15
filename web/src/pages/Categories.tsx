@@ -52,7 +52,7 @@ export default function Categories() {
       <tr key={c.id} className={depth === 0 && hasChildren ? 'bg-muted' : ''}>
         <td className="min-w-56" style={{ paddingInlineStart: depth ? 32 : 8 }}>
           <div className="flex items-center gap-2">
-            {depth > 0 && <CornerDownLeft className="h-3.5 w-3.5 shrink-0 text-zinc-400" aria-hidden />}
+            {depth > 0 && <CornerDownLeft className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />}
             <span className="icon-tile h-7 w-7 rounded-lg [&_svg]:h-4 [&_svg]:w-4" style={{ ['--tile' as string]: hueFor(parentName ?? c.name) }}><Icon /></span>
             <input className={`input py-1 ${depth === 0 && hasChildren ? 'font-semibold' : ''}`} defaultValue={c.name} key={`${c.id}-${c.name}`}
               onBlur={e => e.target.value.trim() && e.target.value !== c.name && patch.mutate({ id: c.id, body: { name: e.target.value } })} />
@@ -77,7 +77,7 @@ export default function Categories() {
         <td className="whitespace-nowrap">
           <div className="flex items-center justify-end gap-0.5">
           {depth === 0 && <button className="btn-ghost text-xs" onClick={() => setAdding({ name: '', parentId: c.id })}><Plus />תת-קטגוריה</button>}
-          <button className="btn-ghost text-xs text-rose-600 hover:text-rose-700 dark:text-rose-400" onClick={() => setDeleting({ cat: c, moveTo: c.parentId })}><Trash2 />מחק / מזג</button>
+          <button className="btn-ghost text-xs text-negative hover:text-negative-strong" onClick={() => setDeleting({ cat: c, moveTo: c.parentId })}><Trash2 />מחק / מזג</button>
           </div>
         </td>
       </tr>
@@ -95,7 +95,7 @@ export default function Categories() {
           <button className="btn btn-primary" onClick={() => setAdding({ name: '', parentId: null })}><Plus />קטגוריה חדשה</button>
         </>} />
 
-      {error && <div role="alert" className="card animate-rise-in mb-3 border-rose-200 bg-rose-50/60 text-sm text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-200">{error}</div>}
+      {error && <div role="alert" className="card animate-rise-in mb-3 border-negative/40 bg-negative-soft text-sm text-negative-strong">{error}</div>}
 
       <div className="card animate-rise-in scroll-x p-0">
         <table className="table">
@@ -144,7 +144,7 @@ export default function Categories() {
             <CategorySelect value={deleting.moveTo} exclude={deleting.cat.id} emptyLabel="ללא קטגוריה (לסיווג מחדש)"
               onChange={moveTo => setDeleting({ ...deleting, moveTo })} />
           </Field>
-          {childrenOf(deleting.cat.id).length > 0 && <p className="text-xs text-amber-600">תתי-הקטגוריות שלה יהפכו לקטגוריות ראשיות.</p>}
+          {childrenOf(deleting.cat.id).length > 0 && <p className="text-xs text-warning">תתי-הקטגוריות שלה יהפכו לקטגוריות ראשיות.</p>}
         </Modal>
       )}
     </>

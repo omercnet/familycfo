@@ -682,6 +682,8 @@
   }
   /* agorot, a step smaller than the shekels (statement rows) */
   .cents { font-size: 0.8em; }
+  /* inline code in chat answers, a step smaller than the text around it */
+  .code-inline { font-size: 0.85em; }
 
   .skeleton {
     border-radius: 0.375rem;

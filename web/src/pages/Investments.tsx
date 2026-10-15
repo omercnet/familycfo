@@ -200,7 +200,7 @@ function HoldingEditor({ draft, onClose, onSaved }: { draft: Draft; onClose: () 
       {!d.manual && isNew && (
         <Field label="נייר (שם או סימול באנגלית — AAPL, VOO, TEVA.TA)">
           <div className="relative">
-            <Search className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+            <Search className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input className="input ps-8" dir="ltr" value={query} placeholder="nvidia / LUMI.TA"
               onChange={e => { setQuery(e.target.value); set({ symbol: undefined }); }}
               onKeyDown={e => { if (e.key === 'Enter' && query.trim()) set({ symbol: query.trim().toUpperCase() }); }} />
