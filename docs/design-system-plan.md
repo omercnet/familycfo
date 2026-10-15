@@ -1,6 +1,6 @@
 # Design system plan (web/)
 
-Status: direction approved 2026-10-15 (Apple-native, one tint plus status colors, AA-checked; see "Visual direction" and `docs/design-direction-mockup.html`). Phase 0 is implemented on its own branch, `claude/charming-vaughan-b3db55`, not yet merged; phases 1 and later are not started.
+Status: direction approved 2026-10-15 (Apple-native, one tint plus status colors, AA-checked; see "Visual direction" and `docs/design-direction-mockup.html`). Phases 0 and 1 are implemented on branch `claude/lucid-vaughan-7f450d` (phase 0 merged in from `claude/charming-vaughan-b3db55`), not yet on main; phases 2 and later are not started.
 
 ## Problem
 
