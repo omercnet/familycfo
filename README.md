@@ -198,6 +198,13 @@ Pension / study / provident fund reports and insurance summaries (e.g. from your
 or הר הביטוח) come as PDFs. Extract them to JSON (by hand, or ask an AI assistant to), keep the files in the
 git-ignored `data/reports/` folder, and import:
 
+For the pension clearing house (מסלקה פנסיונית), skip the extraction: import its XML files directly
+(fees, tracks, coverages and deposits included):
+
+```bash
+npm run import:mislaka   -- --member <name> data/mislaka/
+```
+
 ```bash
 npm run import:pension   -- data/reports/2026-08-pension-report.json
 npm run import:insurance -- data/reports/insurance.json

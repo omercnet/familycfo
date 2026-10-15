@@ -18,6 +18,7 @@
     "web": "npm --prefix web run dev",
     "migrate": "tsx src/db/migrate.ts",
     "import:pension": "tsx src/import/pensionReport.ts",
+    "import:mislaka": "tsx src/import/mislaka.ts",
     "import:insurance": "tsx src/import/insurancePolicies.ts",
     "pipeline": "tsx src/pipeline.ts",
     "test": "vitest run",
@@ -27,6 +28,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^12.11.1",
+    "fast-xml-parser": "^4.5.3",
     "fastify": "^5.12.5",
     "israeli-bank-scrapers": "^6.12.2",
     "node-cron": "^3.0.3",

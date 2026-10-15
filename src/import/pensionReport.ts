@@ -9,13 +9,18 @@ import { readFileSync } from 'fs';
 import { getDb, type DB } from '../db/connection.js';
 
 type Returns = [number | null, number | null, number | null, number | null, number | null, number | null, number | null];
-interface Product {
+export interface Product {
   type: 'pension' | 'keren_hishtalmut' | 'kupat_gemel';
   name: string; provider: string; policyNumber: string; balance: number;
   feeDeposit?: number | null; feeBalance?: number | null; employer?: string | null; status: 'active' | 'inactive'; joinDate?: string | null;
   lastDeposit?: string | null; regularDeposit?: number | null; insuredSalary?: number | null;
   expectedAnnuity?: number | null; expectedAnnuityWithDeposits?: number | null; agentOfRecord?: string | null;
-  tracks?: { name: string; share: number; balance: number; returns: Returns }[];
+  /** `periodReturn`: the net return for the report's own period (the clearing house's one figure per track) */
+  tracks?: { name: string; share: number; balance: number; returns: Returns; periodReturn?: number | null }[];
+  /** the product's net return for the report period */
+  periodReturn?: number | null;
+  /** management fees actually charged in the reporting month, in ₪ */
+  feesCharged?: { fromDeposits: number; fromBalance: number };
   components?: { pitzuyim: number; tagmulim: number; capital: number };
   coverages?: { name: string; pct: number; monthly: number }[];
   coverageCost?: { disability: number; survivors: number };
@@ -26,7 +31,7 @@ interface Policy {
   name: string; type: string; insurer: string; policyNumber: string; premium: number; premiumFrequency: string;
   startDate?: string | null; matchPattern?: string | null; coverage?: string | null; notes?: string | null;
 }
-interface Report {
+export interface Report {
   asOf: string; member: string; source: string; file?: string; issuedAt?: string;
   agent?: { name: string; agency?: string; phone?: string; email?: string };
   summary: Record<string, unknown> & { totalSavings: number };
@@ -59,6 +64,7 @@ export function importPensionReport(db: DB, report: Report): { assets: number; c
         product: p.name, tracks: p.tracks ?? [], components: p.components ?? null, coverages: p.coverages ?? [],
         coverageCost: p.coverageCost ?? null, insuredSalary: p.insuredSalary ?? null, expectedAnnuityWithDeposits: p.expectedAnnuityWithDeposits ?? null,
         lastDeposit: p.lastDeposit ?? null, agentOfRecord: p.agentOfRecord ?? null, reportAsOf: report.asOf,
+        periodReturn: p.periodReturn ?? null, feesCharged: p.feesCharged ?? null,
       });
       const values = {
         // several study funds can share a generic employer ("שכיר כללי") — the number's tail tells them apart
@@ -88,6 +94,10 @@ export function importPensionReport(db: DB, report: Report): { assets: number; c
       if (snap) db.prepare(`UPDATE asset_snapshots SET value = ? WHERE id = ?`).run(p.balance, snap);
       else db.prepare(`INSERT INTO asset_snapshots (asset_id, date, value, currency) VALUES (?, ?, ?, 'ILS')`).run(assetId, report.asOf, p.balance);
 
+      // the report is the record for the dates it covers: replace them (a NULL salary month never conflicts in the
+      // UNIQUE key, so an upsert would duplicate those rows on every re-import)
+      const dates = (p.deposits ?? []).map(d => d[0]).sort();
+      if (dates.length) db.prepare(`DELETE FROM asset_deposits WHERE asset_id = ? AND value_date BETWEEN ? AND ?`).run(assetId, dates[0], dates.at(-1));
       for (const [valueDate, month, salary, employee, employer, severance, total] of p.deposits ?? []) {
         deposits += db.prepare(`INSERT INTO asset_deposits (asset_id, value_date, salary_month, salary, employee, employer, severance, total)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)

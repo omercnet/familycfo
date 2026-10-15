@@ -37,6 +37,9 @@ export default function Pension() {
   if (error || !data) return <ErrorBox error={error} />;
   const { products, report, totals } = data;
   const s = report?.summary;
+  const expectedAnnuity = s?.expectedAnnuity;
+  const exposurePct = s?.exposurePct;
+  const tradedPct = s?.tradedPct;
 
   if (!products.length) {
     return (
@@ -62,11 +65,11 @@ export default function Pension() {
 
       <div className="grid grid-cols-2 gap-3 max-[22.5rem]:grid-cols-1 md:gap-4 lg:grid-cols-4">
         <Stat index={0} icon={PiggyBank} label="סך החיסכון" value={totals.value}
-          hint={s ? <>תשואה מתחילת השנה <span className="font-semibold text-positive">{s.ytdReturnPct}%</span></> : undefined} />
+          hint={s?.ytdReturnPct != null ? <>תשואה מתחילת השנה <span className="font-semibold text-positive">{s.ytdReturnPct}%</span></> : undefined} />
         <Stat index={1} icon={HandCoins} color="var(--chart-5)" label="הפקדות חודשיות" value={totals.monthlyDeposits}
           hint={`${totals.active} מוצרים פעילים מתוך ${products.length}`} />
-        <Stat index={2} icon={Umbrella} color="var(--chart-6)" label="קצבה חודשית צפויה בפרישה" value={s?.expectedAnnuity.totalWithoutDeposits ?? totals.expectedAnnuity}
-          hint={s ? <>בלי הפקדות נוספות · אם ההפקדות ימשיכו: <Money value={s.expectedAnnuity.pensionWithDeposits + s.expectedAnnuity.managers} /></> : undefined} />
+        <Stat index={2} icon={Umbrella} color="var(--chart-6)" label="קצבה חודשית צפויה בפרישה" value={expectedAnnuity?.totalWithoutDeposits ?? totals.expectedAnnuity}
+          hint={expectedAnnuity ? <>בלי הפקדות נוספות · אם ההפקדות ימשיכו: <Money value={expectedAnnuity.pensionWithDeposits + expectedAnnuity.managers} /></> : undefined} />
         <Stat index={3} icon={Banknote} color="var(--chart-2)" label="קרנות השתלמות נזילות היום" value={totals.liquidStudyFunds.value}
           hint={`${totals.liquidStudyFunds.count} קרנות, שעברו 6 שנים מההצטרפות (פטור ממס)`} />
       </div>
@@ -78,7 +81,7 @@ export default function Pension() {
             const Icon = TYPE_ICONS[g.type];
             return { key: g.type, name: SHORT_LABELS[g.type], value: totals.byType[g.type] ?? 0, icon: <Icon /> };
           })} />
-          {s && (
+          {s?.byProvider?.length ? (
             <div className="mt-3 space-y-1.5 border-t border-line-soft pt-3 text-sm">
               <div className="text-xs font-medium text-fg-subtle">לפי גוף מנהל</div>
               {s.byProvider.map(p => (
@@ -88,14 +91,14 @@ export default function Pension() {
                 </div>
               ))}
             </div>
-          )}
+          ) : null}
         </div>
 
-        {s && (
+        {exposurePct && tradedPct && s?.assetMixPct?.length ? (
           <div className="card min-w-0">
             <SectionTitle icon={Globe} color="var(--chart-5)">חשיפה ותמהיל השקעה</SectionTitle>
             <div className="space-y-3">
-              {[['מניות', s.exposurePct.stocks], ['חו״ל', s.exposurePct.abroad], ['מט״ח', s.exposurePct.foreignCurrency], ['נכסים סחירים', s.tradedPct.traded]].map(([label, v]) => (
+              {[['מניות', exposurePct.stocks], ['חו״ל', exposurePct.abroad], ['מט״ח', exposurePct.foreignCurrency], ['נכסים סחירים', tradedPct.traded]].map(([label, v]) => (
                 <div key={label as string}>
                   <div className="mb-1 flex justify-between text-sm"><span>{label}</span><span className="num font-semibold">{v}%</span></div>
                   <Progress value={v as number} max={100} />
@@ -108,7 +111,7 @@ export default function Pension() {
               ))}
             </div>
           </div>
-        )}
+        ) : null}
 
         <div className="card min-w-0">
           <SectionTitle icon={Info} color="var(--chart-3)">שווה לבדוק</SectionTitle>
@@ -122,9 +125,9 @@ export default function Pension() {
               <li><b>{totals.liquidStudyFunds.count} קרנות השתלמות כבר נזילות</b> (<Money value={totals.liquidStudyFunds.value} />).
                 {nextLiquid[0] && <> הבאה תהיה נזילה ב-{fullDate(nextLiquid[0].liquidityDate)}.</>}</li>
             )}
-            {s && s.coverage.noInfo.length > 0 && (
+            {s?.coverage?.noInfo.length ? (
               <li>בדוח אין מידע על: {s.coverage.noInfo.join(', ')}. אם יש לכם ביטוחים כאלה (למשל בקופת חולים או דרך הבנק), אפשר להוסיף אותם ב<Link to="/insurance" className="underline">ביטוחים</Link>.</li>
-            )}
+            ) : null}
           </ul>
           <p className="mt-3 text-xs text-fg-subtle">עובדות מהדוח בלבד, לא המלצה. לשינוי מסלול, איחוד קופות או ניוד — כדאי לדבר עם יועץ פנסיוני{s?.agent ? ` (${s.agent.name})` : ''}.</p>
         </div>
@@ -133,6 +136,9 @@ export default function Pension() {
       <div className="mt-4 space-y-4">
         {groups.map(g => {
           const Icon = TYPE_ICONS[g.type];
+          // a clearing house import has one net return for the report period instead of YTD / 12 months
+          const periodOnly = g.products.every(p => weightedReturn(p, 1) == null && weightedReturn(p, 2) == null)
+            && g.products.some(p => p.details?.periodReturn != null);
           return (
             <section key={g.type} className="card p-0">
               <SectionTitle icon={Icon} as="h2" action={<span className="text-sm font-normal text-fg-subtle"><Money value={totals.byType[g.type]} /></span>}>{TYPE_LABELS[g.type]}</SectionTitle>
@@ -140,7 +146,8 @@ export default function Pension() {
                 <table className="table">
                   <thead><tr>
                     <th>מוצר</th><th>גוף מנהל</th><th>סטטוס</th><th className="text-end">צבירה</th><th className="text-end">דמי ניהול</th>
-                    <th className="text-end">מתחילת השנה</th><th className="text-end">12 חודשים</th><th>{g.type === 'keren_hishtalmut' ? 'נזילה' : 'הפקדה'}</th>
+                    {periodOnly ? <th colSpan={2} className="whitespace-nowrap text-end">תשואה נטו (תקופת הדוח)</th>
+                      : <><th className="text-end">מתחילת השנה</th><th className="text-end">12 חודשים</th></>}<th>{g.type === 'keren_hishtalmut' ? 'נזילה' : 'הפקדה'}</th>
                   </tr></thead>
                   <tbody>
                     {g.products.map(p => (
@@ -154,8 +161,9 @@ export default function Pension() {
                           {p.status === 'active' ? 'פעיל' : 'לא פעיל'}</span></td>
                         <td className="text-end"><Money value={p.value} /></td>
                         <td className="whitespace-nowrap text-end text-xs">{p.managementFee ?? '—'}</td>
-                        <td className="num text-end text-positive">{pct(weightedReturn(p, 1))}</td>
-                        <td className="num text-end text-positive">{pct(weightedReturn(p, 2))}</td>
+                        {periodOnly ? <td colSpan={2} className="num text-end text-positive">{pct(p.details?.periodReturn)}</td> : <>
+                          <td className="num text-end text-positive">{pct(weightedReturn(p, 1))}</td>
+                          <td className="num text-end text-positive">{pct(weightedReturn(p, 2))}</td></>}
                         <td className="whitespace-nowrap text-xs">
                           {g.type === 'keren_hishtalmut'
                             ? (p.liquidNow ? <span className="font-semibold text-positive">נזילה</span> : day(p.liquidityDate))
@@ -178,6 +186,11 @@ export default function Pension() {
 
 function ProductDetails({ product: p, onClose }: { product: PensionProduct; onClose: () => void }) {
   const d = p.details;
+  // a clearing house import has one return per track for the report period, not the 7 standard periods
+  const periodOnly = !!d?.tracks.length && d.tracks.every(t => t.returns.every(r => r == null))
+    && (d.tracks.some(t => t.periodReturn != null) || d.periodReturn != null);
+  // a single track's return is the account's when the file only gives the account's
+  const trackReturn = (t: { periodReturn?: number | null }) => t.periodReturn ?? (d?.tracks.length === 1 ? d.periodReturn ?? null : null);
   const deposits = p.deposits.filter(x => x.salaryMonth);
   const chart = deposits.map(x => ({
     label: shortMonth(x.salaryMonth!),
@@ -188,7 +201,8 @@ function ProductDetails({ product: p, onClose }: { product: PensionProduct; onCl
       <div className="grid gap-3 text-sm sm:grid-cols-4">
         <Fact label="צבירה" value={<Money value={p.value} />} sub={p.valueDate ? `נכון ל-${day(p.valueDate)}` : undefined} />
         <Fact label="סטטוס" value={p.status === 'active' ? 'פעיל' : 'לא פעיל'} sub={p.employer ?? undefined} />
-        <Fact label="דמי ניהול" value={p.managementFee ?? '—'} sub={`כ-₪${Math.round(yearlyFees(p)).toLocaleString('he-IL')} בשנה`} />
+        <Fact label="דמי ניהול" value={p.managementFee ?? '—'} sub={`כ-₪${Math.round(yearlyFees(p)).toLocaleString('he-IL')} בשנה${d?.feesCharged
+          ? ` · נגבו בחודש הדיווח ₪${Math.round(d.feesCharged.fromDeposits + d.feesCharged.fromBalance).toLocaleString('he-IL')}` : ''}`} />
         <Fact label={p.type === 'keren_hishtalmut' ? 'נזילה' : 'הצטרפות'} value={p.type === 'keren_hishtalmut' ? (p.liquidNow ? 'כבר נזילה' : fullDate(p.liquidityDate)) : fullDate(p.joinDate)}
           sub={p.type === 'keren_hishtalmut' ? `הצטרפות ${day(p.joinDate)}` : `פוליסה ${p.policyNumber}`} />
         {p.expectedAnnuity != null && <Fact label="קצבה צפויה" value={<Money value={p.expectedAnnuity} />}
@@ -203,18 +217,21 @@ function ProductDetails({ product: p, onClose }: { product: PensionProduct; onCl
           <SectionTitle icon={ChartPie} as="h3">מסלולי השקעה ותשואות</SectionTitle>
           <div className="scroll-x">
             <table className="table text-sm">
-              <thead><tr><th>מסלול</th><th className="text-end">חלק</th><th className="text-end">צבירה</th>{RETURN_LABELS.map(l => <th key={l} className="whitespace-nowrap text-end">{l}</th>)}</tr></thead>
+              <thead><tr><th>מסלול</th><th className="text-end">חלק</th><th className="text-end">צבירה</th>
+                {periodOnly ? <th className="whitespace-nowrap text-end">תשואה נטו (תקופת הדוח)</th> : RETURN_LABELS.map(l => <th key={l} className="whitespace-nowrap text-end">{l}</th>)}</tr></thead>
               <tbody>
                 {d.tracks.map(t => (
                   <tr key={t.name}>
                     <td className="min-w-44">{t.name}</td><td className="num text-end">{t.share}%</td><td className="text-end"><Money value={t.balance} /></td>
-                    {t.returns.map((r, i) => <td key={i} className={cn('num text-end', r != null && r >= 0 && 'text-positive', r != null && r < 0 && 'text-negative')}>{pct(r)}</td>)}
+                    {(periodOnly ? [trackReturn(t)] : t.returns).map((r, i) => <td key={i} className={cn('num text-end', r != null && r >= 0 && 'text-positive', r != null && r < 0 && 'text-negative')}>{pct(r)}</td>)}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="mt-1 text-xs text-fg-subtle">תשואות לפי דיווח משרד האוצר למסלול, לא לחשבון הספציפי.</p>
+          <p className="mt-1 text-xs text-fg-subtle">{periodOnly
+            ? <>תשואה נטו לתקופת הדוח, כפי שדווחה במסלקה הפנסיונית{d.periodReturn != null ? <> · בחשבון כולו: {pct(d.periodReturn)}</> : null}.</>
+            : 'תשואות לפי דיווח משרד האוצר למסלול, לא לחשבון הספציפי.'}</p>
         </div>
       ) : null}
 

@@ -196,7 +196,11 @@ export interface PensionProduct {
   policyNumber: string | null; employer: string | null; status: 'active' | 'inactive' | null; joinDate: string | null;
   feeDepositPct: number | null; feeBalancePct: number | null; expectedAnnuity: number | null; notes: string | null; liquidNow: boolean;
   details: {
-    product: string; tracks: { name: string; share: number; balance: number; returns: TrackReturns }[];
+    product: string; tracks: { name: string; share: number; balance: number; returns: TrackReturns; periodReturn?: number | null }[];
+    /** net return for the report's own period (the clearing house's figure) */
+    periodReturn?: number | null;
+    /** management fees actually charged in the reporting month, in ₪ */
+    feesCharged?: { fromDeposits: number; fromBalance: number } | null;
     components: { pitzuyim: number; tagmulim: number; capital: number } | null;
     coverages: { name: string; pct: number; monthly: number }[]; coverageCost: { disability: number; survivors: number } | null;
     insuredSalary: number | null; expectedAnnuityWithDeposits: number | null; lastDeposit: string | null; agentOfRecord: string | null;
@@ -204,13 +208,13 @@ export interface PensionProduct {
   deposits: { valueDate: string; salaryMonth: string | null; salary: number | null; employee: number | null; employer: number | null; severance: number | null; total: number }[];
 }
 export interface PensionReportSummary {
-  totalSavings: number; ytdReturnPct: number; lifeHealthMonthlyPremium: number;
-  byProductType: { name: string; amount: number; pct: number }[]; byProvider: { name: string; amount: number; pct: number }[];
-  tradedPct: { traded: number; nonTraded: number }; exposurePct: { stocks: number; abroad: number; foreignCurrency: number };
-  assetMixPct: { name: string; pct: number }[];
-  monthlyDeposits: Record<string, number> & { total: number };
-  expectedAnnuity: { pensionWithoutDeposits: number; pensionWithDeposits: number; managers: number; totalWithoutDeposits: number };
-  coverage: { disability: number; death: number; noInfo: string[] };
+  totalSavings: number; ytdReturnPct?: number; lifeHealthMonthlyPremium?: number;
+  byProductType?: { name: string; amount: number; pct: number }[]; byProvider?: { name: string; amount: number; pct: number }[];
+  tradedPct?: { traded: number; nonTraded: number }; exposurePct?: { stocks: number; abroad: number; foreignCurrency: number };
+  assetMixPct?: { name: string; pct: number }[];
+  monthlyDeposits?: Record<string, number> & { total: number };
+  expectedAnnuity?: { pensionWithoutDeposits: number; pensionWithDeposits: number; managers: number; totalWithoutDeposits: number };
+  coverage?: { disability: number; death: number; noInfo: string[] };
   agent: { name: string; agency?: string; phone?: string; email?: string } | null; issuedAt: string | null;
 }
 export interface PensionOverview {
