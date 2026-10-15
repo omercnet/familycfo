@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { Check, Circle, KeyRound, LoaderCircle, RefreshCw, X } from 'lucide-react';
 import { api, type ScrapeJob } from '../api';
 import { Popover, PopoverContent, PopoverTrigger } from './kit/popover';
@@ -44,6 +45,18 @@ export function ScrapeButton() {
     mutationFn: () => api.post('/scrape/otp', { code }),
     onSuccess: () => { setCode(''); qc.invalidateQueries({ queryKey: ['scrape'] }); },
   });
+
+  // "scan again" from a failed-scrape alert links to ?scrape=1: start it, then drop the parameter
+  const [params, setParams] = useSearchParams();
+  const requested = params.get('scrape') === '1';
+  useEffect(() => {
+    if (!requested || !data) return;
+    const next = new URLSearchParams(params);
+    next.delete('scrape');
+    setParams(next, { replace: true });
+    if (!active(data.status)) start.mutate(); else setOpen(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requested, data]);
 
   // the bank asks for a code: open the panel so it's not missed
   const otpCompany = data?.otp?.company;

@@ -12,6 +12,8 @@ interface TxQuery {
   category?: string; account?: string; search?: string; kind?: string; review?: string; hideCardPayments?: string;
   /** YYYY-MM-DD: only card rows charged in that statement (same card, same charge month) */
   charge?: string;
+  /** comma-separated transaction ids (an alert's or a recommendation's rows): only these, whatever their date */
+  ids?: string;
   limit?: string; offset?: string;
 }
 
@@ -37,9 +39,12 @@ export function transactionRoutes(app: FastifyInstance, db: DB): void {
   app.get('/api/transactions', async req => {
     const q = req.query as TxQuery;
     let from = q.from, to = q.to;
-    if (q.cycle && !q.charge) ({ start: from, end: to } = cycleByKey(q.cycle, cycleStartDay(db)));
+    const ids = q.ids ? new Set(q.ids.split(',').map(Number).filter(Boolean)) : null;
+    if (ids) from = to = undefined;
+    else if (q.cycle && !q.charge) ({ start: from, end: to } = cycleByKey(q.cycle, cycleStartDay(db)));
     let txs = filterTx(loadTransactions(db, { from, to, includeExcluded: true }), parseFilter(q));
     // a card is charged once a month, so a statement = its rows whose charge date falls in that month
+    if (ids) txs = txs.filter(t => ids.has(t.id));
     if (q.charge) txs = txs.filter(t => t.processedDate.slice(0, 7) === q.charge!.slice(0, 7));
     if (q.kind) txs = txs.filter(t => q.kind!.split(',').includes(t.kind));
     if (q.review === '1') txs = txs.filter(needsReview);

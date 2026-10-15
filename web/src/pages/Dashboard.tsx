@@ -237,13 +237,14 @@ export default function Dashboard() {
           {data.alerts.length === 0 && <div className="text-sm text-zinc-500">אין התראות פתוחות 🎉</div>}
           <div className="stagger space-y-1">
             {data.alerts.map((a, i) => (
-              <div key={a.id} style={{ ['--i' as string]: i }} className="flex gap-2.5 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent/50">
+              <Link key={a.id} to={a.action?.href ?? '/insights'} style={{ ['--i' as string]: i }} className="flex gap-2.5 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent/50">
                 <SeverityDot severity={a.severity} />
                 <div className="min-w-0">
                   <div className="font-medium">{a.title}</div>
                   <div className="text-xs leading-relaxed text-zinc-500">{a.message}</div>
+                  {a.action && <div className="mt-0.5 text-xs font-medium text-primary">{a.action.label} ←</div>}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

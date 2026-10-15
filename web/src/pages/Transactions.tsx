@@ -49,6 +49,10 @@ export default function Transactions() {
   const [review, setReview] = useState(urlParams.get('review') === '1');
   // a card statement (from clicking an upcoming card charge): that card's rows charged in that month
   const [charge, setCharge] = useState<string | null>(urlParams.get('charge'));
+  // specific rows (from an alert or an insight), or a date range (a single day from an alert)
+  const [ids, setIds] = useState<string | null>(urlParams.get('ids'));
+  const [range, setRange] = useState<{ from: string; to: string } | null>(
+    urlParams.get('from') ? { from: urlParams.get('from')!, to: urlParams.get('to') ?? urlParams.get('from')! } : null);
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'date', dir: -1 });
   // keep the URL in sync so the filtered view can be bookmarked or opened again with Back
   useEffect(() => {
@@ -60,8 +64,10 @@ export default function Transactions() {
     if (kind) next.set('kind', kind);
     if (review) next.set('review', '1');
     if (charge) next.set('charge', charge);
+    if (ids) next.set('ids', ids);
+    if (range) { next.set('from', range.from); next.set('to', range.to); }
     setUrlParams(next, { replace: true });
-  }, [cycle, search, category, account, kind, review, charge, setUrlParams]);
+  }, [cycle, search, category, account, kind, review, charge, ids, range, setUrlParams]);
   const [hideCardPayments, setHideCardPayments] = useState(true);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [editing, setEditing] = useState<Tx | null>(null);
@@ -70,7 +76,13 @@ export default function Transactions() {
   const [manual, setManual] = useState<Tx | 'new' | null>(null);
   const [suggestRule, setSuggestRule] = useState<{ tx: Tx; patch: Record<string, unknown>; count: number } | null>(null);
 
-  const query = { ...params, cycle: review ? undefined : cycle || undefined, search, category, account, kind, review: review ? 1 : undefined, charge: charge ?? undefined, hideCardPayments: hideCardPayments ? 1 : undefined, limit: 1000 };
+  const pinned = ids != null || range != null;
+  const query = {
+    ...params, cycle: review || pinned ? undefined : cycle || undefined, search, category, account, kind, review: review ? 1 : undefined,
+    charge: charge ?? undefined, ids: ids ?? undefined, from: range?.from, to: range?.to,
+    // rows picked by an alert are shown even when they are card payments
+    hideCardPayments: hideCardPayments && !ids ? 1 : undefined, limit: 1000,
+  };
   const { data, isLoading, error } = useQuery({ queryKey: ['transactions', query], queryFn: () => api.get<TxPage>(`/transactions${qs(query)}`) });
 
   const invalidate = () => {
@@ -151,7 +163,7 @@ export default function Transactions() {
   return (
     <>
       <PageHeader title="תנועות" icon={ArrowLeftRight}
-        subtitle={data ? <>{data.total} תנועות{cycle && !review ? ` · ${monthName(cycle)}` : ''}</> : undefined}
+        subtitle={data ? <>{data.total} תנועות{cycle && !review && !pinned ? ` · ${monthName(cycle)}` : ''}</> : undefined}
         actions={<>
           <button className="btn" onClick={() => setShowCategories(true)} disabled={!data}><PieChart />פירוט לפי קטגוריות</button>
           <button className="btn btn-primary" onClick={() => setManual('new')}><Plus />הוספת הוצאה</button>
@@ -181,7 +193,12 @@ export default function Transactions() {
       )}
 
       <div className="card mb-4 grid grid-cols-2 gap-2.5 p-3 sm:grid-cols-3 md:p-4 lg:grid-cols-6">
-        {charge ? (
+        {ids || range ? (
+          <div className="input flex items-center justify-between gap-2 border-brand-200 bg-brand-50 py-0 pe-1 text-brand-800 dark:border-brand-700/60 dark:bg-brand-700/20 dark:text-brand-100">
+            <span className="truncate">{ids ? `${ids.split(',').length} תנועות נבחרות` : range!.from === range!.to ? day(range!.from) : `${day(range!.from)} – ${day(range!.to)}`}</span>
+            <button className="btn-ghost btn-icon min-h-7" onClick={() => { setIds(null); setRange(null); }} aria-label="הסר סינון"><X /></button>
+          </div>
+        ) : charge ? (
           <div className="input flex items-center justify-between gap-2 border-brand-200 bg-brand-50 py-0 pe-1 text-brand-800 dark:border-brand-700/60 dark:bg-brand-700/20 dark:text-brand-100">
             <span className="truncate">חיוב של {day(charge)}</span>
             <button className="btn-ghost btn-icon min-h-7" onClick={() => setCharge(null)} aria-label="הסר סינון חיוב"><X /></button>

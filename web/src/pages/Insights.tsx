@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, type Alert, type Recommendation } from '../api';
 import { day, todayIso } from '../format';
 import {
-  Activity, Bell, CalendarDays, CloudOff, Copy, CreditCard, Lightbulb, type LucideIcon, PieChart, Receipt, Repeat, RotateCcw,
+  Activity, ArrowLeft, Bell, CalendarDays, CalendarClock, CloudOff, Copy, CreditCard, Lightbulb, type LucideIcon, PieChart, Receipt, Repeat, RotateCcw,
   Sparkles, TrendingUp, TriangleAlert, X,
 } from 'lucide-react';
 import { Empty, ErrorBox, Loading, Money, PageHeader, SectionTitle, SeverityDot } from '../components/ui';
@@ -15,18 +16,20 @@ interface RecurringRow { merchantKey: string; accountId: string; kind: string; t
 const ALERT_TYPES: Record<string, string> = {
   budget: 'תקציב', duplicate: 'חיוב כפול', anomaly: 'חריגה', new_subscription: 'מנוי חדש', price_increase: 'עליית מחיר',
   low_balance: 'יתרה נמוכה', card_vs_balance: 'חיוב כרטיס', fee: 'עמלה', unmatched_card_bill: 'כרטיס לא נסרק',
-  scrape_failed: 'סריקה', big_day: 'יום חריג',
+  scrape_failed: 'סריקה', big_day: 'יום חריג', planned_overdue: 'הוצאה מתוכננת',
 };
 
 const ALERT_ICONS: Record<string, LucideIcon> = {
   budget: PieChart, duplicate: Copy, anomaly: Activity, new_subscription: Repeat, price_increase: TrendingUp,
   low_balance: TriangleAlert, card_vs_balance: CreditCard, fee: Receipt, unmatched_card_bill: CreditCard,
-  scrape_failed: CloudOff, big_day: CalendarDays,
+  scrape_failed: CloudOff, big_day: CalendarDays, planned_overdue: CalendarClock,
 };
 const SEVERITY_TILE: Record<string, string> = { critical: 'var(--negative)', warning: 'var(--chart-3)' };
 
 export default function Insights() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
+  const { hash } = useLocation();
   const [showAll, setShowAll] = useState(false);
   const recs = useQuery({ queryKey: ['recommendations'], queryFn: () => api.get<Recommendation[]>('/recommendations') });
   const alerts = useQuery({ queryKey: ['alerts', showAll ? 'all' : 'open'], queryFn: () => api.get<Alert[]>(`/alerts${showAll ? '?all=1' : ''}`) });
@@ -47,6 +50,11 @@ export default function Insights() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alerts.data]);
 
+  // links like /insights#subscriptions: scroll once the section is on screen
+  useEffect(() => {
+    if (hash && recurring.data) document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [hash, recurring.data]);
+
   const totalSaving = recs.data?.reduce((s, r) => s + r.annualSaving, 0) ?? 0;
   const snoozeUntil = () => { const d = new Date(`${todayIso()}T12:00:00`); d.setDate(d.getDate() + 30); return d.toISOString().slice(0, 10); };
   const subs = recurring.data?.filter(r => r.kind === 'subscription') ?? [];
@@ -61,7 +69,7 @@ export default function Insights() {
           {recs.data && recs.data.some(r => r.annualSaving > 0) && (
             <div className="card animate-rise-in">
               <BarList color="var(--positive)" items={[...recs.data].filter(r => r.annualSaving > 0).sort((a, b) => b.annualSaving - a.annualSaving)
-                .map(r => ({ key: r.key, label: r.title, value: r.annualSaving, icon: <Lightbulb /> }))} />
+                .map(r => ({ key: r.key, label: r.title, value: r.annualSaving, icon: <Lightbulb />, href: r.action?.href }))} />
             </div>
           )}
           {recs.isLoading ? <Loading /> : recs.error ? <ErrorBox error={recs.error} /> : recs.data!.length === 0 ? <Empty>אין המלצות כרגע</Empty> : <div className="stagger space-y-3">{recs.data!.map((r, i) => (
@@ -83,10 +91,14 @@ export default function Insights() {
               </div>
               {r.examples.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {r.examples.map((e, i) => <span key={i} className="chip">{e.description}{e.amount ? <> · <Money value={e.amount} /></> : null}</span>)}
+                  {r.examples.map((e, i) => {
+                    const label = <>{e.description}{e.amount ? <> · <Money value={e.amount} /></> : null}</>;
+                    return e.href ? <Link key={i} to={e.href} className="chip hover:border-primary hover:text-primary">{label}</Link> : <span key={i} className="chip">{label}</span>;
+                  })}
                 </div>
               )}
               <div className="mt-4 flex flex-wrap gap-1.5 border-t border-line-soft pt-3">
+                {r.action && <Link to={r.action.href} className="btn btn-primary">{r.action.label}<ArrowLeft /></Link>}
                 <button className="btn" onClick={() => recState.mutate({ key: r.key, state: 'done' })}>✓ טיפלתי</button>
                 <button className="btn-ghost" onClick={() => recState.mutate({ key: r.key, state: 'snoozed', until: snoozeUntil() })}>הזכר בעוד חודש</button>
                 <button className="btn-ghost" onClick={() => recState.mutate({ key: r.key, state: 'dismissed' })}>לא רלוונטי</button>
@@ -94,7 +106,7 @@ export default function Insights() {
             </div>
           ))}</div>}
 
-          <div className="card">
+          <div id="subscriptions" className="card scroll-mt-20">
             <SectionTitle icon={Repeat} color="var(--chart-6)"><span>מנויים שזוהו ({subs.length}) — <Money value={subs.reduce((s, r) => s + r.typicalAmount, 0) * 12} /> בשנה</span></SectionTitle>
             {subs.length > 0 && (
               <div className="mb-4">
@@ -129,7 +141,9 @@ export default function Insights() {
               {alerts.data!.map((a, i) => {
                 const TypeIcon = ALERT_ICONS[a.type] ?? Bell;
                 return (
-                <div key={a.id} style={{ ['--i' as string]: i }} className={`card card-hover flex gap-3 p-3.5 transition-opacity duration-(--duration-base) md:p-4 ${a.dismissedAt ? 'opacity-50' : ''}`}>
+                <div key={a.id} style={{ ['--i' as string]: i }}
+                  className={`card card-hover flex gap-3 p-3.5 transition-opacity duration-(--duration-base) md:p-4 ${a.action ? 'cursor-pointer' : ''} ${a.dismissedAt ? 'opacity-50' : ''}`}
+                  onClick={a.action ? () => navigate(a.action!.href) : undefined}>
                   <SeverityDot severity={a.severity} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -140,9 +154,14 @@ export default function Insights() {
                     </div>
                     <div className="mt-1.5 text-sm font-medium">{a.title}</div>
                     <div className="mt-0.5 text-xs leading-relaxed text-zinc-500">{a.message}</div>
+                    {a.action && (
+                      <Link to={a.action.href} onClick={e => e.stopPropagation()} className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                        {a.action.label}<ArrowLeft className="h-3 w-3" />
+                      </Link>
+                    )}
                   </div>
                   <button className="btn-ghost btn-icon -me-1.5 -mt-1 self-start" title={a.dismissedAt ? 'החזר' : 'סגור'} aria-label={a.dismissedAt ? 'החזר' : 'סגור'}
-                    onClick={() => alertAction.mutate({ id: a.id, body: { dismissed: !a.dismissedAt } })}>{a.dismissedAt ? <RotateCcw /> : <X />}</button>
+                    onClick={e => { e.stopPropagation(); alertAction.mutate({ id: a.id, body: { dismissed: !a.dismissedAt } }); }}>{a.dismissedAt ? <RotateCcw /> : <X />}</button>
                 </div>
                 );
               })}

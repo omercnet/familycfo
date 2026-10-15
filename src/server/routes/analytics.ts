@@ -7,6 +7,7 @@ import { buildForecast, bankBalances, planningPeriod } from '../../analytics/for
 import { installmentPlans, upcomingCardCharges } from '../../analytics/cards.js';
 import { savingsCapacity, tightMonthPlan } from '../../analytics/planning.js';
 import { buildRecommendations } from '../../analytics/recommendations.js';
+import { withActions } from '../../analytics/actions.js';
 import { netWorth } from '../../analytics/networth.js';
 import { refreshPrices } from './investments.js';
 import { runPipeline } from '../../pipeline.js';
@@ -42,8 +43,8 @@ export function analyticsRoutes(app: FastifyInstance, db: DB): void {
       },
       cardCharges: upcomingCardCharges(db, txs).slice(0, 8),
       budgets: budgetStatus(db, { cycleKey: q.cycle, memberId: filter.memberId }).filter(b => b.budget != null).slice(0, 10),
-      alerts: (db.prepare(`SELECT * FROM alerts WHERE dismissed_at IS NULL ORDER BY
-        CASE severity WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END, created_at DESC LIMIT 6`).all() as Record<string, unknown>[]).map(toApi),
+      alerts: withActions(db, (db.prepare(`SELECT * FROM alerts WHERE dismissed_at IS NULL ORDER BY
+        CASE severity WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END, created_at DESC LIMIT 6`).all() as Record<string, unknown>[]).map(toApi)),
       capacity: savingsCapacity(db, filter),
       income: expectedIncome(db, filter),
       // the income of the month being planned (arrived + recurring still expected)
@@ -104,8 +105,8 @@ export function analyticsRoutes(app: FastifyInstance, db: DB): void {
 
   app.get('/api/alerts', async req => {
     const all = (req.query as Q).all === '1';
-    return (db.prepare(`SELECT * FROM alerts ${all ? '' : 'WHERE dismissed_at IS NULL'} ORDER BY created_at DESC, id DESC LIMIT 300`)
-      .all() as Record<string, unknown>[]).map(toApi);
+    return withActions(db, (db.prepare(`SELECT * FROM alerts ${all ? '' : 'WHERE dismissed_at IS NULL'} ORDER BY created_at DESC, id DESC LIMIT 300`)
+      .all() as Record<string, unknown>[]).map(toApi));
   });
 
   app.patch('/api/alerts/:id', async req => {

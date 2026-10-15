@@ -3,6 +3,7 @@ import { addDays, cycleFor, cycleStartDay, loadTransactions, median, recentCycle
 import { summarizeCycle } from './cashflow.js';
 import { savingsCapacity } from './planning.js';
 import { bankBalances } from './forecast.js';
+import { merchantRows, txHref, type Action } from './actions.js';
 
 export interface Recommendation {
   key: string;
@@ -11,7 +12,10 @@ export interface Recommendation {
   detail: string;
   monthlySaving: number;
   annualSaving: number;
-  examples: { description: string; amount: number }[];
+  /** where to act on it */
+  action: Action | null;
+  /** each with a link to its rows when it has some */
+  examples: { description: string; amount: number; href?: string }[];
 }
 
 /** Services that often overlap — paying for several in a group is a candidate to cancel. */
@@ -38,7 +42,8 @@ export function buildRecommendations(db: DB, asOf = today()): Recommendation[] {
       title: `${subscriptions.length} מנויים קבועים — ₪${Math.round(monthly * 12).toLocaleString('he-IL')} בשנה`,
       detail: 'כדאי לעבור על הרשימה ולבטל את מה שלא בשימוש. ביטול של רבע מהמנויים חוסך בערך את הסכום המוצג.',
       monthlySaving: round(monthly * 0.25), annualSaving: round(monthly * 12 * 0.25),
-      examples: subscriptions.slice(0, 8).map(s => ({ description: describe(s.merchant_key), amount: s.typical_amount })),
+      action: { label: 'לרשימת המנויים', href: '/insights#subscriptions' },
+      examples: subscriptions.slice(0, 8).map(s => ({ description: describe(s.merchant_key), amount: s.typical_amount, href: txHref(merchantRows(txs, s.merchant_key, s.account_id)) })),
     });
   }
 
@@ -53,7 +58,9 @@ export function buildRecommendations(db: DB, asOf = today()): Recommendation[] {
       title: `${inGroup.length} שירותי ${group.name} במקביל`,
       detail: `משלמים ₪${Math.round(total)} בחודש על ${group.name}. אם שירות אחד מספיק, אפשר לחסוך את השאר.`,
       monthlySaving: round(total - cheapest), annualSaving: round((total - cheapest) * 12),
-      examples: inGroup.map(s => ({ description: describe(s.merchant_key), amount: s.typical_amount })),
+      // the latest charge of each: which card each one is on, to cancel the ones you don't need
+      action: { label: `לחיובים של שירותי ה${group.name}`, href: txHref(inGroup.flatMap(s => merchantRows(txs, s.merchant_key, s.account_id, 1))) },
+      examples: inGroup.map(s => ({ description: describe(s.merchant_key), amount: s.typical_amount, href: txHref(merchantRows(txs, s.merchant_key, s.account_id)) })),
     });
   }
 
@@ -64,7 +71,8 @@ export function buildRecommendations(db: DB, asOf = today()): Recommendation[] {
       key: `price:${s.merchant_key}:${s.account_id}`, type: 'price_increase',
       title: `המחיר של ${describe(s.merchant_key)} עלה`,
       detail: `מ-₪${Math.round(s.typical_amount)} ל-₪${Math.round(s.last_amount)}. כדאי לבדוק מבצע שהסתיים או לנהל משא ומתן.`,
-      monthlySaving: round(diff), annualSaving: round(diff * 12), examples: [],
+      monthlySaving: round(diff), annualSaving: round(diff * 12),
+      action: { label: 'לחיובים של המנוי', href: txHref(merchantRows(txs, s.merchant_key, s.account_id)) }, examples: [],
     });
   }
 
@@ -79,7 +87,8 @@ export function buildRecommendations(db: DB, asOf = today()): Recommendation[] {
       title: `עמלות בנק וכרטיסים: ₪${Math.round(total / 3)} בחודש`,
       detail: 'אפשר לבקש מהבנק לבטל עמלות (דמי כרטיס, הקצאת אשראי) או לעבור למסלול עמלות דיגיטלי.',
       monthlySaving: round(total / 3), annualSaving: round((total / 3) * 12),
-      examples: fees.slice(0, 6).map(t => ({ description: t.description, amount: round(-t.amount) })),
+      action: { label: `ל-${fees.length} העמלות`, href: txHref(fees.map(t => t.id)) },
+      examples: fees.slice(0, 6).map(t => ({ description: t.description, amount: round(-t.amount), href: txHref([t.id]) })),
     });
   }
   const foreign = txs.filter(t => t.date >= since && t.kind === 'expense' && isForeign(db, t.id));
@@ -89,7 +98,8 @@ export function buildRecommendations(db: DB, asOf = today()): Recommendation[] {
       key: 'fees:fx', type: 'fees',
       title: `${foreign.length} עסקאות במט"ח ב-3 חודשים`,
       detail: 'על עסקאות במט"ח נגבית בדרך כלל עמלת המרה של כ-2.5%-3%. כרטיס או חשבון מט"ח ללא עמלה יחסכו אותה.',
-      monthlySaving: round(volume * 0.025), annualSaving: round(volume * 0.025 * 12), examples: [],
+      monthlySaving: round(volume * 0.025), annualSaving: round(volume * 0.025 * 12),
+      action: { label: 'לעסקאות במט"ח', href: txHref(foreign.map(t => t.id)) }, examples: [],
     });
   }
 
@@ -102,6 +112,7 @@ export function buildRecommendations(db: DB, asOf = today()): Recommendation[] {
       title: `${insurers.size} גופי ביטוח שונים — ₪${Math.round(monthly)} בחודש`,
       detail: 'כפל ביטוחי בריאות וחיים נפוץ מאוד. כדאי להוציא דוח מ"הר הביטוח" ולבדוק כפילויות (במיוחד ביטוח בריאות פרטי מול שב"ן).',
       monthlySaving: round(monthly * 0.2), annualSaving: round(monthly * 12 * 0.2),
+      action: { label: 'לביטוחים', href: '/insurance' },
       examples: [...insurers].slice(0, 6).map(m => ({ description: describe(m), amount: 0 })),
     });
   }
@@ -117,8 +128,12 @@ export function buildRecommendations(db: DB, asOf = today()): Recommendation[] {
         recs.push({
           key: `trend:${c.categoryId}:${last.cycle.key}`, type: 'trend',
           title: `עלייה בהוצאות ${c.name}`,
-          detail: `₪${Math.round(c.spend)} בחודש שעבר לעומת ₪${Math.round(typical)} בדרך כלל.`,
-          monthlySaving: round(c.dynamic - typical), annualSaving: round((c.dynamic - typical) * 12), examples: [],
+          detail: `₪${Math.round(c.spend)} בחודש שעבר לעומת ₪${Math.round(typical)} בדרך כלל. כדאי לעבור על התנועות, לזהות מה חד־פעמי, ולהגדיר תקציב לקטגוריה כדי לקבל התראה לפני חריגה.`,
+          monthlySaving: round(c.dynamic - typical), annualSaving: round((c.dynamic - typical) * 12),
+          // spending without a category: the rows to categorize
+          action: c.categoryId == null
+            ? { label: 'לתנועות ללא קטגוריה', href: '/transactions?review=1' }
+            : { label: 'לתנועות של החודש', href: `/transactions?category=${c.categoryId}&cycle=${last.cycle.key}` }, examples: [],
         });
       }
     }
@@ -134,7 +149,8 @@ export function buildRecommendations(db: DB, asOf = today()): Recommendation[] {
       key: 'cash:idle', type: 'savings',
       title: `₪${Math.round(idle).toLocaleString('he-IL')} יושבים בעו"ש`,
       detail: 'כסף מעבר לחודש וחצי של הוצאות לא מרוויח ריבית בעו"ש. קרן כספית או פיקדון נזיל ישאירו אותו זמין.',
-      monthlySaving: round((idle * 0.04) / 12), annualSaving: round(idle * 0.04), examples: [],
+      monthlySaving: round((idle * 0.04) / 12), annualSaving: round(idle * 0.04),
+      action: { label: 'לחסכונות', href: '/savings' }, examples: [],
     });
   }
 
@@ -145,7 +161,8 @@ export function buildRecommendations(db: DB, asOf = today()): Recommendation[] {
       key: `capacity:${cycleFor(asOf, startDay).key}`, type: 'savings',
       title: `אפשר לחסוך בערך ₪${Math.round(capacity.monthlyCapacity).toLocaleString('he-IL')} בחודש`,
       detail: `היעדים החודשיים בקופות מסתכמים ב-₪${Math.round(targets)}. כדאי להגדיר הוראת קבע לחיסכון כבר בתחילת החודש.`,
-      monthlySaving: 0, annualSaving: 0, examples: capacity.allocation.map(a => ({ description: a.name, amount: a.amount })),
+      monthlySaving: 0, annualSaving: 0, action: { label: 'לקופות החיסכון', href: '/savings' },
+      examples: capacity.allocation.map(a => ({ description: a.name, amount: a.amount })),
     });
   }
 

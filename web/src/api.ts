@@ -66,7 +66,10 @@ export interface Forecast {
 export interface Alert {
   id: number; type: string; severity: 'info' | 'warning' | 'critical'; title: string; message: string; txnIds: string | null;
   createdAt: string; seenAt: string | null; dismissedAt: string | null;
+  /** where to act on it: a page already filtered to the item */
+  action: Action | null;
 }
+export interface Action { label: string; href: string }
 export interface SavingsCapacity {
   expectedIncome: number; averageFixed: number; averageDynamic: number; irregularReserve: number; monthsUsed: string[]; monthlyCapacity: number;
   allocation: { fundId: number; name: string; amount: number }[];
@@ -93,7 +96,8 @@ export interface TightMonthPlan {
 }
 export interface Recommendation {
   key: string; type: string; title: string; detail: string; monthlySaving: number; annualSaving: number;
-  examples: { description: string; amount: number }[];
+  action: Action | null;
+  examples: { description: string; amount: number; href?: string }[];
 }
 export interface InstallmentPlan {
   description: string; cardAccountId: string; memberId: number; purchaseDate: string; installmentAmount: number;

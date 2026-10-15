@@ -66,7 +66,9 @@ export function generateAlerts(db: DB, asOf = today()): AlertDraft[] {
       type: 'budget', severity: level === 100 ? 'critical' : 'warning',
       dedupeKey: `budget:${b.categoryId}:${b.memberId ?? 'h'}:${asOf.slice(0, 7)}:${level}`,
       title: level === 100 ? `חריגה מתקציב ${b.categoryName}` : `${b.pct}% מתקציב ${b.categoryName}`,
-      message: `הוצאו ${ils(b.spent)} מתוך ${ils(b.budget)}. תחזית לסוף החודש: ${ils(b.projected)}.`,
+      message: `הוצאו ${ils(b.spent)} מתוך ${ils(b.budget)}. תחזית לסוף החודש: ${ils(b.projected)}. ${level === 100
+        ? 'כדאי לעצור הוצאות לא הכרחיות בקטגוריה עד סוף החודש, או לעדכן את התקציב אם הוא לא מציאותי.'
+        : 'כדאי לעבור על ההוצאות בקטגוריה ולהאט עד סוף החודש.'}`,
       data: b,
     });
   }
@@ -75,7 +77,8 @@ export function generateAlerts(db: DB, asOf = today()): AlertDraft[] {
     drafts.push({
       type: 'duplicate', severity: 'warning', dedupeKey: `dup:${a.id}:${b.id}`,
       title: `חיוב כפול אפשרי: ${a.description}`,
-      message: `${ils(a.amount)} ב-${a.date} ושוב ב-${b.date} באותו כרטיס.`, txnIds: [a.id, b.id],
+      message: `${ils(a.amount)} ב-${a.date} ושוב ב-${b.date} באותו כרטיס. אם קניתם פעם אחת — פנו לבית העסק או לחברת האשראי לביטול החיוב הכפול.`,
+      txnIds: [a.id, b.id],
     });
   }
 
@@ -83,7 +86,7 @@ export function generateAlerts(db: DB, asOf = today()): AlertDraft[] {
     drafts.push({
       type: 'anomaly', severity: 'info', dedupeKey: `anomaly:${tx.id}`,
       title: `הוצאה גבוהה מהרגיל: ${tx.description}`,
-      message: `${ils(tx.amount)} לעומת ${ils(typical)} בדרך כלל.`, txnIds: [tx.id],
+      message: `${ils(tx.amount)} לעומת ${ils(typical)} בדרך כלל. אם אתם לא מזהים את הסכום — בדקו מול הקבלה או פנו לחברת האשראי.`, txnIds: [tx.id],
     });
   }
 
@@ -92,14 +95,17 @@ export function generateAlerts(db: DB, asOf = today()): AlertDraft[] {
     { merchant_key: string; account_id: string; typical_amount: number; last_amount: number; last_date: string }[];
   for (const s of series) {
     const rows = txs.filter(t => t.merchant === s.merchant_key && t.accountId === s.account_id).sort((a, b) => a.date.localeCompare(b.date));
+    // its charges, newest first: where to see it (and the card it's on) before cancelling or calling
+    const txnIds = rows.slice(-24).reverse().map(t => t.id);
     if (rows[0] && rows[0].date >= addDays(asOf, -100)) {
       drafts.push({ type: 'new_subscription', severity: 'info', dedupeKey: `newsub:${s.merchant_key}:${s.account_id}`,
-        title: `מנוי חדש: ${rows[0].description}`, message: `${ils(s.typical_amount)} בחודש (${ils(s.typical_amount * 12)} בשנה).` });
+        title: `מנוי חדש: ${rows[0].description}`,
+        message: `${ils(s.typical_amount)} בחודש (${ils(s.typical_amount * 12)} בשנה). אם לא נרשמתם אליו בכוונה — כדאי לבטל.`, txnIds });
     }
     if (s.last_amount > s.typical_amount * 1.05 && s.last_amount - s.typical_amount >= 2) {
       drafts.push({ type: 'price_increase', severity: 'warning', dedupeKey: `price:${s.merchant_key}:${s.account_id}:${s.last_date}`,
         title: `עליית מחיר: ${rows.at(-1)?.description ?? s.merchant_key}`,
-        message: `מ-${ils(s.typical_amount)} ל-${ils(s.last_amount)} בחודש.` });
+        message: `מ-${ils(s.typical_amount)} ל-${ils(s.last_amount)} בחודש. כדאי לבדוק אם הסתיים מבצע ולבקש להחזיר את המחיר.`, txnIds });
     }
   }
 
@@ -110,7 +116,7 @@ export function generateAlerts(db: DB, asOf = today()): AlertDraft[] {
       drafts.push({ type: 'low_balance', severity: a.lowest.amount < 0 ? 'critical' : 'warning',
         dedupeKey: `lowbal:${a.accountId}:${forecast.cycle.key}:${a.lowest.amount < 0 ? 'neg' : 'buf'}`,
         title: `${a.displayName} צפוי לרדת ל-${a.lowest.amount < 0 ? '-' : ''}${ils(a.lowest.amount)}`,
-        message: `הנקודה הנמוכה צפויה ב-${a.lowest.date}. כרית הביטחון: ${ils(forecast.buffer)}.` });
+        message: `הנקודה הנמוכה צפויה ב-${a.lowest.date}. כרית הביטחון: ${ils(forecast.buffer)}. כדאי להעביר כסף לחשבון לפני כן או לדחות הוצאה גדולה.` });
     }
   }
   const balances = new Map(forecast.accounts.map(a => [a.accountId, a.startBalance]));
@@ -119,14 +125,14 @@ export function generateAlerts(db: DB, asOf = today()): AlertDraft[] {
     if (balance != null && c.expectedAmount > balance) {
       drafts.push({ type: 'card_vs_balance', severity: 'warning', dedupeKey: `cardbal:${c.cardAccountId}:${c.chargeDate}`,
         title: `חיוב ${c.displayName} גבוה מהיתרה`,
-        message: `${ils(c.expectedAmount)} יחויבו ב-${c.chargeDate}, ביתרה יש ${ils(balance)}.` });
+        message: `${ils(c.expectedAmount)} יחויבו ב-${c.chargeDate}, ביתרה יש ${ils(balance)}. כדאי להעביר את ההפרש לחשבון לפני מועד החיוב.` });
     }
   }
 
   for (const t of txs.filter(t => t.date >= addDays(asOf, -30) && t.kind === 'expense'
     && (FEE_PATTERN.test(t.description) || t.categoryName === 'עמלות בנקאיות'))) {
     drafts.push({ type: 'fee', severity: 'info', dedupeKey: `fee:${t.id}`, title: `עמלה: ${t.description}`,
-      message: `${ils(t.amount)} ב-${t.date}.`, txnIds: [t.id] });
+      message: `${ils(t.amount)} ב-${t.date}. אפשר לבקש מהבנק לבטל או להחזיר אותה, ולבדוק מסלול עמלות זול יותר.`, txnIds: [t.id] });
   }
 
   for (const bill of unmatchedCardBills(txs, asOf)) {
@@ -160,7 +166,7 @@ export function generateAlerts(db: DB, asOf = today()): AlertDraft[] {
   for (const [date, sum] of daily) {
     if (date >= recentSince && typicalDay > 0 && sum > typicalDay * 5 && sum > 2000) {
       drafts.push({ type: 'big_day', severity: 'info', dedupeKey: `bigday:${date}`, title: `יום הוצאות גבוה: ${date}`,
-        message: `${ils(sum)} ביום אחד, לעומת ${ils(typicalDay)} ביום רגיל.` });
+        message: `${ils(sum)} ביום אחד, לעומת ${ils(typicalDay)} ביום רגיל. כדאי לוודא שאתם מזהים את כל החיובים של אותו יום.` });
     }
   }
   return drafts;
