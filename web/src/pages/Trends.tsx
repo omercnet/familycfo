@@ -129,10 +129,10 @@ export default function Trends() {
         ]} />} />
 
       <nav aria-label="רמת פירוט" className="mb-4 flex flex-wrap items-center gap-1 text-sm">
-        <button className={`rounded-md px-2 py-1 ${parentId == null && leafKey == null ? 'font-semibold' : 'text-primary hover:underline'}`} onClick={() => go(null)}>כל הקטגוריות</button>
+        <button className={`rounded-md px-2 py-1 ${parentId == null && leafKey == null ? 'font-semibold' : 'text-link hover:underline'}`} onClick={() => go(null)}>כל הקטגוריות</button>
         {parent && <>
           <ChevronLeft className="h-4 w-4 text-muted-foreground" />
-          <button className={`rounded-md px-2 py-1 ${leafKey == null ? 'font-semibold' : 'text-primary hover:underline'}`} onClick={() => go(parentId)}>{parent.name}</button>
+          <button className={`rounded-md px-2 py-1 ${leafKey == null ? 'font-semibold' : 'text-link hover:underline'}`} onClick={() => go(parentId)}>{parent.name}</button>
         </>}
         {leaf && <><ChevronLeft className="h-4 w-4 text-muted-foreground" /><span className="px-2 py-1 font-semibold">{leaf.name}</span></>}
       </nav>

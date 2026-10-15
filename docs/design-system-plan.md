@@ -1,6 +1,6 @@
 # Design system plan (web/)
 
-Status: direction approved 2026-10-15 (Apple-native, one tint plus status colors, AA-checked; see "Visual direction" and `docs/design-direction-mockup.html`). Phases 0 and 1 are implemented on branch `claude/lucid-vaughan-7f450d` (phase 0 merged in from `claude/charming-vaughan-b3db55`), not yet on main; phases 2 and later are not started.
+Status: direction approved 2026-10-15 (Apple-native, one tint plus status colors, AA-checked; see "Visual direction" and `docs/design-direction-mockup.html`). Phases 0 and 1 are implemented on branch `claude/lucid-vaughan-7f450d` (phase 0 merged in from `claude/charming-vaughan-b3db55`), not yet on main. Phase 2a (global tokens, system font, the hand-edit list below, accessibility settings, token contrast check) is implemented on top of it; phase 2b (Dashboard and transactions rebuild, illustrations) is not started.
 
 ## Problem
 

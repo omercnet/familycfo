@@ -61,7 +61,8 @@ const cssVar = (name: string) => getComputedStyle(document.documentElement).getP
 
 const TOKENS: { title: string; names: string[] }[] = [
   { title: 'משטחים וטקסט', names: ['background', 'foreground', 'card', 'popover', 'muted', 'muted-foreground', 'secondary', 'secondary-foreground', 'accent', 'accent-foreground'] },
-  { title: 'פעולה ומסגרות', names: ['primary', 'primary-foreground', 'destructive', 'border', 'input', 'ring'] },
+  { title: 'פעולה ומסגרות', names: ['primary', 'primary-foreground', 'link', 'destructive', 'destructive-foreground', 'border', 'input', 'ring'] },
+  { title: 'מילוי וזכוכית', names: ['fill', 'fill-2', 'fill-3', 'seg-selected', 'glass', 'scrim'] },
   { title: 'גרפים', names: ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5', 'chart-6', 'chart-7', 'chart-8'] },
   { title: 'סרגל צד', names: ['sidebar', 'sidebar-foreground', 'sidebar-muted', 'sidebar-accent', 'sidebar-border', 'sidebar-primary'] },
 ];
@@ -130,13 +131,13 @@ export default function Kit() {
         </div>
       </Section>
 
-      <Section icon={Type} title="טיפוגרפיה" note="גוף 14px. משקלים: 400 גוף, 500 תוויות ופקדים, 600 כותרות, 700 ערכי KPI בלבד.">
+      <Section icon={Type} title="טיפוגרפיה" note="גופן המערכת (SF Pro / SF Hebrew; Segoe UI ב-Windows). ערכים גדולים ב-font-rounded. גוף 14px. משקלים: 400 גוף, 500 תוויות ופקדים, 600 כותרות וערכים.">
         <div className="divide-y divide-border">
           {TYPE_SCALE.map(s => (
             <div key={s.cls} className="flex flex-wrap items-baseline gap-x-6 gap-y-1 py-2.5">
               <code className="num w-24 shrink-0 text-xs text-muted-foreground">{s.cls} · {s.px}px</code>
               <span className={`${s.cls} min-w-0 flex-1`}>
-                הוצאות החודש <Money value={11035} className={s.cls === 'text-kpi' ? 'font-bold' : ''} />
+                הוצאות החודש <Money value={11035} className={s.cls === 'text-kpi' ? 'font-rounded font-semibold' : ''} />
               </span>
               <span className="text-xs text-muted-foreground">{s.use}</span>
             </div>
@@ -146,7 +147,13 @@ export default function Kit() {
           <span className="font-normal">400 גוף</span>
           <span className="font-medium">500 תווית</span>
           <span className="font-semibold">600 כותרת</span>
-          <span className="font-bold">700 ערך</span>
+          <span className="font-bold">700 מודגש</span>
+        </div>
+        <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+          <span className="font-rounded text-kpi font-semibold"><Money value={24680.5} cents /></span>
+          <span className="font-rounded text-kpi font-semibold"><span className="num">0123456789</span></span>
+          <span className="num text-md">₪ 1,111.11 / ₪ 8,888.88</span>
+          <span className="text-xs text-muted-foreground">ספרות טבלאיות וסימן ₪ ב-SF וב-SF Rounded</span>
         </div>
       </Section>
 
@@ -180,7 +187,7 @@ export default function Kit() {
             </div>
           </Demo>
 
-          <Demo label=".chip · .seg (סימון ידני) · .num · .skeleton · .icon-tile">
+          <Demo label=".chip · .chip-{tone} · .seg (סימון ידני) · .num · .skeleton · .icon-tile · .icon-tile-{tone}">
             <div className="flex flex-wrap items-center gap-3">
               <span className="chip">צ׳יפ</span>
               <button type="button" className="chip">צ׳יפ לחיץ</button>
@@ -190,16 +197,30 @@ export default function Kit() {
               </div>
               <span className="num">1,234.50</span>
               <div className="skeleton h-4 w-24" />
-              {(['primary', 'positive', 'negative', 'warning', 'info'] as const).map(t => (
-                <span key={t} className="icon-tile" style={{ ['--tile' as string]: `var(--${t})` }}><Wallet /></span>
+              <span className="icon-tile"><Wallet /></span>
+              {(['positive', 'negative', 'warning', 'info'] as const).map(t => (
+                <span key={t} className={`icon-tile icon-tile-${t}`}><Wallet /></span>
               ))}
+              {TONES.map(t => <span key={t.tone} className={`chip chip-${t.tone}`}><t.icon className="h-3 w-3" />{t.label}</span>)}
             </div>
           </Demo>
 
-          <Demo label=".card · .card-hover · .card-title">
-            <div className="grid gap-3 sm:grid-cols-2">
+          <Demo label=".card (רדיוס 20, בלי מסגרת וצל) · .card-hover · .card-title · .list-group (רדיוס 14)">
+            <div className="grid gap-3 sm:grid-cols-3">
               <div className="card"><div className="card-title">כרטיס<span className="text-xs font-normal text-muted-foreground">פעולה</span></div>תוכן הכרטיס.</div>
-              <div className="card card-hover"><div className="card-title">כרטיס מגיב</div>מרחף מעליו מרים אותו.</div>
+              <div className="card card-hover"><div className="card-title">כרטיס לחיץ</div>מעבר עכבר מכהה מעט את הרקע, בלי הרמה.</div>
+              <div className="list-group">
+                {ROWS.map(r => {
+                  const Icon = categoryIcon(r.category);
+                  return (
+                    <div key={r.desc} className="flex items-center gap-3 px-3.5 py-2.5 text-sm">
+                      <span className="icon-tile h-8 w-8 [&_svg]:h-4 [&_svg]:w-4"><Icon /></span>
+                      <span className="min-w-0 flex-1 truncate">{r.desc}</span>
+                      <Money value={r.amount} />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </Demo>
 
@@ -276,12 +297,12 @@ export default function Kit() {
 
           <Demo label="<SectionTitle> · <MoreLink> · <SeverityDot> · <MemberAvatar>">
             <div className="card">
-              <SectionTitle icon={Bell} color="var(--warning)" action={<MoreLink to="/insights">הכל</MoreLink>}>התראות</SectionTitle>
+              <SectionTitle icon={Bell} action={<MoreLink to="/insights">הכל</MoreLink>}>התראות</SectionTitle>
               <ul className="space-y-2 text-sm">
                 {(['critical', 'warning', 'info'] as const).map(s => <li key={s} className="flex gap-2"><SeverityDot severity={s} />{s}</li>)}
               </ul>
               <div className="mt-3 flex gap-2">
-                {['דנה', 'יואב', 'משותף'].map((n, i) => <MemberAvatar key={n} name={n} color={`var(--chart-${i + 1})`} size={24} />)}
+                {['דנה', 'יואב', 'משותף'].map(n => <MemberAvatar key={n} name={n} size={24} />)}
               </div>
             </div>
           </Demo>

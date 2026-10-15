@@ -88,7 +88,7 @@ export default function Savings() {
                 return (
                   <div key={type} className="flex items-center justify-between gap-3 px-2 py-1.5">
                     <span className="flex min-w-0 items-center gap-2">
-                      <span className="icon-tile h-6 w-6 rounded-md [&_svg]:h-3.5 [&_svg]:w-3.5" style={{ ['--tile' as string]: 'var(--negative)' }}><Icon /></span>
+                      <span className="icon-tile icon-tile-negative h-6 w-6 [&_svg]:h-3.5 [&_svg]:w-3.5"><Icon /></span>
                       <span className="truncate">{ASSET_TYPE_LABELS[type] ?? type}</span>
                     </span>
                     <Money value={v} colored />

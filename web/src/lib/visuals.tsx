@@ -68,12 +68,14 @@ export const accountIcon = (kind: 'bank' | 'card' | string | undefined): LucideI
 
 export { CircleDollarSign, Sparkles, TrendingUp };
 
-/** Round avatar with the member's initial, in their colour. */
-export function MemberAvatar({ name, color, size = 22 }: { name: string; color?: string | null; size?: number }) {
-  const c = color ?? hueFor(name);
+/**
+ * Round avatar with the member's initial, in a neutral gray circle (one tint: members are told apart
+ * by name and initial, not color). `color` is still accepted so call sites need no change.
+ */
+export function MemberAvatar({ name, size = 22 }: { name: string; color?: string | null; size?: number }) {
   return (
-    <span aria-hidden className="inline-flex shrink-0 items-center justify-center rounded-full font-semibold leading-none text-white shadow-sm"
-      style={{ width: size, height: size, fontSize: size * 0.46, background: `linear-gradient(145deg, color-mix(in oklab, ${c} 80%, white), ${c})` }}>
+    <span aria-hidden className="inline-flex shrink-0 items-center justify-center rounded-full bg-fill-2 font-semibold leading-none text-foreground"
+      style={{ width: size, height: size, fontSize: size * 0.46 }}>
       {name.trim().charAt(0).toUpperCase()}
     </span>
   );

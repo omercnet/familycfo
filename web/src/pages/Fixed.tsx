@@ -13,13 +13,13 @@ import { AccountSelect, CategorySelect, Empty, ErrorBox, Field, Loading, MemberB
 import { DonutChart } from '../components/charts';
 import { categoryIcon } from '@/lib/visuals';
 
-const COLORS = { fixed: 'var(--chart-1)', installments: 'var(--chart-6)', planned: 'var(--chart-5)', spent: 'var(--chart-3)', left: 'var(--positive)' };
+const COLORS = { fixed: 'var(--chart-1)', installments: 'var(--chart-6)', planned: 'var(--chart-5)', spent: 'var(--chart-3)', left: 'var(--chart-2)' };
 
 const STATE: Record<Commitment['state'], { label: string; cls: string }> = {
-  paid: { label: 'שולם ✓', cls: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200' },
-  partial: { label: 'שולם חלקית', cls: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' },
-  pending: { label: 'ממתין', cls: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300' },
-  missing: { label: 'עוד לא נראה', cls: 'bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-200' },
+  paid: { label: 'שולם ✓', cls: '' },
+  partial: { label: 'שולם חלקית', cls: 'chip-warning' },
+  pending: { label: 'ממתין', cls: '' },
+  missing: { label: 'עוד לא נראה', cls: 'chip-negative' },
 };
 
 const groupOf = (c: Commitment) => c.parentName ?? (c.kind === 'loan' || c.kind === 'mortgage' ? 'הלוואות ומשכנתא' : 'ללא קטגוריה');
@@ -116,7 +116,7 @@ export default function Fixed() {
             <div className="flex h-4 w-full gap-px overflow-hidden rounded-full bg-muted">
               {composition.map((c, i) => (
                 <motion.div key={c.key} className="h-full" title={c.name}
-                  style={{ background: `linear-gradient(to left, ${c.color}, color-mix(in oklab, ${c.color} 70%, white))` }}
+                  style={{ background: c.color }}
                   initial={{ width: 0 }} animate={{ width: seg(c.value) }}
                   transition={{ duration: 0.8, delay: 0.1 + i * 0.08, ease: [0.22, 1, 0.36, 1] }} />
               ))}
@@ -146,7 +146,7 @@ export default function Fixed() {
       </div>
 
       {suggested.length > 0 && (
-        <div className="card mt-4 border-amber-200 bg-amber-50/30 dark:border-amber-800/60 dark:bg-amber-950/10">
+        <div className="card mt-4">
           <SectionTitle icon={Sparkles} color="var(--chart-3)"
             action={<button className="btn btn-primary" onClick={() => suggested.forEach(c => patch.mutate({ id: c.id, body: { status: 'confirmed' } }))}>הוסף הכל</button>}>
             <span>זיהינו {suggested.length} חיובים שחוזרים כל חודש — להוסיף לקבועות?</span>
@@ -157,7 +157,7 @@ export default function Fixed() {
               return (
               <div key={c.id} style={{ ['--i' as string]: i }} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-2.5 text-sm">
                 <div className="flex min-w-0 items-center gap-2.5">
-                  <span className="icon-tile h-8 w-8 rounded-lg [&_svg]:h-4 [&_svg]:w-4" style={{ ['--tile' as string]: 'var(--chart-3)' }}><Icon /></span>
+                  <span className="icon-tile h-8 w-8 [&_svg]:h-4 [&_svg]:w-4"><Icon /></span>
                   <div className="min-w-0">
                   <div className="font-medium">{c.name}</div>
                   <div className="text-xs text-muted-foreground">{groupOf(c)} · {accountName(c.accountId)} · בסביבות ה-{c.day} בחודש</div>
@@ -212,7 +212,7 @@ export default function Fixed() {
                     </td>
                     <td className="min-w-32 text-xs text-muted-foreground">
                       {c.method === 'card' ? <>בכרטיס {accountName(c.accountId)}<div className="text-2xs">נכלל בחיוב הכרטיס</div></> : <>מהבנק {accountName(c.accountId)}</>}
-                      {c.liabilityId && <div><Link className="text-primary hover:underline" to="/loans">מההלוואות</Link></div>}
+                      {c.liabilityId && <div><Link className="text-link hover:underline" to="/loans">מההלוואות</Link></div>}
                     </td>
                     <td><MemberBadge id={c.memberId} /></td>
                     <td className="whitespace-nowrap text-sm">{day(c.dueDate)}</td>
@@ -223,7 +223,7 @@ export default function Fixed() {
                     <td className="text-end">
                       {c.actual > 0 ? (
                         <Link className="hover:underline" to={`/transactions?account=${encodeURIComponent(c.accountId)}&cycle=${data.cycle.key}&search=${encodeURIComponent(c.name.split(/\s+/).slice(0, 2).join(' '))}`}>
-                          <Money value={c.actual} className={c.actual > c.expected * 1.1 ? 'text-rose-600' : ''} />
+                          <Money value={c.actual} className={c.actual > c.expected * 1.1 ? 'text-negative' : ''} />
                         </Link>
                       ) : <span className="text-muted-foreground">—</span>}
                     </td>
@@ -238,7 +238,7 @@ export default function Fixed() {
         {data.otherFixed.count > 0 && (
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
             בנוסף, <Money value={data.otherFixed.amount} /> ב-{data.otherFixed.count} תנועות נספרו כקבועות כי הקטגוריה שלהן מסומנת כקבועה, אבל הן לא ברשימה.
-            {' '}<Link className="text-primary hover:underline" to="/categories">הגדרת קטגוריות</Link>
+            {' '}<Link className="text-link hover:underline" to="/categories">הגדרת קטגוריות</Link>
           </p>
         )}
       </div>
@@ -306,9 +306,9 @@ export default function Fixed() {
 
 const PLANNED_STATE = {
   planned: { label: 'צפוי ⏳', cls: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300' },
-  overdue: { label: 'עוד לא חויב', cls: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' },
-  choose: { label: 'לבחור חיוב', cls: 'bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-200' },
-  matched: { label: 'חויב ✓', cls: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200' },
+  overdue: { label: 'עוד לא חויב', cls: 'chip-warning' },
+  choose: { label: 'לבחור חיוב', cls: 'chip-info' },
+  matched: { label: 'חויב ✓', cls: '' },
 };
 
 /** One-off expenses entered in advance: the ones falling in this month, charged ✓ or still expected. */

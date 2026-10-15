@@ -293,8 +293,7 @@ export default function Transactions() {
                   </td>
                   <td className="min-w-28">
                     <Picker className="input py-1" value={String(t.memberId)} options={memberOptions} searchable={false}
-                      onChange={v => v && patch.mutate({ id: t.id, body: { memberId: Number(v) } })}
-                      style={{ color: member(t.memberId)?.color ?? undefined }} />
+                      onChange={v => v && patch.mutate({ id: t.id, body: { memberId: Number(v) } })} />
                   </td>
                   <td className="min-w-40">
                     <BusinessSelect className="input py-1" value={t.businessId} onChange={id => patch.mutate({ id: t.id, body: { businessId: id } })} />

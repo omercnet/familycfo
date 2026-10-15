@@ -1,13 +1,14 @@
 import { useEffect, useId, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { animate, motion, useInView, useReducedMotion } from 'motion/react';
+import { animate, motion, useReducedMotion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Check, ChevronsUpDown, Plus, TrendingDown, TrendingUp, X } from 'lucide-react';
 import { api, type Tag } from '../api';
 import { money } from '../format';
 import { useLookups } from '../state';
 import { cn } from '@/lib/utils';
+import { duration, ease } from '@/lib/motion';
 import { accountIcon, categoryIcon, MemberAvatar } from '@/lib/visuals';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/kit/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/kit/command';
@@ -15,23 +16,22 @@ import { Sparkline } from './charts';
 
 // ---- numbers ---------------------------------------------------------------------------
 
-/** A number that counts to its value when it first appears and glides to new values. */
+/** A number shown as-is on first view that glides when its value changes (no count-up from zero). */
 export function AnimatedNumber({ value, format, className }: { value: number; format: (n: number) => string; className?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true });
   const reduce = useReducedMotion();
-  const last = useRef(0);
+  const last = useRef(value);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (reduce || !inView) { el.textContent = format(value); if (reduce) last.current = value; return; }
+    if (reduce || last.current === value) { el.textContent = format(value); last.current = value; return; }
     const controls = animate(last.current, value, {
-      duration: last.current === 0 ? 0.9 : 0.5, ease: [0.22, 1, 0.36, 1],
+      duration: duration.slow, ease: ease.out,
       onUpdate: v => { el.textContent = format(v); },
     });
     last.current = value;
     return () => controls.stop();
-  }, [value, inView, reduce, format]);
+  }, [value, reduce, format]);
   return <span ref={ref} className={className}>{format(value)}</span>;
 }
 
@@ -47,14 +47,16 @@ export function Money({ value, cents, colored, animated, className = '' }: {
 // ---- KPI cards -------------------------------------------------------------------------
 
 type Tone = 'good' | 'bad' | 'warn';
-const TONE_TEXT: Record<Tone, string> = { good: 'text-positive', bad: 'text-negative', warn: 'text-amber-600 dark:text-amber-400' };
-const TONE_TILE: Record<Tone, string> = { good: 'var(--positive)', bad: 'var(--negative)', warn: 'var(--chart-3)' };
+const TONE_TEXT: Record<Tone, string> = { good: 'text-positive', bad: 'text-negative', warn: 'text-warning' };
+const TONE_MARK: Record<Tone, string> = { good: 'var(--positive)', bad: 'var(--negative)', warn: 'var(--warning)' };
 
 /**
- * KPI card. Optional icon (tinted tile), trend sparkline and a delta chip. `value` may be a
- * number (animated as money) or any node.
+ * KPI tile in the Health summary style: neutral title with a gray icon, a big rounded value,
+ * an optional sparkline (in the tint, or the status color) and a supporting line with a delta chip.
+ * `value` may be a number (money unless `format` is given) or any node. `color` and `index` are
+ * accepted for existing call sites but no longer change anything (one tint, no staggered entry).
  */
-export function Stat({ label, value, hint, tone, icon: Icon, color, spark, delta, index = 0, format }: {
+export function Stat({ label, value, hint, tone, icon: Icon, spark, delta, format }: {
   label: string; value: ReactNode | number; hint?: ReactNode; tone?: Tone;
   icon?: ComponentType<{ className?: string }>; color?: string; spark?: number[];
   /** change vs a reference, as a fraction (0.12 = +12%); positiveIsGood flips the colouring */
@@ -63,30 +65,24 @@ export function Stat({ label, value, hint, tone, icon: Icon, color, spark, delta
   /** how a numeric value is shown (default: money) */
   format?: (n: number) => string;
 }) {
-  const tile = color ?? (tone ? TONE_TILE[tone] : 'var(--primary)');
   const deltaGood = delta ? (delta.value >= 0) === (delta.positiveIsGood ?? true) : false;
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
-      className="card card-hover relative flex min-w-0 flex-col overflow-hidden">
-      {/* soft wash in the card's colour */}
-      <div aria-hidden className="pointer-events-none absolute -end-10 -top-12 h-32 w-32 rounded-full opacity-60 blur-2xl"
-        style={{ background: `color-mix(in oklab, ${tile} 16%, transparent)` }} />
-      <div className="relative flex items-start justify-between gap-3">
-        <div className="min-w-0 text-xs font-medium leading-4 text-muted-foreground">{label}</div>
-        {Icon && <span className="icon-tile -mt-0.5 h-8 w-8" style={{ ['--tile' as string]: tile }}><Icon /></span>}
+    <div className="card flex min-w-0 flex-col">
+      <div className="flex min-w-0 items-center gap-1.5 text-sm font-semibold leading-5">
+        {Icon && <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />}
+        <span className="min-w-0 truncate">{label}</span>
       </div>
-      <div className="relative mt-1.5 flex items-end justify-between gap-3">
-        <div className={cn('min-w-0 text-xl font-bold leading-7 tracking-tight sm:text-kpi sm:leading-8', tone && TONE_TEXT[tone])}>
+      <div className="mt-2 flex items-end justify-between gap-3">
+        <div className={cn('min-w-0 font-rounded text-xl font-semibold leading-7 tracking-tight sm:text-kpi sm:leading-8', tone && TONE_TEXT[tone])}>
           {typeof value === 'number' ? (format ? <AnimatedNumber value={value} format={format} className="num" /> : <Money value={value} animated />) : value}
         </div>
-        {spark && spark.length > 1 && <Sparkline data={spark} color={tile} className="-mb-0.5 h-9 w-16 shrink-0 sm:w-24" />}
+        {spark && spark.length > 1 && <Sparkline data={spark} color={tone ? TONE_MARK[tone] : 'var(--chart-1)'} className="-mb-0.5 h-9 w-16 shrink-0 sm:w-24" />}
       </div>
-      <div className="relative mt-auto pt-2">
+      <div className="mt-auto pt-2">
         <div className="min-w-0 text-xs leading-relaxed text-muted-foreground">
           {delta && (
             <span className={cn('me-1.5 inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 font-semibold',
-              deltaGood ? 'bg-positive/10 text-positive' : 'bg-negative/10 text-negative')}>
+              deltaGood ? 'chip-positive' : 'chip-negative')}>
               {delta.value >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
               <span className="num">{Math.abs(Math.round(delta.value * 100))}%</span>
             </span>
@@ -95,18 +91,18 @@ export function Stat({ label, value, hint, tone, icon: Icon, color, spark, delta
           {hint}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
 export function Progress({ value, max, status, className }: { value: number; max: number; status?: string; className?: string }) {
   const pctValue = max > 0 ? Math.min(100, (value / max) * 100) : 0;
-  const color = status === 'over' ? 'from-rose-500 to-rose-400' : status === 'warning' ? 'from-amber-500 to-amber-300' : 'from-[var(--chart-1)] to-[var(--chart-5)]';
+  const color = status === 'over' ? 'bg-negative' : status === 'warning' ? 'bg-warning' : 'bg-chart-1';
   return (
-    <div className={cn('h-1.5 w-full overflow-hidden rounded-full bg-muted', className)} role="presentation">
-      <motion.div className={`h-full rounded-full bg-gradient-to-l ${color}`}
+    <div className={cn('h-1.5 w-full overflow-hidden rounded-full bg-fill', className)} role="presentation">
+      <motion.div className={`h-full rounded-full ${color}`}
         initial={{ width: 0 }} whileInView={{ width: `${pctValue}%` }} viewport={{ once: true }}
-        animate={{ width: `${pctValue}%` }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} />
+        animate={{ width: `${pctValue}%` }} transition={{ duration: 0.8, ease: ease.out }} />
     </div>
   );
 }
@@ -131,7 +127,7 @@ export function Loading() {
 
 export function ErrorBox({ error }: { error: unknown }) {
   return (
-    <div role="alert" className="card border-rose-200 bg-rose-50/60 text-sm text-rose-800 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-200">
+    <div role="alert" className="card bg-negative-soft text-sm text-negative-strong">
       שגיאה: {String((error as Error)?.message ?? error)}
     </div>
   );
@@ -150,11 +146,9 @@ export function PageHeader({ title, subtitle, actions, icon: Icon }: { title: st
     <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 md:mb-7">
       <div className="flex min-w-0 items-center gap-3">
         {Icon && (
-          <motion.span initial={{ scale: 0.6, opacity: 0, rotate: -12 }} animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-            className="icon-tile hidden h-11 w-11 rounded-xl sm:inline-flex [&_svg]:h-5 [&_svg]:w-5">
+          <span className="icon-tile hidden h-11 w-11 sm:inline-flex [&_svg]:h-5 [&_svg]:w-5">
             <Icon />
-          </motion.span>
+          </span>
         )}
         <div className="min-w-0">
           <h1 className="text-[1.375rem] font-bold leading-8 tracking-tight md:text-kpi">{title}</h1>
@@ -166,14 +160,14 @@ export function PageHeader({ title, subtitle, actions, icon: Icon }: { title: st
   );
 }
 
-/** Card heading with a tinted icon tile and an optional action on the end side. */
-export function SectionTitle({ icon: Icon, color, children, action, as: As = 'span' }: {
+/** Card heading with a gray icon tile and an optional action on the end side (`color` is ignored: one tint). */
+export function SectionTitle({ icon: Icon, children, action, as: As = 'span' }: {
   icon: ComponentType<{ className?: string }>; color?: string; children: ReactNode; action?: ReactNode; as?: 'span' | 'h2' | 'h3';
 }) {
   return (
     <div className="card-title">
       <As className="flex min-w-0 items-center gap-2.5 text-[length:inherit] font-[inherit]">
-        <span className="icon-tile h-7 w-7 rounded-lg [&_svg]:h-4 [&_svg]:w-4" style={{ ['--tile' as string]: color ?? 'var(--primary)' }}><Icon /></span>
+        <span className="icon-tile h-7 w-7 [&_svg]:h-4 [&_svg]:w-4"><Icon /></span>
         <span className="min-w-0">{children}</span>
       </As>
       {action}
@@ -195,7 +189,7 @@ export function MemberBadge({ id }: { id: number | null | undefined }) {
   const m = member(id);
   if (!m) return null;
   return (
-    <span className="chip gap-1 ps-0.5" style={{ backgroundColor: `color-mix(in oklab, ${m.color ?? '#6b7280'} 13%, transparent)`, color: m.color ?? undefined }}>
+    <span className="chip gap-1 ps-0.5">
       <MemberAvatar name={m.name} color={m.color} size={16} />
       {m.name}
     </span>
@@ -203,7 +197,7 @@ export function MemberBadge({ id }: { id: number | null | undefined }) {
 }
 
 export function SeverityDot({ severity }: { severity: string }) {
-  const color = severity === 'critical' ? 'bg-rose-500 text-rose-500 animate-pulse-dot' : severity === 'warning' ? 'bg-amber-500 text-amber-500' : 'bg-sky-500 text-sky-500';
+  const color = severity === 'critical' ? 'bg-negative text-negative animate-pulse-dot' : severity === 'warning' ? 'bg-warning text-warning' : 'bg-info text-info';
   return <span className={`mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full ${color}`} />;
 }
 
@@ -268,11 +262,10 @@ export function Modal({ title, onClose, children, footer, wide }: { title: strin
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6" role="presentation">
-      <div className="animate-fade-in absolute inset-0 bg-[oklch(0.2_0.04_272/0.45)] backdrop-blur-[2px]" onClick={onClose} aria-hidden />
+      <div className="animate-fade-in absolute inset-0 bg-(--scrim)" onClick={onClose} aria-hidden />
       <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}
-        className={`animate-dialog-in relative flex max-h-[calc(100dvh-1.5rem)] w-full flex-col overflow-hidden rounded-t-(--radius-dialog) border bg-popover shadow-(--shadow-overlay) outline-none
+        className={`animate-dialog-in relative flex max-h-[calc(100dvh-1.5rem)] w-full flex-col overflow-hidden rounded-t-(--radius-dialog) bg-popover shadow-(--shadow-overlay) outline-none
           sm:max-h-[min(88dvh,56rem)] sm:rounded-(--radius-dialog) ${wide ? 'sm:max-w-4xl' : 'sm:max-w-lg'}`}>
-        <div aria-hidden className="h-1 w-full bg-gradient-to-l from-[var(--chart-1)] via-[var(--chart-6)] to-[var(--chart-5)]" />
         <div className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-muted-foreground/30 sm:hidden" aria-hidden />
         <div className="flex shrink-0 items-start justify-between gap-3 px-5 pb-3 pt-3 sm:px-6 sm:pt-5">
           <h2 id={titleId} className="min-w-0 break-words pt-1 text-base font-semibold leading-6 tracking-tight">{title}</h2>
@@ -358,7 +351,7 @@ export function Picker({ value, onChange, options, placeholder = 'בחר…', cl
                     className="gap-2">
                     {o.icon ? <span className="flex w-4 shrink-0 justify-center text-muted-foreground [&_svg]:h-4 [&_svg]:w-4">{o.icon}</span> : null}
                     <span className={cn('min-w-0 flex-1 truncate', o.value === '' && 'text-muted-foreground')}>{o.label}</span>
-                    <Check className={cn('h-4 w-4 shrink-0 text-primary transition-opacity', o.value === (value ?? '') ? 'opacity-100' : 'opacity-0')} />
+                    <Check className={cn('h-4 w-4 shrink-0 text-link transition-opacity', o.value === (value ?? '') ? 'opacity-100' : 'opacity-0')} />
                   </CommandItem>
                 ))}
               </CommandGroup>
@@ -424,7 +417,7 @@ export function BusinessSelect({ value, onChange, className = 'input' }: {
   const BizIcon = categoryIcon('עסק');
   const options: PickerOption[] = [
     { value: '', label: 'פרטי (לא עסקי)', short: 'פרטי' },
-    ...(meta?.businesses ?? []).filter(b => !b.archived).map(b => ({ value: String(b.id), label: b.name, icon: <BizIcon style={{ color: b.color ?? undefined }} /> })),
+    ...(meta?.businesses ?? []).filter(b => !b.archived).map(b => ({ value: String(b.id), label: b.name, icon: <BizIcon /> })),
   ];
   return <IdPicker className={className} value={value} onChange={onChange} options={options} placeholder="פרטי" />;
 }

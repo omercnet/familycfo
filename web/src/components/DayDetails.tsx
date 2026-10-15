@@ -47,7 +47,7 @@ export function DayDetails({ date, events, points, dailyRate, onClose }: {
               return (
               <tr key={i} className={url ? 'cursor-pointer' : ''}
                 title={url ? 'הצג את העסקאות שבחיוב הזה' : undefined} onClick={url ? () => navigate(url) : undefined}>
-                <td className="min-w-36 font-medium">{e.name}{url && <span className="ms-1 text-xs text-primary">←</span>}</td>
+                <td className="min-w-36 font-medium">{e.name}{url && <span className="ms-1 text-xs text-link">←</span>}</td>
                 <td className="whitespace-nowrap text-xs text-muted-foreground">{SCHEDULED_KIND_LABELS[e.kind] ?? e.kind}{e.estimated ? ' · הערכה' : ''}</td>
                 <td className="whitespace-nowrap text-xs text-muted-foreground">{accountName(e.accountId)}</td>
                 <td><MemberBadge id={ownerOf(e)} /></td>
@@ -60,7 +60,7 @@ export function DayDetails({ date, events, points, dailyRate, onClose }: {
       )}
       <div className="mt-3 flex flex-wrap justify-between gap-x-4 gap-y-2 text-xs leading-relaxed text-muted-foreground">
         {dailyRate > 0 && <span>בנוסף מחושבות הוצאות שוטפות משוערות של כ-<Money value={dailyRate} /> ליום (ביט, מזומן, כרטיס דביט).</span>}
-        <Link className="font-medium text-primary hover:underline" to="/fixed#scheduled">עריכת הכנסות והוצאות קבועות ←</Link>
+        <Link className="font-medium text-link hover:underline" to="/fixed#scheduled">עריכת הכנסות והוצאות קבועות ←</Link>
       </div>
     </div>
   );

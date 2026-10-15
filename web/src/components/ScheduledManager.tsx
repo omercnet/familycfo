@@ -85,10 +85,10 @@ function ScheduledTable({ items, all, dismissed, onPatch }: {
           const path = `/scheduled/${s.id}`;
           const src = sourceOf(s, all);
           return (
-            <tr key={s.id} className={s.status === 'suggested' ? 'bg-amber-50/50 dark:bg-amber-950/10' : ''}>
+            <tr key={s.id} className={s.status === 'suggested' ? 'bg-info-soft/60' : ''}>
               <td className="min-w-44"><input className="input py-1" defaultValue={s.name} onBlur={e => e.target.value !== s.name && onPatch(path, { name: e.target.value })} /></td>
               <td className="min-w-32 text-xs">
-                {src.to ? <Link className="text-primary hover:underline" to={src.to}>{src.label}</Link> : <span className="text-muted-foreground">{src.label}</span>}
+                {src.to ? <Link className="text-link hover:underline" to={src.to}>{src.label}</Link> : <span className="text-muted-foreground">{src.label}</span>}
                 {src.why && <div className="text-2xs text-muted-foreground">{src.why}</div>}
               </td>
               <td className="min-w-32"><Picker className="input py-1" value={s.kind} options={SCHEDULED_KIND_OPTIONS} searchable={false}

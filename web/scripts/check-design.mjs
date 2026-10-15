@@ -10,6 +10,10 @@
  * index.css and components/kit/ are out of scope (that is where tokens and Radix wrappers live).
  * Comment lines are skipped. Rule `amounts` is a heuristic (see its comment) and will miss
  * multi-line JSX. Exemptions go in ALLOW below, with a reason, not in the patterns.
+ *
+ * Rule `contrast` is different: it reads the token values in index.css (light block and the
+ * `@variant dark` block) and measures every text/background pair in PAIRS below with the WCAG
+ * formula. It has no baseline: any pair under its minimum fails the check.
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, relative, dirname } from 'node:path';
@@ -117,8 +121,75 @@ function scan() {
   return hits;
 }
 
+// ---- contrast ----------------------------------------------------------------------------
+// [foreground, background, minimum]. Text 4.5 (WCAG AA), marks / outlines / focus 3. A translucent
+// value (rgba) is composited over the next background in the chain: the pair's background over
+// --background, so glass and fills are measured as they render on the page. `fill@card` means
+// the fill over a card (over the page).
+const TEXT = 4.5, MARK = 3;
+const SURFACES = ['background', 'card', 'popover'];
+const PAIRS = [
+  ...['foreground', 'muted-foreground'].flatMap(fg => [...SURFACES, 'muted', 'secondary'].map(bg => [fg, bg, TEXT])),
+  ['secondary-foreground', 'secondary', TEXT],
+  ['primary-foreground', 'primary', TEXT],
+  ['destructive-foreground', 'destructive', TEXT],
+  ['accent-foreground', 'accent', TEXT],
+  ...['link', 'positive', 'negative', 'warning', 'info'].flatMap(fg => SURFACES.map(bg => [fg, bg, TEXT])),
+  ...['positive', 'negative', 'warning', 'info'].flatMap(t => [[`${t}-strong`, `${t}-soft`, TEXT], [t, `${t}-soft`, MARK]]),
+  ['sidebar-foreground', 'sidebar', TEXT],
+  ['sidebar-muted', 'sidebar', TEXT],
+  ['sidebar-foreground', 'sidebar-accent', TEXT],
+  ['sidebar-primary', 'sidebar-accent', MARK],
+  ['foreground', 'seg-selected', TEXT],
+  ['muted-foreground', 'fill', TEXT], ['muted-foreground', 'fill@card', TEXT],
+  ['foreground', 'fill-2', TEXT], ['foreground', 'fill-2@card', TEXT],
+  ...SURFACES.map(bg => ['ring', bg, MARK]),
+  ['input', 'background', MARK], ['input', 'card', MARK],
+  ...Array.from({ length: 8 }, (_, i) => [`chart-${i + 1}`, 'card', MARK]),
+];
+
+function tokenBlocks() {
+  const css = readFileSync(join(SRC, 'index.css'), 'utf8');
+  const read = body => Object.fromEntries([...body.matchAll(/--([\w-]+):\s*([^;]+);/g)].map(m => [m[1], m[2].trim()]));
+  const light = read(css.match(/^:root \{([\s\S]*?)^\}/m)[1]);
+  const dark = read(css.match(/@variant dark \{([\s\S]*?)\n {2}\}/)[1]);
+  return { light, dark: { ...light, ...dark } };
+}
+function rgba(tokens, name, seen = []) {
+  const v = tokens[name];
+  if (v == null) throw new Error(`contrast: --${name} is not defined in index.css`);
+  const ref = v.match(/^var\(--([\w-]+)\)$/);
+  if (ref) return rgba(tokens, ref[1], [...seen, name]);
+  const hex = v.match(/^#([0-9a-f]{6})$/i);
+  if (hex) return [0, 2, 4].map(i => parseInt(hex[1].slice(i, i + 2), 16)).concat(1);
+  const fn = v.match(/^rgba?\(([^)]+)\)$/);
+  if (fn) { const [r, g, b, a = 1] = fn[1].split(/[\s,/]+/).filter(Boolean).map(Number); return [r, g, b, a]; }
+  throw new Error(`contrast: can't read --${name}: ${v} (use #rrggbb, rgba() or var(--token))`);
+}
+const over = ([r, g, b, a], [R, G, B]) => [r * a + R * (1 - a), g * a + G * (1 - a), b * a + B * (1 - a), 1];
+function luminance([r, g, b]) {
+  const lin = v => { const s = v / 255; return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; };
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+function contrastPairs() {
+  const out = [];
+  for (const [theme, tokens] of Object.entries(tokenBlocks())) {
+    const page = rgba(tokens, 'background');
+    for (const [fg, bg, min] of PAIRS) {
+      const back = bg.split('@').reverse().reduce((under, name) => over(rgba(tokens, name), under), page);
+      const front = over(rgba(tokens, fg), back);
+      const [hi, lo] = [luminance(front), luminance(back)].sort((a, b) => b - a);
+      out.push({ theme, fg, bg, min, ratio: (hi + 0.05) / (lo + 0.05) });
+    }
+  }
+  return out;
+}
+
 const args = process.argv.slice(2);
 const hits = scan();
+const contrast = contrastPairs();
+const lowContrast = contrast.filter(c => c.ratio < c.min);
+const fmtPair = c => `${c.theme.padEnd(5)} --${c.fg} on --${c.bg}: ${c.ratio.toFixed(2)} (min ${c.min})`;
 const counts = Object.fromEntries(RULES.map(r => [r.id, hits.filter(h => h.rule === r.id).length]));
 
 if (args[0] === '--update') {
@@ -129,6 +200,10 @@ if (args[0] === '--update') {
 
 if (args[0] === '--report') {
   const only = args[1];
+  if (!only || only === 'contrast') {
+    console.log(`\ncontrast (${lowContrast.length} below minimum): token pairs from index.css`);
+    for (const c of contrast) console.log(`  ${fmtPair(c)}${c.ratio < c.min ? '  FAIL' : ''}`);
+  }
   for (const rule of RULES.filter(r => !only || r.id === only)) {
     const rs = hits.filter(h => h.rule === rule.id);
     console.log(`\n${rule.id} (${rs.length}): ${rule.title}`);
@@ -151,8 +226,13 @@ for (const rule of RULES) {
   for (const [f, n] of Object.entries(perFile).sort((a, b) => b[1] - a[1])) rows.push(`    ${String(n).padStart(4)}  ${f}`);
   rows.push(`  list them: node scripts/check-design.mjs --report ${rule.id}`);
 }
+if (lowContrast.length) {
+  failed = true;
+  rows.push(`contrast: ${lowContrast.length} token pair(s) below minimum (node scripts/check-design.mjs --report contrast)`);
+  for (const c of lowContrast) rows.push(`    ${fmtPair(c)}`);
+}
 if (failed) {
   console.error(`design check failed (hits / baseline):\n${rows.join('\n')}`);
   process.exit(1);
 }
-console.log(`design check ok (hits / baseline): ${RULES.map(r => `${r.id} ${counts[r.id]}/${baseline[r.id] ?? 0}`).join(', ')}`);
+console.log(`design check ok (hits / baseline): ${RULES.map(r => `${r.id} ${counts[r.id]}/${baseline[r.id] ?? 0}`).join(', ')}; contrast ${contrast.length} pairs ok`);

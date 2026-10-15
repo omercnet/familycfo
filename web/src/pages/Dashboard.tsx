@@ -183,7 +183,7 @@ export default function Dashboard() {
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <div className="card min-w-0">
           <SectionTitle icon={GaugeIcon} action={<MoreLink to="/budgets">הכל</MoreLink>}>תקציב</SectionTitle>
-          {data.budgets.length === 0 && <div className="text-sm text-muted-foreground">עוד לא הוגדרו תקציבים. <Link className="text-primary" to="/budgets">להגדרה</Link></div>}
+          {data.budgets.length === 0 && <div className="text-sm text-muted-foreground">עוד לא הוגדרו תקציבים. <Link className="text-link" to="/budgets">להגדרה</Link></div>}
           {data.budgets.length > 0 && (
             <div className="mb-4 flex items-center gap-4 rounded-xl bg-muted/50 p-3">
               <Gauge value={budgetSpent} max={budgetTotal} size={96} label="נוצל"
@@ -217,7 +217,7 @@ export default function Dashboard() {
             <BarList items={members.sort((a, b) => b.spend - a.spend).map(m => {
               const mm = member(m.id);
               return {
-                key: String(m.id), value: m.spend, color: mm?.color ?? hueFor(m.id),
+                key: String(m.id), value: m.spend, color: hueFor(m.id),
                 label: <span className="inline-flex items-center gap-2">{mm && <MemberAvatar name={mm.name} color={mm.color} size={20} />}{mm?.name ?? 'משותף'}</span>,
                 sub: m.income > 0 ? <>הכנסות <Money value={m.income} /></> : undefined,
               };
@@ -242,7 +242,7 @@ export default function Dashboard() {
                 <div className="min-w-0">
                   <div className="font-medium">{a.title}</div>
                   <div className="text-xs leading-relaxed text-muted-foreground">{a.message}</div>
-                  {a.action && <div className="mt-0.5 text-xs font-medium text-primary">{a.action.label} ←</div>}
+                  {a.action && <div className="mt-0.5 text-xs font-medium text-link">{a.action.label} ←</div>}
                 </div>
               </Link>
             ))}
@@ -257,10 +257,9 @@ export default function Dashboard() {
         <div className="stagger grid gap-3 sm:grid-cols-3">
           {capacity.allocation.map((a, i) => (
             <div key={a.fundId} style={{ ['--i' as string]: i }}
-              className="card-hover relative overflow-hidden rounded-xl border border-emerald-200/70 bg-gradient-to-br from-emerald-50 to-teal-50/40 px-4 py-3.5 dark:border-emerald-900/50 dark:from-emerald-950/40 dark:to-teal-950/20">
-              <PiggyBank aria-hidden className="absolute -bottom-2 -end-2 h-14 w-14 text-emerald-500/10" />
-              <div className="text-xs font-medium text-emerald-800 dark:text-emerald-300">{a.name}</div>
-              <Money value={a.amount} animated className="mt-1 block text-xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300" />
+              className="rounded-(--radius-group) bg-muted px-4 py-3.5">
+              <div className="text-xs font-medium text-muted-foreground">{a.name}</div>
+              <Money value={a.amount} animated className="mt-1 block font-rounded text-xl font-semibold tracking-tight" />
             </div>
           ))}
         </div>

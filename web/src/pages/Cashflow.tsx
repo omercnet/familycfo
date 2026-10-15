@@ -78,12 +78,12 @@ export default function Cashflow() {
         actions={<Link to="/fixed#scheduled" className="btn"><Settings2 className="h-4 w-4" />ניהול הכנסות והוצאות קבועות</Link>} />
 
       {tight?.isTight && (
-        <div role="status" className="card animate-rise-in mb-4 border-rose-200 bg-gradient-to-l from-rose-50/80 to-orange-50/40 dark:border-rose-900/60 dark:from-rose-950/30 dark:to-orange-950/10">
-          <div className="mb-2 flex items-center gap-2 font-semibold text-rose-800 dark:text-rose-300">
-            <span className="icon-tile h-7 w-7 rounded-lg [&_svg]:h-4 [&_svg]:w-4" style={{ ['--tile' as string]: 'var(--negative)' }}><TriangleAlert /></span>
+        <div role="status" className="card animate-rise-in mb-4 bg-negative-soft">
+          <div className="mb-2 flex items-center gap-2 font-semibold text-negative-strong">
+            <span className="icon-tile icon-tile-negative h-7 w-7 [&_svg]:h-4 [&_svg]:w-4"><TriangleAlert /></span>
             חודש לחוץ — כדאי לצמצם
           </div>
-          <ul className="mb-3 list-disc space-y-0.5 ps-5 text-sm leading-relaxed text-rose-900 dark:text-rose-200">{tight.reasons.map(r => <li key={r}>{r}</li>)}</ul>
+          <ul className="mb-3 list-disc space-y-0.5 ps-5 text-sm leading-relaxed text-negative-strong">{tight.reasons.map(r => <li key={r}>{r}</li>)}</ul>
           {tight.cuts.length > 0 && (
             <div className="overflow-x-auto"><table className="table">
               <thead><tr><th>קטגוריה</th><th className="text-end">עד עכשיו</th><th className="text-end">בדרך כלל</th><th className="text-end">בקצב הנוכחי</th><th className="text-end">לצמצם ב-</th></tr></thead>
@@ -152,7 +152,7 @@ export default function Cashflow() {
                   <td className="whitespace-nowrap">{day(e.date)}</td>
                   <td className="min-w-40">
                     {e.kind === 'card_charge' && e.cardAccountId
-                      ? <Link className="font-medium text-primary hover:underline" title="הצג את העסקאות שבחיוב הזה"
+                      ? <Link className="font-medium text-link hover:underline" title="הצג את העסקאות שבחיוב הזה"
                           to={`/transactions?account=${encodeURIComponent(e.cardAccountId)}&charge=${e.date}`}>{e.name} ←</Link>
                       : <div className="font-medium">{e.name}</div>}
                     <div className="text-2xs text-muted-foreground">{SCHEDULED_KIND_LABELS[e.kind] ?? e.kind}{e.estimated ? ' · הערכה' : ''}</div>

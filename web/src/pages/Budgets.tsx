@@ -10,7 +10,7 @@ import { BarList, Gauge } from '../components/charts';
 import { categoryIcon } from '@/lib/visuals';
 
 const STATUS_COLOR: Record<BudgetStatus['status'], string> = {
-  ok: 'var(--chart-1)', warning: 'var(--chart-3)', over: 'var(--negative)', none: 'var(--muted-foreground)',
+  ok: 'var(--chart-1)', warning: 'var(--warning)', over: 'var(--negative)', none: 'var(--muted-foreground)',
 };
 
 export default function Budgets() {
@@ -242,7 +242,7 @@ function CategoryTransactions({ categoryId, cycle, memberId }: { categoryId: num
           </tbody>
         </table>
       )}
-      <Link className="mt-1.5 inline-block text-xs font-medium text-primary hover:underline" to={`/transactions?category=${categoryId}&cycle=${cycle}`}>
+      <Link className="mt-1.5 inline-block text-xs font-medium text-link hover:underline" to={`/transactions?category=${categoryId}&cycle=${cycle}`}>
         {data && data.total > 50 ? `כל ${data.total} התנועות ←` : 'פתח בעמוד התנועות ←'}
       </Link>
     </div>

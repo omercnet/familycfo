@@ -105,7 +105,7 @@ export function ScrapeButton() {
             {data?.companies.map(c => (
               <li key={c.company} className="flex items-start gap-2.5 px-4 py-2.5">
                 <span className="mt-0.5 shrink-0">
-                  {c.status === 'running' ? <LoaderCircle className="h-4 w-4 animate-spin text-primary" />
+                  {c.status === 'running' ? <LoaderCircle className="h-4 w-4 animate-spin text-link" />
                     : c.status === 'done' ? <Check className="h-4 w-4 text-emerald-600" />
                     : c.status === 'failed' ? <X className="h-4 w-4 text-red-600" />
                     : <Circle className="h-4 w-4 text-zinc-300" />}

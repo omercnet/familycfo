@@ -1,4 +1,3 @@
-@import "@fontsource-variable/heebo";
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -7,66 +6,91 @@
    shadcn/ui tokens (--background, --primary, --chart-1…) are the source of truth and the only
    color names: kit components and page-level utilities both speak them (docs/design-system-plan.md, D1).
    Dark mode follows the OS unless data-theme forces one (below).
+
+   Direction (plan, "Visual direction"): Apple's grouped backgrounds, one blue tint for interaction
+   and the main data series, status colors only where something needs attention, label grays for
+   everything else. Text colors are opaque so contrast can be measured: every text pair is listed
+   in scripts/check-design.mjs (rule `contrast`) and must stay 4.5:1 (3:1 for marks and outlines).
+   Values are written as hex / rgba so that check can read them; keep it that way.
    ========================================================================================= */
 :root {
   --radius: 0.875rem;
 
-  --background: oklch(0.975 0.006 270);
-  --foreground: oklch(0.2 0.03 268);
-  --card: oklch(1 0 0);
+  --background: #f2f2f7;
+  --foreground: #000000;
+  --card: #ffffff;
   --card-foreground: var(--foreground);
-  --popover: oklch(1 0 0);
+  --popover: #ffffff;
   --popover-foreground: var(--foreground);
-  --primary: oklch(0.53 0.22 272);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.955 0.012 272);
-  --secondary-foreground: oklch(0.3 0.06 272);
-  --muted: oklch(0.96 0.008 270);
-  --muted-foreground: oklch(0.52 0.025 268);
-  --accent: oklch(0.95 0.025 272);
-  --accent-foreground: oklch(0.35 0.14 272);
-  --destructive: oklch(0.6 0.22 18);
-  --border: oklch(0.915 0.012 270);
-  --input: oklch(0.89 0.014 270);
-  --ring: oklch(0.6 0.2 272);
+  /* the tint: filled buttons, focus, selection (white on it 5.3:1; Apple's #007aff gives only 4.0) */
+  --primary: #0068d6;
+  --primary-foreground: #ffffff;
+  /* the tint as text (links, active nav icon): separate from --primary because in dark mode no
+     single blue carries both white text and text on dark cards */
+  --link: #0058b8;
+  --secondary: #e9e9ee;
+  --secondary-foreground: #3a3a3c;
+  --muted: #efeff4;
+  --muted-foreground: #636366;
+  --accent: #e8f1fc;
+  --accent-foreground: #0058b8;
+  --destructive: #d70015;
+  --destructive-foreground: #ffffff;
+  /* Apple's opaque separator; --input outlines controls (3:1 on page and card) */
+  --border: #c6c6c8;
+  --input: #8a8a8e;
+  --ring: #0068d6;
 
-  /* data palette — distinct hues, similar weight */
-  --chart-1: oklch(0.58 0.21 272);  /* indigo */
-  --chart-2: oklch(0.7 0.14 178);   /* teal */
-  --chart-3: oklch(0.78 0.16 75);   /* amber */
-  --chart-4: oklch(0.64 0.21 12);   /* rose */
-  --chart-5: oklch(0.68 0.15 235);  /* sky */
-  --chart-6: oklch(0.62 0.2 305);   /* violet */
-  --chart-7: oklch(0.74 0.17 135);  /* green */
-  --chart-8: oklch(0.7 0.17 45);    /* orange */
-  --positive: oklch(0.62 0.15 162);
-  --negative: oklch(0.6 0.21 18);
+  /* translucent fills (Apple's system fills): control backgrounds, segmented track, hover */
+  --fill: rgba(120, 120, 128, 0.12);
+  --fill-2: rgba(120, 120, 128, 0.2);
+  --fill-3: rgba(120, 120, 128, 0.28);
+  /* glass: header and sidebar; prefers-reduced-transparency swaps it for --card */
+  --glass: rgba(242, 242, 247, 0.72);
+  --glass-edge: rgba(255, 255, 255, 0.75);
+  --scrim: rgba(0, 0, 0, 0.32);
+  --seg-selected: #ffffff;
 
-  /* status tones: base (icons, dots, bars), -soft (tinted background), -strong (text on -soft).
-     strong-on-soft contrast, light / dark: positive 6.6 / 9.5, negative 6.5 / 9.2,
-     warning 6.4 / 9.8, info 6.2 / 9.3 (WCAG AA needs 4.5). Re-check when changing a value. */
-  --positive-soft: oklch(0.955 0.04 162);
-  --positive-strong: oklch(0.44 0.09 162);
-  --negative-soft: oklch(0.955 0.022 18);
-  --negative-strong: oklch(0.47 0.17 18);
-  --warning: oklch(0.78 0.16 75);
-  --warning-soft: oklch(0.965 0.04 88);
-  --warning-strong: oklch(0.47 0.1 60);
-  --info: oklch(0.68 0.15 235);
-  --info-soft: oklch(0.955 0.022 235);
-  --info-strong: oklch(0.46 0.11 245);
+  /* data: one hue. chart-1 is the main series; the rest step through lighter/darker blues and
+     grays so stacked series stay apart by lightness. All 3:1 or better on cards. */
+  --chart-1: #007aff;
+  --chart-2: #003f8a;
+  --chart-3: #8e8e93;
+  --chart-4: #0058b8;
+  --chart-5: #3d8af7;
+  --chart-6: #636366;
+  --chart-7: #4d7cc0;
+  --chart-8: #3a3a3c;
 
-  /* the sidebar is always ink — it anchors the page */
-  --sidebar: oklch(0.2 0.035 272);
-  --sidebar-foreground: oklch(0.8 0.025 272);
-  --sidebar-muted: oklch(0.6 0.03 272);
-  --sidebar-accent: oklch(0.28 0.05 272);
-  --sidebar-border: oklch(0.28 0.035 272);
-  --sidebar-primary: oklch(0.68 0.19 276);
+  /* status tones: base (text, icons, dots, bars: the text-safe variant, so text-positive passes),
+     -soft (tinted background), -strong (text on -soft). Green is only for money coming in. */
+  --positive: #1f7a35;
+  --positive-soft: #e5f4e9;
+  --positive-strong: #17652b;
+  --negative: #d70015;
+  --negative-soft: #fde8ea;
+  --negative-strong: #b00012;
+  --warning: #c93400;
+  --warning-soft: #fdeee5;
+  --warning-strong: #a32a00;
+  --info: #0058b8;
+  --info-soft: #e8f1fc;
+  --info-strong: #004a9c;
 
-  --shadow-card: 0 1px 2px oklch(0.3 0.05 272 / 0.05), 0 1px 1px oklch(0.3 0.05 272 / 0.03);
-  --shadow-lift: 0 10px 24px -10px oklch(0.35 0.1 272 / 0.22), 0 2px 6px oklch(0.35 0.08 272 / 0.06);
-  --shadow-overlay: 0 18px 44px -12px oklch(0.25 0.08 272 / 0.3), 0 4px 10px oklch(0.25 0.06 272 / 0.08);
+  /* the sidebar is a more opaque glass panel; text measured on it over the page */
+  --sidebar: rgba(250, 250, 252, 0.82);
+  --sidebar-foreground: #000000;
+  --sidebar-muted: #636366;
+  --sidebar-accent: rgba(120, 120, 128, 0.2);
+  --sidebar-border: rgba(60, 60, 67, 0.12);
+  --sidebar-primary: #0058b8;
+
+  /* no shadows on cards; floating things (glass, popovers, dialogs) get a neutral one */
+  --shadow-card: 0 0 #0000;
+  --shadow-control: 0 1px 3px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  --shadow-lift: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-overlay: 0 18px 44px -12px rgba(0, 0, 0, 0.22), 0 4px 10px rgba(0, 0, 0, 0.06);
+  --scroll-shadow: rgba(0, 0, 0, 0.12);
 }
 
 /* Dark mode follows the OS unless <html data-theme="light|dark"> forces one. The `dark` variant
@@ -87,53 +111,87 @@
 
 :root {
   @variant dark {
-    --background: oklch(0.165 0.02 272);
-    --foreground: oklch(0.95 0.01 270);
-    --card: oklch(0.205 0.025 272);
-    --popover: oklch(0.225 0.028 272);
-    --primary: oklch(0.66 0.19 276);
-    --primary-foreground: oklch(0.16 0.03 272);
-    --secondary: oklch(0.26 0.03 272);
-    --secondary-foreground: oklch(0.9 0.02 272);
-    --muted: oklch(0.24 0.025 272);
-    --muted-foreground: oklch(0.7 0.025 270);
-    --accent: oklch(0.28 0.05 274);
-    --accent-foreground: oklch(0.9 0.06 276);
-    --destructive: oklch(0.66 0.2 18);
-    --border: oklch(1 0 0 / 0.08);
-    --input: oklch(1 0 0 / 0.13);
-    --ring: oklch(0.68 0.18 276);
-    --chart-1: oklch(0.68 0.19 276);
-    --chart-2: oklch(0.75 0.13 178);
-    --chart-3: oklch(0.82 0.15 80);
-    --chart-4: oklch(0.7 0.19 14);
-    --chart-5: oklch(0.74 0.13 235);
-    --chart-6: oklch(0.7 0.18 305);
-    --chart-7: oklch(0.78 0.16 135);
-    --chart-8: oklch(0.75 0.15 50);
-    --positive: oklch(0.74 0.15 162);
-    --negative: oklch(0.7 0.19 18);
-    --positive-soft: oklch(0.29 0.05 162);
-    --positive-strong: oklch(0.86 0.12 162);
-    --negative-soft: oklch(0.29 0.06 18);
-    --negative-strong: oklch(0.86 0.065 18);
-    --warning: oklch(0.82 0.15 80);
-    --warning-soft: oklch(0.3 0.05 75);
-    --warning-strong: oklch(0.89 0.1 85);
-    --info: oklch(0.74 0.13 235);
-    --info-soft: oklch(0.29 0.05 240);
-    --info-strong: oklch(0.86 0.08 235);
-    --sidebar: oklch(0.14 0.02 272);
-    --sidebar-border: oklch(1 0 0 / 0.06);
-    --sidebar-accent: oklch(0.24 0.04 272);
-    --shadow-card: 0 1px 2px oklch(0 0 0 / 0.4);
-    --shadow-lift: 0 12px 28px -10px oklch(0 0 0 / 0.6);
-    --shadow-overlay: 0 20px 48px -12px oklch(0 0 0 / 0.7), 0 0 0 1px oklch(1 0 0 / 0.06);
+    --background: #000000;
+    --foreground: #ffffff;
+    --card: #1c1c1e;
+    --popover: #2c2c2e;
+    --primary: #0068d6;
+    --primary-foreground: #ffffff;
+    --link: #409cff;
+    --secondary: #323236;
+    --secondary-foreground: #e5e5ea;
+    --muted: #2c2c2e;
+    --muted-foreground: #a1a1a8;
+    --accent: #10263f;
+    --accent-foreground: #409cff;
+    --destructive: #d70015;
+    --destructive-foreground: #ffffff;
+    --border: #38383a;
+    --input: #7c7c80;
+    --ring: #409cff;
+    --fill: rgba(120, 120, 128, 0.24);
+    --fill-2: rgba(120, 120, 128, 0.36);
+    --fill-3: rgba(120, 120, 128, 0.44);
+    --glass: rgba(0, 0, 0, 0.66);
+    --glass-edge: rgba(255, 255, 255, 0.12);
+    --scrim: rgba(0, 0, 0, 0.55);
+    --seg-selected: #5a5a5e;
+    --chart-1: #0a84ff;
+    --chart-2: #a8d0ff;
+    --chart-3: #8e8e93;
+    --chart-4: #409cff;
+    --chart-5: #2f6fd1;
+    --chart-6: #aeaeb2;
+    --chart-7: #5e8fd6;
+    --chart-8: #d1d1d6;
+    --positive: #30d158;
+    --positive-soft: #13301c;
+    --positive-strong: #7ee59a;
+    --negative: #ff6961;
+    --negative-soft: #3a1714;
+    --negative-strong: #ff9b94;
+    --warning: #ffb340;
+    --warning-soft: #3a2610;
+    --warning-strong: #ffcf8a;
+    --info: #409cff;
+    --info-soft: #10263f;
+    --info-strong: #8cc4ff;
+    --sidebar: rgba(28, 28, 30, 0.78);
+    --sidebar-foreground: #ffffff;
+    --sidebar-muted: #a1a1a8;
+    --sidebar-accent: rgba(120, 120, 128, 0.36);
+    --sidebar-border: rgba(255, 255, 255, 0.08);
+    --sidebar-primary: #409cff;
+    --shadow-control: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-lift: 0 10px 30px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-overlay: 0 20px 48px -12px rgba(0, 0, 0, 0.7), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+    --scroll-shadow: rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Accessibility settings (plan, "Respect the OS settings"). More contrast: secondary text at full
+   strength, separators at control-outline strength, outlines on cards. Less transparency: the
+   glass surfaces become opaque (the .glass rules below drop the blur too). */
+@media (prefers-contrast: more) {
+  :root {
+    --muted-foreground: var(--foreground);
+    --sidebar-muted: var(--sidebar-foreground);
+    --secondary-foreground: var(--foreground);
+    --border: var(--input);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass: var(--background);
+    --sidebar: var(--card);
   }
 }
 
 @theme inline {
-  --font-sans: "Heebo Variable", "Heebo", "Assistant", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* the system font: SF Pro / SF Hebrew on Apple devices, Segoe UI on Windows, the desktop's UI font
+     elsewhere. Big values use the rounded variant (SF Pro Rounded) where it exists. Nothing is self-hosted. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Hebrew", system-ui, "Segoe UI", "Arial Hebrew", sans-serif;
+  --font-rounded: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
 
   /* type steps added to Tailwind's scale: 11 / 12 / 14 / 15 / 18 / 20 / 26 px (body is text-sm) */
   --text-2xs: 0.6875rem;
@@ -151,6 +209,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-link: var(--link);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -158,6 +217,10 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-fill: var(--fill);
+  --color-fill-2: var(--fill-2);
+  --color-fill-3: var(--fill-3);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -195,8 +258,10 @@
   --radius-2xl: calc(var(--radius) + 4px);
 
   --radius-control: var(--radius-md);
-  --radius-panel: var(--radius-xl);
-  --radius-dialog: var(--radius-2xl);
+  /* cards 20, grouped lists 14 (Apple's grouped inset style) */
+  --radius-panel: 1.25rem;
+  --radius-group: var(--radius);
+  --radius-dialog: 1.375rem;
 
   /* motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -223,18 +288,14 @@
   }
   * {
     border-color: var(--border);
-    outline-color: color-mix(in oklab, var(--ring) 50%, transparent);
+    outline-color: var(--ring);
   }
   html {
     scrollbar-gutter: stable;
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    background:
-      radial-gradient(1200px 520px at 100% -10%, color-mix(in oklab, var(--chart-1) 9%, transparent), transparent 60%),
-      radial-gradient(900px 480px at 0% 0%, color-mix(in oklab, var(--chart-2) 7%, transparent), transparent 60%),
-      var(--background);
-    background-attachment: fixed;
+    background: var(--background);
     color: var(--foreground);
     font-size: 0.875rem;
     line-height: 1.5;
@@ -246,7 +307,7 @@
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: 6px;
   }
   button, [role="button"], summary, label:has(input[type="checkbox"]) { cursor: pointer; }
   button:disabled { cursor: not-allowed; }
@@ -296,8 +357,8 @@
     animation: check-pop var(--duration-base) var(--ease-spring);
   }
   input[type="checkbox"]:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 35%, transparent);
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
   input[type="checkbox"]:disabled { opacity: 0.5; }
   @media (pointer: coarse) {
@@ -316,24 +377,27 @@
    App component classes (pages use these; they share the kit's tokens)
    ========================================================================================= */
 @layer components {
+  /* borderless, shadowless; hierarchy comes from the grouped background and type */
   .card {
     border-radius: var(--radius-panel);
-    border: 1px solid var(--border);
+    border: 0 solid var(--border);
     background: var(--card);
     padding: 1rem;
-    box-shadow: var(--shadow-card);
     @media (width >= 48rem) { padding: 1.25rem; }
   }
-  /* cards that react to the pointer */
+  /* cards that are links or buttons: a pressed-cell tint, no lift */
   .card-hover {
-    transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out),
-      border-color var(--duration-base) var(--ease-out);
+    transition: background-color var(--duration-fast) var(--ease-out);
   }
-  .card-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lift);
-    border-color: color-mix(in oklab, var(--primary) 22%, var(--border));
+  .card-hover:hover { background-color: color-mix(in srgb, var(--card) 95%, var(--foreground)); }
+
+  /* grouped inset list (Wallet / Settings style): rows separated by inset hairlines */
+  .list-group {
+    overflow: hidden;
+    border-radius: var(--radius-group);
+    background: var(--card);
   }
+  .list-group > * + * { box-shadow: inset 0 0.5px 0 var(--border); }
   .card-title {
     margin-bottom: 0.875rem;
     display: flex;
@@ -393,39 +457,33 @@
   .btn:active:not(:disabled), .btn-ghost:active:not(:disabled) { transform: scale(0.97); }
   .btn:disabled, .btn-ghost:disabled { opacity: 0.45; }
   .btn:focus-visible, .btn-ghost:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 35%, transparent);
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
   @media (pointer: coarse) {
     .btn, .btn-ghost { min-height: 2.75rem; }
   }
+  /* gray-filled (Apple's bordered button); the label identifies it, so no outline */
   .btn {
-    border: 1px solid var(--input);
-    background: var(--card);
+    border: 1px solid transparent;
+    background: var(--fill-2);
     color: var(--foreground);
-    box-shadow: var(--shadow-card);
   }
-  .btn:hover:not(:disabled) {
-    border-color: color-mix(in oklab, var(--primary) 30%, var(--input));
-    background: color-mix(in oklab, var(--accent) 45%, var(--card));
-  }
+  .btn:hover:not(:disabled) { background: var(--fill-3); }
+  /* the one filled-tint style: flat, no gradient or glow */
   .btn-primary {
     border-color: transparent;
-    background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 88%, white), var(--primary));
+    background: var(--primary);
     color: var(--primary-foreground);
-    box-shadow: 0 1px 2px color-mix(in oklab, var(--primary) 40%, transparent), 0 4px 12px -4px color-mix(in oklab, var(--primary) 55%, transparent),
-      inset 0 1px 0 rgb(255 255 255 / 0.18);
   }
   .btn-primary:hover:not(:disabled) {
     border-color: transparent;
-    background: linear-gradient(180deg, var(--primary), color-mix(in oklab, var(--primary) 85%, black));
-    box-shadow: 0 1px 2px color-mix(in oklab, var(--primary) 40%, transparent), 0 8px 18px -6px color-mix(in oklab, var(--primary) 65%, transparent),
-      inset 0 1px 0 rgb(255 255 255 / 0.18);
+    background: color-mix(in srgb, var(--primary) 88%, black);
   }
   .btn-danger {
     border-color: transparent;
     background: var(--destructive);
-    color: #fff;
+    color: var(--destructive-foreground);
   }
   .btn-danger:hover:not(:disabled) {
     border-color: transparent;
@@ -437,8 +495,8 @@
     color: color-mix(in oklab, var(--foreground) 72%, var(--muted-foreground));
   }
   .btn-ghost:hover:not(:disabled) {
-    background: color-mix(in oklab, var(--accent) 70%, transparent);
-    color: var(--accent-foreground);
+    background: var(--fill);
+    color: var(--foreground);
   }
   @media (pointer: coarse) {
     .btn-ghost { min-height: 2.5rem; min-width: 2.5rem; }
@@ -464,16 +522,15 @@
     font-size: 0.875rem;
     line-height: 1.25rem;
     color: var(--foreground);
-    box-shadow: var(--shadow-card);
     outline: none;
     transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out),
       background-color var(--duration-fast) var(--ease-out);
   }
-  .input::placeholder { color: var(--muted-foreground); opacity: 0.8; }
-  .input:hover:not(:disabled):not(:focus) { border-color: color-mix(in oklab, var(--primary) 30%, var(--input)); }
+  .input::placeholder { color: var(--muted-foreground); }
+  .input:hover:not(:disabled):not(:focus) { border-color: color-mix(in srgb, var(--input) 70%, var(--foreground)); }
   .input:focus {
     border-color: var(--ring);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 22%, transparent);
+    box-shadow: 0 0 0 1px var(--ring);
   }
   .input:disabled {
     cursor: not-allowed;
@@ -527,8 +584,12 @@
   }
   .table > tbody:last-child > tr:last-child > td { border-bottom: 0; }
   .table > tbody > tr { transition: background-color var(--duration-fast) var(--ease-out); }
-  .table > tbody > tr:hover > td { background-color: color-mix(in oklab, var(--accent) 45%, transparent); }
-  .table .input { box-shadow: none; }
+  .table > tbody > tr:hover > td { background-color: var(--fill); }
+  /* in-row pickers read as popup buttons (fill + chevron) rather than a grid of outlined boxes;
+     standalone fields keep the 3:1 outline */
+  .table .input { border-color: transparent; background-color: var(--fill); }
+  .table .input:hover:not(:disabled):not(:focus) { border-color: transparent; background-color: var(--fill-2); }
+  .table .input:focus { border-color: var(--ring); }
   .card:not(.p-0) > .table th:first-child,
   .card:not(.p-0) > div > .table th:first-child { border-start-start-radius: 8px; border-end-start-radius: 8px; }
   .card:not(.p-0) > .table th:last-child,
@@ -542,8 +603,8 @@
     background:
       linear-gradient(to left, var(--scroll-bg, var(--card)), var(--scroll-bg, var(--card))) right / 1.5rem 100% no-repeat local,
       linear-gradient(to right, var(--scroll-bg, var(--card)), var(--scroll-bg, var(--card))) left / 1.5rem 100% no-repeat local,
-      radial-gradient(farthest-side at 100% 50%, oklch(0.3 0.05 272 / 0.12), transparent) right / 0.625rem 100% no-repeat scroll,
-      radial-gradient(farthest-side at 0 50%, oklch(0.3 0.05 272 / 0.12), transparent) left / 0.625rem 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, var(--scroll-shadow), transparent) right / 0.625rem 100% no-repeat scroll,
+      radial-gradient(farthest-side at 0 50%, var(--scroll-shadow), transparent) left / 0.625rem 100% no-repeat scroll,
       var(--scroll-bg, var(--card));
   }
 
@@ -565,16 +626,16 @@
   }
   button.chip:hover, a.chip:hover { background: var(--accent); color: var(--accent-foreground); }
 
+  /* capsule segmented control: translucent track, raised selected segment */
   .seg {
     position: relative;
     display: inline-flex;
     max-width: 100%;
     flex-wrap: wrap;
     gap: 0.125rem;
-    border-radius: calc(var(--radius-control) + 2px);
-    background: var(--muted);
-    border: 1px solid color-mix(in oklab, var(--border) 65%, transparent);
-    padding: 0.1875rem;
+    border-radius: 1.125rem;
+    background: var(--fill);
+    padding: 0.125rem;
   }
   .seg-item {
     position: relative;
@@ -584,8 +645,8 @@
     align-items: center;
     justify-content: center;
     gap: 0.375rem;
-    border-radius: var(--radius-control);
-    padding-inline: 0.75rem;
+    border-radius: 1rem;
+    padding-inline: 0.875rem;
     font-size: 0.8125rem;
     line-height: 1.25rem;
     font-weight: 500;
@@ -594,20 +655,20 @@
     transition: color var(--duration-fast) var(--ease-out);
   }
   .seg-item:hover { color: var(--foreground); }
-  .seg-item[aria-pressed="true"] { color: var(--foreground); }
+  .seg-item[aria-pressed="true"] { color: var(--foreground); font-weight: 600; }
   /* the moving pill behind the active item (rendered by <Segmented>) */
   .seg-pill {
     position: absolute;
     inset: 0;
     z-index: -1;
-    border-radius: var(--radius-control);
-    background: var(--card);
-    box-shadow: 0 1px 3px oklch(0.3 0.05 272 / 0.12), 0 0 0 1px oklch(0.3 0.05 272 / 0.04);
+    border-radius: 1rem;
+    background: var(--seg-selected);
+    box-shadow: var(--shadow-control);
   }
   /* plain markup (no <Segmented>): static pill */
   .seg-item[aria-pressed="true"]:not(:has(.seg-pill)) {
-    background: var(--card);
-    box-shadow: 0 1px 3px oklch(0.3 0.05 272 / 0.12), 0 0 0 1px oklch(0.3 0.05 272 / 0.04);
+    background: var(--seg-selected);
+    box-shadow: var(--shadow-control);
   }
   .seg-item:focus-visible { outline-offset: 0; }
   @media (pointer: coarse) {
@@ -622,12 +683,14 @@
 
   .skeleton {
     border-radius: 0.375rem;
-    background: linear-gradient(90deg, var(--muted) 0%, color-mix(in oklab, var(--accent) 80%, var(--muted)) 50%, var(--muted) 100%);
+    background: linear-gradient(90deg, var(--muted) 0%, color-mix(in srgb, var(--muted) 60%, var(--card)) 50%, var(--muted) 100%);
     background-size: 200% 100%;
     animation: shimmer 1.4s var(--ease-in-out) infinite;
   }
 
-  /* soft tinted icon tile (KPI cards, section headers) */
+  /* icon in a neutral gray circle (list rows, section headers). Categories are told apart by icon
+     and name, not color, so a `--tile` style is ignored; only status gets a color, through the
+     tone modifiers (each status also needs words next to it). */
   .icon-tile {
     display: inline-flex;
     flex-shrink: 0;
@@ -635,12 +698,41 @@
     justify-content: center;
     width: 2.25rem;
     height: 2.25rem;
-    border-radius: 0.625rem;
-    color: var(--tile, var(--primary));
-    background: color-mix(in oklab, var(--tile, var(--primary)) 13%, transparent);
-    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tile, var(--primary)) 18%, transparent);
+    border-radius: 9999px;
+    color: var(--muted-foreground);
+    background: var(--fill);
   }
   .icon-tile svg { width: 1.125rem; height: 1.125rem; }
+  .icon-tile-positive { color: var(--positive-strong); background: var(--positive-soft); }
+  .icon-tile-negative { color: var(--negative-strong); background: var(--negative-soft); }
+  .icon-tile-warning { color: var(--warning-strong); background: var(--warning-soft); }
+  .icon-tile-info { color: var(--info-strong); background: var(--info-soft); }
+
+  /* status chips: tone + words (never color alone) */
+  .chip-positive { background: var(--positive-soft); color: var(--positive-strong); }
+  .chip-negative { background: var(--negative-soft); color: var(--negative-strong); }
+  .chip-warning { background: var(--warning-soft); color: var(--warning-strong); }
+  .chip-info { background: var(--info-soft); color: var(--info-strong); }
+
+  /* floating glass (header, sidebar). prefers-reduced-transparency: opaque, no blur */
+  .glass {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+  }
+  .glass-panel {
+    background: var(--sidebar);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    backdrop-filter: blur(30px) saturate(180%);
+    box-shadow: inset 0 0 0 0.5px var(--glass-edge), var(--shadow-lift);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .glass, .glass-panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  }
+  @media (prefers-contrast: more) {
+    .card, .list-group { outline: 1px solid var(--input); outline-offset: -1px; }
+    .glass-panel { box-shadow: inset 0 0 0 1px var(--input); }
+  }
 }
 
 /* =========================================================================================
@@ -648,8 +740,6 @@
    ========================================================================================= */
 @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 @keyframes fade-in { from { opacity: 0; } }
-@keyframes page-in { from { opacity: 0; transform: translateY(8px); } }
-@keyframes rise-in { from { opacity: 0; transform: translateY(6px); } }
 @keyframes dialog-in { from { opacity: 0; transform: translateY(6px) scale(0.97); } }
 @keyframes sheet-in { from { transform: translateY(100%); } }
 @keyframes check-pop { 0% { transform: scale(0.8); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
@@ -659,8 +749,9 @@
   100% { box-shadow: 0 0 0 0 transparent; }
 }
 
-@utility animate-page-in { animation: page-in var(--duration-slow) var(--ease-out) backwards; }
-@utility animate-rise-in { animation: rise-in var(--duration-base) var(--ease-out) backwards; }
+/* entrances are plain cross-fades (plan, "Motion": no page rise-in, no card stagger) */
+@utility animate-page-in { animation: fade-in var(--duration-base) var(--ease-out) backwards; }
+@utility animate-rise-in { animation: fade-in var(--duration-base) var(--ease-out) backwards; }
 @utility animate-fade-in { animation: fade-in var(--duration-base) var(--ease-out) backwards; }
 @utility animate-dialog-in {
   animation: sheet-in var(--duration-slow) var(--ease-out) backwards;
@@ -668,15 +759,14 @@
 }
 @utility animate-delayed-in { animation: fade-in var(--duration-base) var(--ease-out) 180ms backwards; }
 @utility animate-pulse-dot { animation: pulse-dot 2s var(--ease-out) infinite; }
-/* children enter one after another: put on a grid/list, children get --i via style */
+/* was a staggered entry; children now appear together (kept so call sites need no change) */
 @utility stagger {
-  & > * { animation: rise-in 420ms var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 55ms); }
+  & > * { animation: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-page-in, .animate-rise-in, .animate-dialog-in, .stagger > * { animation-name: fade-in; }
+  .animate-dialog-in { animation-name: fade-in; }
   .motion-transform { transition-property: opacity !important; }
   .btn:active:not(:disabled), .btn-ghost:active:not(:disabled), input[type="checkbox"]:active { transform: none; }
-  .card-hover:hover { transform: none; }
   .skeleton, .animate-pulse-dot { animation: none; }
 }

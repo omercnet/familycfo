@@ -89,7 +89,7 @@ export function ForecastChart({ points, buffer, events = [], height = 260, lowes
               const net = evs.reduce((s, e) => s + e.amount, 0);
               return <circle key={props.payload!.date} cx={props.cx} cy={props.cy} r={4.5} fill={net >= 0 ? 'var(--positive)' : 'var(--negative)'} stroke="var(--card)" strokeWidth={2} />;
             }} />
-          <ReferenceLine y={buffer} stroke="var(--chart-3)" strokeDasharray="5 4" label={{ value: 'כרית', position: 'insideTopLeft', fontSize: 11, fill: 'var(--chart-3)' }} />
+          <ReferenceLine y={buffer} stroke="var(--warning)" strokeDasharray="5 4" label={{ value: 'כרית', position: 'insideTopLeft', fontSize: 11, fill: 'var(--warning)' }} />
           <ReferenceLine y={0} stroke="var(--negative)" strokeOpacity={0.45} />
           {selectedDate && <ReferenceLine x={selectedDate} stroke="var(--chart-1)" strokeWidth={2} />}
           {lowest && <ReferenceDot x={lowest.date} y={lowest.amount} r={6} fill="var(--negative)" stroke="var(--card)" strokeWidth={2} />}
@@ -297,8 +297,8 @@ export function BarList({ items, format = money, color = 'var(--chart-1)' }: {
               </span>
               <span className="num shrink-0 font-medium">{format(it.value)}</span>
             </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-              <motion.div className="h-full rounded-full" style={{ background: `linear-gradient(to left, ${it.color ?? color}, color-mix(in oklab, ${it.color ?? color} 55%, white))` }}
+            <div className="h-1.5 overflow-hidden rounded-full bg-fill">
+              <motion.div className="h-full rounded-full" style={{ background: it.color ?? color }}
                 initial={{ width: 0 }} animate={{ width: `${(Math.abs(it.value) / max) * 100}%` }}
                 transition={{ duration: 0.8, delay: 0.1 + i * 0.05, ease: [0.22, 1, 0.36, 1] }} />
             </div>
@@ -320,19 +320,12 @@ export function BarList({ items, format = money, color = 'var(--chart-1)' }: {
 export function Gauge({ value, max, label, sub, size = 132, status }: { value: number; max: number; label?: ReactNode; sub?: ReactNode; size?: number; status?: 'ok' | 'warning' | 'over' }) {
   const pctv = max > 0 ? Math.min(1, value / max) : 0;
   const r = 44, c = 2 * Math.PI * r;
-  const color = status === 'over' ? 'var(--negative)' : status === 'warning' ? 'var(--chart-3)' : 'var(--chart-1)';
-  const id = useId().replace(/:/g, '');
+  const color = status === 'over' ? 'var(--negative)' : status === 'warning' ? 'var(--warning)' : 'var(--chart-1)';
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }} role="img" aria-label={`${Math.round(pctv * 100)}%`}>
       <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90" aria-hidden>
-        <defs>
-          <linearGradient id={`g-${id}`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor="var(--chart-5)" />
-          </linearGradient>
-        </defs>
-        <circle cx="50" cy="50" r={r} fill="none" stroke="var(--muted)" strokeWidth="9" />
-        <motion.circle cx="50" cy="50" r={r} fill="none" stroke={status === 'ok' || !status ? `url(#g-${id})` : color} strokeWidth="9" strokeLinecap="round"
+        <circle cx="50" cy="50" r={r} fill="none" stroke="var(--fill)" strokeWidth="9" />
+        <motion.circle cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="9" strokeLinecap="round"
           strokeDasharray={c} initial={{ strokeDashoffset: c }} animate={{ strokeDashoffset: c * (1 - pctv) }}
           transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }} />
       </svg>

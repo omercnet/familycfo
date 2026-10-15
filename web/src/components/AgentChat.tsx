@@ -260,7 +260,7 @@ export function AgentChat() {
           <div ref={scroller} className="flex-1 space-y-4 overflow-y-auto px-4 py-4 text-sm">
             {empty && (
               <div className="space-y-3 pt-6 text-center">
-                <Sparkles className="mx-auto h-8 w-8 text-primary/70" />
+                <Sparkles className="mx-auto h-8 w-8 text-link/70" />
                 <p className="text-muted-foreground">אפשר לשאול כל שאלה על ההכנסות, ההוצאות, התקציב והתחזית.<br />התשובות מבוססות על הנתונים שלך.</p>
                 <div className="flex flex-col gap-2 pt-2">
                   {SUGGESTIONS.map(q => (

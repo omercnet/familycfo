@@ -10,6 +10,7 @@ import {
 import { Empty, ErrorBox, Loading, Money, PageHeader, SectionTitle, SeverityDot } from '../components/ui';
 import { BarList, DonutChart } from '../components/charts';
 import { categoryIcon } from '@/lib/visuals';
+import { cn } from '@/lib/utils';
 
 interface RecurringRow { merchantKey: string; accountId: string; kind: string; typicalAmount: number; lastAmount: number; typicalDay: number; lastDate: string; categoryName: string | null }
 
@@ -24,7 +25,7 @@ const ALERT_ICONS: Record<string, LucideIcon> = {
   low_balance: TriangleAlert, card_vs_balance: CreditCard, fee: Receipt, unmatched_card_bill: CreditCard,
   scrape_failed: CloudOff, big_day: CalendarDays, planned_overdue: CalendarClock,
 };
-const SEVERITY_TILE: Record<string, string> = { critical: 'var(--negative)', warning: 'var(--chart-3)' };
+const SEVERITY_CHIP: Record<string, string> = { critical: 'chip-negative', warning: 'chip-warning' };
 
 export default function Insights() {
   const qc = useQueryClient();
@@ -65,7 +66,7 @@ export default function Insights() {
 
       <div className="grid gap-4 lg:grid-cols-5">
         <div className="min-w-0 space-y-3 lg:col-span-3">
-          <h2 className="flex items-center gap-2 text-md font-semibold tracking-tight"><Sparkles className="h-4 w-4 text-primary" />איפה אפשר לחסוך</h2>
+          <h2 className="flex items-center gap-2 text-md font-semibold tracking-tight"><Sparkles className="h-4 w-4 text-link" />איפה אפשר לחסוך</h2>
           {recs.data && recs.data.some(r => r.annualSaving > 0) && (
             <div className="card animate-rise-in">
               <BarList color="var(--positive)" items={[...recs.data].filter(r => r.annualSaving > 0).sort((a, b) => b.annualSaving - a.annualSaving)
@@ -76,7 +77,7 @@ export default function Insights() {
             <div key={r.key} style={{ ['--i' as string]: i }} className="card card-hover">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 gap-3">
-                  <span className="icon-tile h-9 w-9" style={{ ['--tile' as string]: r.annualSaving > 0 ? 'var(--positive)' : 'var(--chart-3)' }}>{r.annualSaving > 0 ? <Sparkles /> : <Lightbulb />}</span>
+                  <span className={cn('icon-tile h-9 w-9', r.annualSaving > 0 && 'icon-tile-positive')}>{r.annualSaving > 0 ? <Sparkles /> : <Lightbulb />}</span>
                   <div className="min-w-0">
                     <div className="font-semibold">{r.title}</div>
                     <p className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{r.detail}</p>
@@ -93,7 +94,7 @@ export default function Insights() {
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {r.examples.map((e, i) => {
                     const label = <>{e.description}{e.amount ? <> · <Money value={e.amount} /></> : null}</>;
-                    return e.href ? <Link key={i} to={e.href} className="chip hover:border-primary hover:text-primary">{label}</Link> : <span key={i} className="chip">{label}</span>;
+                    return e.href ? <Link key={i} to={e.href} className="chip hover:border-primary hover:text-link">{label}</Link> : <span key={i} className="chip">{label}</span>;
                   })}
                 </div>
               )}
@@ -133,7 +134,7 @@ export default function Insights() {
 
         <div className="min-w-0 lg:col-span-2">
           <div className="mb-3 flex min-h-9 items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 text-md font-semibold tracking-tight"><Bell className="h-4 w-4 text-primary" />התראות</h2>
+            <h2 className="flex items-center gap-2 text-md font-semibold tracking-tight"><Bell className="h-4 w-4 text-link" />התראות</h2>
             <label className="flex min-h-8 items-center gap-2 text-sm text-muted-foreground"><input type="checkbox" checked={showAll} onChange={e => setShowAll(e.target.checked)} /> כולל שנסגרו</label>
           </div>
           {alerts.isLoading ? <Loading /> : (alerts.data ?? []).length === 0 ? <Empty>אין התראות</Empty> : (
@@ -147,7 +148,7 @@ export default function Insights() {
                   <SeverityDot severity={a.severity} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="chip gap-1" style={{ color: SEVERITY_TILE[a.severity], backgroundColor: SEVERITY_TILE[a.severity] ? `color-mix(in oklab, ${SEVERITY_TILE[a.severity]} 12%, transparent)` : undefined }}>
+                      <span className={cn('chip gap-1', SEVERITY_CHIP[a.severity])}>
                         <TypeIcon className="h-3 w-3" />{ALERT_TYPES[a.type] ?? a.type}
                       </span>
                       <span className="text-xs text-muted-foreground">{day(a.createdAt)}</span>
@@ -155,7 +156,7 @@ export default function Insights() {
                     <div className="mt-1.5 text-sm font-medium">{a.title}</div>
                     <div className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{a.message}</div>
                     {a.action && (
-                      <Link to={a.action.href} onClick={e => e.stopPropagation()} className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                      <Link to={a.action.href} onClick={e => e.stopPropagation()} className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-link hover:underline">
                         {a.action.label}<ArrowLeft className="h-3 w-3" />
                       </Link>
                     )}

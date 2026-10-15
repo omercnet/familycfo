@@ -102,11 +102,11 @@ export default function Settings() {
       </Section>
 
       <Section title="הכנסות והוצאות קבועות" icon={CalendarClock} color="var(--chart-3)">
-        <p className="text-sm">עברו לעמוד <Link className="text-primary hover:underline" to="/fixed#scheduled">קבועות החודש</Link> — שם מנהלים את כל ההוצאות הקבועות, ההכנסות הקבועות ואומדני חיובי הכרטיסים.</p>
+        <p className="text-sm">עברו לעמוד <Link className="text-link hover:underline" to="/fixed#scheduled">קבועות החודש</Link> — שם מנהלים את כל ההוצאות הקבועות, ההכנסות הקבועות ואומדני חיובי הכרטיסים.</p>
       </Section>
 
       <Section title="קטגוריות" icon={Layers} color="var(--chart-4)">
-        <p className="text-sm">ניהול קטגוריות, קטגוריות אב, מיזוג ומחיקה — <Link className="text-primary hover:underline" to="/categories">בעמוד הקטגוריות</Link>.</p>
+        <p className="text-sm">ניהול קטגוריות, קטגוריות אב, מיזוג ומחיקה — <Link className="text-link hover:underline" to="/categories">בעמוד הקטגוריות</Link>.</p>
       </Section>
 
       <Section title="כללי סיווג" icon={Wand2} color="var(--chart-5)" subtitle="נוצרים כשבוחרים ״החל על תנועות דומות״. חלים על תנועות חדשות בכל סריקה.">
