@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { legacyIdentifier, normalizeTransactions, type ScrapedTransaction } from '../src/ingest/normalize.js';
 import { saveTransactions } from '../src/db/ingestRepo.js';
-import { applyRules, deriveKinds, findCategory, getOrCreateCategory, kindFor } from '../src/ingest/classify.js';
+import { applyRules, categorizeTransactions, counterparty, deriveKinds, findCategory, getOrCreateCategory, kindFor } from '../src/ingest/classify.js';
 import { openDb } from '../src/db/connection.js';
 import { matchImmediateCardDebits, matchInternalTransfers, reconcileCardBills } from '../src/ingest/transfers.js';
 import { addAccount, addTx, testDb } from './helpers.js';
@@ -171,6 +171,27 @@ describe('kinds, card bills and transfers', () => {
     const row = (id: number) => db.prepare(`SELECT category_id, business_id FROM transactions WHERE id = ?`).get(id);
     expect(row(a)).toEqual({ category_id: cat, business_id: biz });
     expect(row(b)).toEqual({ category_id: null, business_id: biz });
+  });
+});
+
+describe('same-description cache', () => {
+  it('categorizes a bank transfer only from earlier transfers to the same recipient', async () => {
+    const db = testDb();
+    addAccount(db, 'leumi:1', 'bank');
+    const health = Number(db.prepare(`INSERT INTO categories (name, kind) VALUES ('בריאות', 'expense')`).run().lastInsertRowid);
+    const transfer = (memo: string, categoryId?: number) => {
+      const id = addTx(db, { account: 'leumi:1', date: '2026-09-01', description: 'העברה דיגיטל', amount: -500, categoryId });
+      db.prepare(`UPDATE transactions SET memo = ?, category_source = ? WHERE id = ?`).run(memo, categoryId ? 'manual' : null, id);
+      return id;
+    };
+    transfer('העברה אל: ישראל ישראלי 99-999-000000001 תשלום', health);
+    const same = transfer('העברה אל: ישראל ישראלי 99-999-000000001 השלמה');
+    const other = transfer('העברה אל: משה כהן 99-999-000000002 תשלום');
+    expect(counterparty('העברה ל: ועד הבית 99-999-00000003 תאריך סיום: 01.01.2030')).toBe('ועד הבית 99-999-00000003');
+
+    await categorizeTransactions(db, [same, other]);
+    const category = (id: number) => db.prepare(`SELECT category_id FROM transactions WHERE id = ?`).pluck().get(id);
+    expect([category(same), category(other)]).toEqual([health, null]);
   });
 });
 

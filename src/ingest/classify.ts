@@ -37,6 +37,16 @@ interface TxRow {
   category_id: number | null;
   category_source: string | null;
   kind_source: string | null;
+  memo: string | null;
+}
+
+/**
+ * The recipient of a bank transfer, from its memo ("העברה אל: ישראל ישראלי 99-999-000000001 תשלום" →
+ * "ישראל ישראלי 99-999-000000001"). Transfer rows share a generic description ("העברה דיגיטל"), so the
+ * recipient is what tells them apart.
+ */
+export function counterparty(memo: string | null): string | null {
+  return memo?.match(/^העברה (?:אל|ל): (.+?\d+-\d+-\d+)/)?.[1] ?? null;
 }
 
 export function ruleMatches(rule: Rule, tx: Pick<TxRow, 'description' | 'account_id' | 'charged_amount'>): boolean {
@@ -112,11 +122,10 @@ export async function categorizeTransactions(db: DB, txIds: number[], apiUrl?: s
   applyRules(db, txIds);
 
   const cache = db.prepare(`
-    SELECT category_id FROM transactions
+    SELECT category_id, memo FROM transactions
     WHERE description = ? AND category_id IS NOT NULL AND id != ?
     ORDER BY CASE category_source WHEN 'manual' THEN 0 WHEN 'rule' THEN 1 ELSE 2 END, id DESC
-    LIMIT 1
-  `).pluck();
+  `);
   const set = db.prepare(`UPDATE transactions SET category_id = ?, category_source = ? WHERE id = ?`);
   const apiCache = new Map<string, number | null>();
 
@@ -124,7 +133,10 @@ export async function categorizeTransactions(db: DB, txIds: number[], apiUrl?: s
     const tx = db.prepare(`SELECT * FROM transactions WHERE id = ?`).get(id) as TxRow | undefined;
     if (!tx || tx.category_id != null) continue;
 
-    const cached = cache.get(tx.description, tx.id) as number | undefined;
+    // a transfer takes the category of an earlier transfer to the same recipient only
+    const party = counterparty(tx.memo);
+    const cached = (cache.all(tx.description, tx.id) as { category_id: number; memo: string | null }[])
+      .find(r => counterparty(r.memo) === party)?.category_id;
     if (cached) { set.run(cached, 'cache', tx.id); continue; }
 
     const fromScraper = tx.source_category ? findCategory(db, tx.source_category) : undefined;
