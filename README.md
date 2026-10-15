@@ -82,6 +82,10 @@ It understands how Israeli money actually moves:
 
 Requirements: **Node.js 20+** and npm. macOS or Linux (Windows works via WSL).
 
+If you switch Node versions (or upgrade from a checkout that used `better-sqlite3` 11, which aborts on Node 24 with
+`RemoveEnvironmentCleanupHook ... Assertion failed`), run `npm install` again, or `npm rebuild better-sqlite3`, so the
+SQLite binding matches your Node.
+
 ```bash
 git clone https://github.com/nmazuz/familycfo.git && cd familycfo
 npm install            # also installs the web app's packages
