@@ -121,10 +121,24 @@ accounts, two cards, a mortgage, savings and a small stock portfolio. Delete `de
    | ישראכרט / אמריקן אקספרס | `isracard` / `amex` | `id`, `card6Digits`, `password` |
    | מקס | `max` | `username`, `password` |
    | כאל | `visaCal` | `username`, `password` |
+   | One Zero (experimental) | `oneZero` | `email`, `password`, `otpLongTermToken` |
 
    The full and current list (and any extra fields) is in the
    [israeli-bank-scrapers docs](https://github.com/eshaham/israeli-bank-scrapers#specific-definitions-per-scraper).
    Bank accounts and cards are told apart automatically.
+
+   **One Zero:** add exactly one entry like this (replace the email and password):
+
+   ```json
+   { "companyId": "oneZero", "credentials": { "email": "you@example.com", "password": "YOUR_PASSWORD", "otpLongTermToken": "" } }
+   ```
+
+   Before the first scrape, run `npm run setup:onezero` in an interactive terminal. It sends an SMS to the
+   international phone number you enter (`+972...`), then asks for the OTP; both inputs are hidden.
+   It saves only `credentials.otpLongTermToken`, preserving the other config fields and setting file permissions
+   to `0600` (owner only). `ACCOUNTS_FILE=/path/to/accounts.json npm run setup:onezero` uses a different file.
+   Treat the token as a password; run setup again if the bank expires it. `npm run setup:onezero -- --help`
+   is safe to run without sending an SMS.
 
 3. **First scrape** (fetches the last 3 months, plus upcoming card charges):
 
