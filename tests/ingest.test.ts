@@ -67,6 +67,40 @@ describe('saveTransactions', () => {
     expect(res.updated).toBe(1);
     expect(db.prepare(`SELECT status, charged_amount FROM transactions`).get()).toEqual({ status: 'completed', charged_amount: -18 });
   });
+
+  it('matches a completed row dated local midnight (previous UTC day) with a changed description', () => {
+    const db = testDb();
+    addAccount(db, 'max:1', 'card');
+    const pending = (description: string, date: string) =>
+      scraped({ status: 'pending' as ScrapedTransaction['status'], chargedAmount: 0, description, date, originalAmount: -450 });
+    saveTransactions(db, normalizeTransactions('max:1', [pending('PAYBOX', '2026-03-10T12:00:00.000Z'),
+      pending('חניון העיר הדוגמה-קיוסק', '2026-03-10T07:00:00.000Z')]));
+    // the bank stops listing the pending rows and returns the completed ones
+    const res = saveTransactions(db, normalizeTransactions('max:1', [
+      scraped({ identifier: 'R1', date: '2026-03-09T22:00:00.000Z', description: 'PAYBOX                 SOMEWHERE     IL', originalAmount: -450, chargedAmount: -450 }),
+      scraped({ identifier: 'R2', date: '2026-03-09T22:00:00.000Z', description: 'חניון העיר הדוגמה-קיו', originalAmount: -450, chargedAmount: -450 }),
+    ]));
+    expect(res).toEqual({ insertedIds: [], updated: 2 });
+    // the pending row's description is kept
+    expect(db.prepare(`SELECT description, status FROM transactions ORDER BY id`).all()).toEqual([
+      { description: 'PAYBOX', status: 'completed' },
+      { description: 'חניון העיר הדוגמה-קיוסק', status: 'completed' },
+    ]);
+  });
+
+  it('does not merge a completed row into a pending row the bank still lists', () => {
+    const db = testDb();
+    addAccount(db, 'leumi:1', 'bank');
+    const pending = scraped({ status: 'pending' as ScrapedTransaction['status'], identifier: '900000001', date: '2026-03-11T17:00:00.000Z', originalAmount: -1000, chargedAmount: -1000, description: 'העברה דיגיטל' });
+    saveTransactions(db, normalizeTransactions('leumi:1', [pending]));
+    const completed = scraped({ identifier: '100001', date: '2026-03-10T22:00:00.000Z', originalAmount: -1000, chargedAmount: -1000, description: 'העברה דיגיטל' });
+    expect(saveTransactions(db, normalizeTransactions('leumi:1', [pending, completed])).insertedIds).toHaveLength(1);
+    // once it is gone from the scrape, the completed row takes it over
+    const db2 = testDb();
+    addAccount(db2, 'leumi:1', 'bank');
+    saveTransactions(db2, normalizeTransactions('leumi:1', [pending]));
+    expect(saveTransactions(db2, normalizeTransactions('leumi:1', [completed]))).toEqual({ insertedIds: [], updated: 1 });
+  });
 });
 
 describe('kinds, card bills and transfers', () => {

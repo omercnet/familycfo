@@ -47,13 +47,16 @@ export function saveTransactions(db: DB, txns: NormalizedTransaction[]): SaveRes
   const legacyMatch = db.prepare(
     `SELECT id FROM transactions WHERE identifier = ? AND bank_identifier IS NULL`
   ).pluck();
-  // A pending row that has since completed (completed rows get a reference and a charged amount)
-  const pendingMatch = db.prepare(`
-    SELECT id FROM transactions
-    WHERE account_id = ? AND substr(date, 1, 10) = ? AND description = ? AND original_amount = ?
-      AND (status = 'pending' OR (status IS NULL AND charged_amount = 0)) AND identifier != ?
-    LIMIT 1
-  `).pluck();
+  // A pending row that has since completed (completed rows get a reference and a charged amount).
+  // Pending rows carry the real UTC time, completed ones local midnight (the previous UTC day), so
+  // the date is matched ±1 day; card companies also truncate or extend the description on completion.
+  const pendingCandidates = db.prepare(`
+    SELECT id, identifier, description FROM transactions
+    WHERE account_id = ? AND substr(date, 1, 10) BETWEEN date(?, '-1 day') AND date(?, '+1 day')
+      AND original_amount = ? AND (status = 'pending' OR (status IS NULL AND charged_amount = 0))
+      AND identifier != ?
+    ORDER BY id
+  `);
 
   // Same transaction, different reference: some banks (Hapoalim) renumber the reference between scrapes.
   // Candidates are matched one-to-one, so two identical coffees on the same day stay two rows.
@@ -93,6 +96,18 @@ export function saveTransactions(db: DB, txns: NormalizedTransaction[]): SaveRes
     // skip rows another incoming transaction will match by its own identifier
     return rows.find(r => !claimed.has(r.id) && !incoming.has(r.identifier))?.id;
   };
+  const squash = (s: string) => s.replace(/\s+/g, ' ').trim();
+  const pendingMatch = (t: NormalizedTransaction): number | undefined => {
+    const day = dateKey(t.date);
+    const rows = pendingCandidates.all(t.accountId, day, day, t.originalAmount, t.identifier) as { id: number; identifier: string; description: string }[];
+    const desc = squash(t.description);
+    // a row still listed as pending in this scrape is a different transaction
+    return rows.find(r => {
+      if (claimed.has(r.id) || incoming.has(r.identifier)) return false;
+      const other = squash(r.description);
+      return desc.startsWith(other) || other.startsWith(desc);
+    })?.id;
+  };
 
   db.transaction(() => {
     for (const t of txns) {
@@ -100,9 +115,7 @@ export function saveTransactions(db: DB, txns: NormalizedTransaction[]): SaveRes
         (byIdentifier.get(t.identifier) as number | undefined) ??
         // rows saved before the migration carry the legacy identifier and no bank reference
         (t.bankIdentifier ? legacyMatch.get(t.legacyIdentifier) as number | undefined : undefined) ??
-        (t.status !== 'pending' && t.chargedAmount !== 0
-          ? pendingMatch.get(t.accountId, dateKey(t.date), t.description, t.originalAmount, t.identifier) as number | undefined
-          : undefined) ??
+        (t.status !== 'pending' && t.chargedAmount !== 0 ? pendingMatch(t) : undefined) ??
         fuzzyMatch(t);
       if (existingId != null) claimed.add(existingId);
 
