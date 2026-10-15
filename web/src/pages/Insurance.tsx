@@ -83,7 +83,7 @@ export default function Insurance() {
       {data.unlinked.length > 0 && (
         <section className="card mt-4 md:mt-6">
           <SectionTitle icon={Receipt} as="h2">חיובי ביטוח בלי פוליסה</SectionTitle>
-          <p className="mb-3 text-sm text-fg-subtle">חיובים מהשנה האחרונה שנראים כמו ביטוח ועוד לא שויכו לפוליסה. הוספת פוליסה תעקוב אחרי העלות שלהם.</p>
+          <p className="mb-3 text-sm text-muted-foreground">חיובים מהשנה האחרונה שנראים כמו ביטוח ועוד לא שויכו לפוליסה. הוספת פוליסה תעקוב אחרי העלות שלהם.</p>
           <div className="overflow-x-auto">
             <table className="table">
               <thead><tr><th>בדף החיוב</th><th>מאיפה</th><th className="text-end">חיובים</th><th className="text-end">אחרון</th><th className="text-end">ב-12 חודשים</th><th /></tr></thead>
@@ -91,9 +91,9 @@ export default function Insurance() {
                 {data.unlinked.map(u => (
                   <tr key={`${u.description}|${u.accountId}`}>
                     <td className="font-medium">{u.description}</td>
-                    <td className="text-fg-subtle">{accountName(u.accountId)}</td>
+                    <td className="text-muted-foreground">{accountName(u.accountId)}</td>
                     <td className="num text-end">{u.count}</td>
-                    <td className="text-end"><Money value={u.lastAmount} /> <span className="text-xs text-fg-subtle">{day(u.lastDate)}</span></td>
+                    <td className="text-end"><Money value={u.lastAmount} /> <span className="text-xs text-muted-foreground">{day(u.lastDate)}</span></td>
                     <td className="text-end"><Money value={u.total} /></td>
                     <td className="text-end"><button type="button" className="btn btn-sm" onClick={() => open(fromCharge(u))}><Plus />פוליסה</button></td>
                   </tr>
@@ -113,7 +113,7 @@ export default function Insurance() {
         )}
         {groups.map(g => (
           <section key={g.value}>
-            <h2 className="mb-2.5 flex items-center gap-2 text-sm font-semibold text-fg-muted"><g.icon className="h-4 w-4" />{g.label}</h2>
+            <h2 className="mb-2.5 flex items-center gap-2 text-sm font-semibold text-muted-foreground"><g.icon className="h-4 w-4" />{g.label}</h2>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {g.policies.map(p => <PolicyCard key={p.id} policy={p} onOpen={() => open(p)} />)}
             </div>
@@ -141,16 +141,16 @@ function PolicyCard({ policy: p, onOpen }: { policy: InsurancePolicy; onOpen: ()
         <span className="icon-tile h-9 w-9 shrink-0 rounded-lg [&_svg]:h-4 [&_svg]:w-4"><T.icon /></span>
         <div className="min-w-0 flex-1">
           <div className="truncate font-semibold">{p.name}</div>
-          <div className="truncate text-xs text-fg-subtle">{[p.insurer, p.policyNumber && `פוליסה ${p.policyNumber}`].filter(Boolean).join(' · ') || '—'}</div>
+          <div className="truncate text-xs text-muted-foreground">{[p.insurer, p.policyNumber && `פוליסה ${p.policyNumber}`].filter(Boolean).join(' · ') || '—'}</div>
         </div>
-        {p.insuredMemberId != null ? <MemberBadge id={p.insuredMemberId} /> : <span className="chip text-[11px]">כל המשפחה</span>}
+        {p.insuredMemberId != null ? <MemberBadge id={p.insuredMemberId} /> : <span className="chip text-2xs">כל המשפחה</span>}
       </div>
-      {p.coverage && <p className="line-clamp-2 text-sm text-fg-muted">{p.coverage}</p>}
-      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-fg-subtle">
-        <span>{p.premium != null ? <><Money value={p.premium} className="font-semibold text-fg" /> {FREQUENCIES.find(f => f.value === p.premiumFrequency)?.label}</> : 'פרמיה לא הוזנה'}</span>
+      {p.coverage && <p className="line-clamp-2 text-sm text-muted-foreground">{p.coverage}</p>}
+      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
+        <span>{p.premium != null ? <><Money value={p.premium} className="font-semibold text-foreground" /> {FREQUENCIES.find(f => f.value === p.premiumFrequency)?.label}</> : 'פרמיה לא הוזנה'}</span>
         {p.payments.count > 0 && <span title={`${p.payments.count} חיובים, אחרון ${day(p.payments.lastDate)}`}>בפועל <Money value={p.payments.last12} /> ב-12 ח׳</span>}
         {p.endDate && (
-          <span className={cn('chip text-[11px]', expired ? 'text-fg-subtle' : p.renewalSoon && 'border-amber-300 bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300')}>
+          <span className={cn('chip text-2xs', expired ? 'text-muted-foreground' : p.renewalSoon && 'border-amber-300 bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300')}>
             <CalendarClock className="h-3 w-3" />{expired ? 'הסתיימה' : 'מתחדשת'} {day(p.endDate)}
           </span>
         )}
@@ -250,7 +250,7 @@ function PolicyEditor({ policy, onClose, onSaved }: {
         ) : undefined}>מסמכים</SectionTitle>
         {draft.id
           ? <Documents policyId={draft.id} documents={documents} />
-          : <p className="text-sm text-fg-subtle">שמור את הפוליסה כדי לצרף אליה את מסמך הפוליסה, נספחים וחידושים.</p>}
+          : <p className="text-sm text-muted-foreground">שמור את הפוליסה כדי לצרף אליה את מסמך הפוליסה, נספחים וחידושים.</p>}
       </div>
     </Modal>
   );
@@ -287,7 +287,7 @@ function Documents({ policyId, documents }: { policyId: number; documents: Insur
   return (
     <div className="space-y-3">
       <div onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={onDrop}
-        className={cn('flex flex-col items-center gap-2 rounded-xl border border-dashed px-4 py-5 text-center text-sm text-fg-subtle transition-colors',
+        className={cn('flex flex-col items-center gap-2 rounded-xl border border-dashed px-4 py-5 text-center text-sm text-muted-foreground transition-colors',
           dragging && 'border-primary bg-primary/5')}>
         <FileUp className="h-5 w-5" />
         <span>גרור לכאן PDF או תמונה של הפוליסה, או</span>
@@ -303,11 +303,11 @@ function Documents({ policyId, documents }: { policyId: number; documents: Insur
         <ul className="divide-y rounded-xl border">
           {documents.map(d => (
             <li key={d.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5 text-sm">
-              <FileText className="h-4 w-4 shrink-0 text-fg-subtle" />
+              <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
               <a href={`/api/insurance/documents/${d.id}/file`} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate font-medium hover:underline">
                 {d.originalName} <ExternalLink className="inline h-3 w-3 opacity-50" />
               </a>
-              <span className="text-xs text-fg-subtle">{kb(d.size)} · {fullDate(d.uploadedAt)}</span>
+              <span className="text-xs text-muted-foreground">{kb(d.size)} · {fullDate(d.uploadedAt)}</span>
               <Picker className="input h-8 w-24 text-xs" value={d.kind} onChange={v => v && setKind.mutate({ id: d.id, kind: v })} options={DOC_KINDS} />
               {confirm === d.id
                 ? <button type="button" className="btn btn-danger btn-sm" onClick={() => remove.mutate(d.id)}>למחוק?</button>

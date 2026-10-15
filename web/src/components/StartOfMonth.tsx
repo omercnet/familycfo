@@ -84,7 +84,7 @@ export function StartOfMonth({ data }: { data: MonthPlan }) {
   return (
     <div className="space-y-6">
       {summary.length > 1 && (
-        <div className="animate-rise-in rounded-xl border border-line-soft bg-muted/40 p-3 md:p-4">
+        <div className="animate-rise-in rounded-xl border border-border/65 bg-muted/40 p-3 md:p-4">
           <div className="mb-1 text-xs font-medium text-muted-foreground">לפי חשבון וכרטיס</div>
           <BarList items={summary} />
         </div>
@@ -97,12 +97,12 @@ export function StartOfMonth({ data }: { data: MonthPlan }) {
         return (
           <section key={key} className="animate-rise-in">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-              <h3 className="flex items-center gap-2 text-[0.9375rem] font-semibold tracking-tight">
+              <h3 className="flex items-center gap-2 text-md font-semibold tracking-tight">
                 <MemberAvatar name={name} color={m?.color ?? (key === 'shared' ? 'var(--chart-4)' : undefined)} size={26} />
                 {name}
               </h3>
               <span className="text-sm text-muted-foreground">
-                <Money value={memberTotal} animated className="font-semibold text-fg" />
+                <Money value={memberTotal} animated className="font-semibold text-foreground" />
                 {data.income > 0 && <> · {pct((memberTotal / data.income) * 100)} מההכנסה</>}
               </span>
             </div>
@@ -133,8 +133,8 @@ function SourceCard({ source: s, payer, cardsPaidHere, accountName, memberTotal,
   const tile = hueFor(s.accountId);
 
   return (
-    <div style={{ ['--i' as string]: index }} className="card-hover flex min-w-0 flex-col overflow-hidden rounded-xl border border-line bg-card">
-      <div className="border-b border-line-soft px-4 py-3">
+    <div style={{ ['--i' as string]: index }} className="card-hover flex min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-card">
+      <div className="border-b border-border/65 px-4 py-3">
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-2.5">
           <span className="icon-tile h-9 w-9 rounded-lg" style={{ ['--tile' as string]: tile }}><Icon /></span>
@@ -152,12 +152,12 @@ function SourceCard({ source: s, payer, cardsPaidHere, accountName, memberTotal,
       {memberTotal > 0 && (
         <div className="mt-2.5 flex items-center gap-2" title={pct((s.total / memberTotal) * 100)}>
           <Progress value={s.total} max={memberTotal} className="h-1" />
-          <span className="num w-9 shrink-0 text-end text-[11px] text-muted-foreground">{pct((s.total / memberTotal) * 100)}</span>
+          <span className="num w-9 shrink-0 text-end text-2xs text-muted-foreground">{pct((s.total / memberTotal) * 100)}</span>
         </div>
       )}
       </div>
 
-      <ul className="flex-1 divide-y divide-line-soft px-4 text-sm">
+      <ul className="flex-1 divide-y divide-border/65 px-4 text-sm">
         {items.map(c => {
           const CatIcon = categoryIcon(c.categoryName ?? c.name);
           return (
@@ -166,7 +166,7 @@ function SourceCard({ source: s, payer, cardsPaidHere, accountName, memberTotal,
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground [&_svg]:h-3.5 [&_svg]:w-3.5"><CatIcon /></span>
               <div className="min-w-0">
               <div className="truncate">{c.name}</div>
-              <div className="flex flex-wrap items-center gap-x-1.5 text-[11px] text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-x-1.5 text-2xs text-muted-foreground">
                 <span>ב-{c.day} לחודש</span>
                 {c.categoryName && <span>· {c.categoryName}</span>}
                 {c.estimated && <span>· הערכה</span>}
@@ -193,7 +193,7 @@ function SourceCard({ source: s, payer, cardsPaidHere, accountName, memberTotal,
       </ul>
 
       {s.kind === 'bank' && cardsPaidHere.length > 0 && (
-        <div className="space-y-1 border-t border-line-soft bg-muted/50 px-4 py-2.5 text-xs text-muted-foreground">
+        <div className="space-y-1 border-t border-border/65 bg-muted/50 px-4 py-2.5 text-xs text-muted-foreground">
           <div className="flex justify-between gap-3">
             <span>ישירות מהחשבון</span>
             <Money value={s.total} />
@@ -204,7 +204,7 @@ function SourceCard({ source: s, payer, cardsPaidHere, accountName, memberTotal,
               <Money value={c.total} />
             </div>
           ))}
-          <div className="flex justify-between gap-3 border-t border-line-soft pt-1.5 text-sm font-semibold text-fg">
+          <div className="flex justify-between gap-3 border-t border-border/65 pt-1.5 text-sm font-semibold text-foreground">
             <span>סה״כ יורד מהחשבון</span>
             <Money value={s.total + viaCards} />
           </div>

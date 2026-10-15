@@ -139,7 +139,7 @@ export default function Cashflow() {
               <div><div className="label">נטו בתקופה</div><Money value={ledger.reduce((s, e) => s + e.amount, 0)} className="font-semibold" colored /></div>
             </div>
           )}
-          <div className="scroll-x border-t border-line"><table className="table">
+          <div className="scroll-x border-t border-border"><table className="table">
             <thead><tr><th>תאריך</th><th>מה</th><th>חשבון</th><th>של מי</th><th className="text-end">סכום</th>
               <th className="text-end" title={memberTab === 'all' ? 'יתרת החשבון אחרי הפריט' : 'סכום מצטבר של הכנסות והוצאות של בן המשפחה'}>
                 {memberTab === 'all' ? 'יתרה אחרי' : 'מצטבר'}
@@ -152,10 +152,10 @@ export default function Cashflow() {
                   <td className="whitespace-nowrap">{day(e.date)}</td>
                   <td className="min-w-40">
                     {e.kind === 'card_charge' && e.cardAccountId
-                      ? <Link className="font-medium text-brand-700 hover:underline dark:text-brand-300" title="הצג את העסקאות שבחיוב הזה"
+                      ? <Link className="font-medium text-primary hover:underline" title="הצג את העסקאות שבחיוב הזה"
                           to={`/transactions?account=${encodeURIComponent(e.cardAccountId)}&charge=${e.date}`}>{e.name} ←</Link>
                       : <div className="font-medium">{e.name}</div>}
-                    <div className="text-[11px] text-muted-foreground">{SCHEDULED_KIND_LABELS[e.kind] ?? e.kind}{e.estimated ? ' · הערכה' : ''}</div>
+                    <div className="text-2xs text-muted-foreground">{SCHEDULED_KIND_LABELS[e.kind] ?? e.kind}{e.estimated ? ' · הערכה' : ''}</div>
                   </td>
                   <td className="whitespace-nowrap text-xs text-muted-foreground">{accountName(e.accountId)}</td>
                   <td><MemberBadge id={e.member} /></td>
@@ -171,7 +171,7 @@ export default function Cashflow() {
               {ledger.length === 0 && <tr><td colSpan={7} className="p-4 text-center text-sm text-muted-foreground">אין אירועים מתוכננים — הוסף הכנסות והוצאות קבועות בהגדרות</td></tr>}
             </tbody>
           </table></div>
-          <p className="border-t border-line-soft px-4 py-3 text-xs leading-relaxed text-muted-foreground md:px-5">
+          <p className="border-t border-border/65 px-4 py-3 text-xs leading-relaxed text-muted-foreground md:px-5">
             {memberTab !== 'all' && <>מוצג כל מה שנכנס ויוצא מהחשבונות של {meta?.members.find(m => m.id === memberTab)?.name}, כולל תשלומים משותפים שיורדים מהם. </>}
             בנוסף מחושבות הוצאות שוטפות ישירות מהבנק (ביט, מזומן) של כ-<Money value={f.remaining.dynamic} /> עד סוף {monthName(f.period.key)}.
           </p>
@@ -194,7 +194,7 @@ export default function Cashflow() {
                       </div>
                     ))}
                     {mi.other > 0 && <div className="flex justify-between gap-2"><span>הכנסות נוספות שנכנסו</span><Money value={mi.other} /></div>}
-                    <div className="flex justify-between gap-2 border-t border-line-soft pt-2.5 text-xs text-muted-foreground">
+                    <div className="flex justify-between gap-2 border-t border-border/65 pt-2.5 text-xs text-muted-foreground">
                       <span title="משמש רק לחישוב העודף החודשי הממוצע לחיסכון">חודש טיפוסי (ממוצע, כולל הכנסות מזדמנות)</span>
                       <Money value={planningQ.data.income.expectedMonthly} />
                     </div>
@@ -215,7 +215,7 @@ export default function Cashflow() {
               </>
             )}
             {(installmentsQ.data ?? []).slice(0, 6).map(p => (
-              <div key={p.description + p.purchaseDate} className="mt-2 border-t border-line-soft pt-2 text-xs leading-relaxed text-muted-foreground">
+              <div key={p.description + p.purchaseDate} className="mt-2 border-t border-border/65 pt-2 text-xs leading-relaxed text-muted-foreground">
                 {p.description} · {p.paid}/{p.total} · נשארו {p.remaining} · <Money value={p.remainingAmount} />
               </div>
             ))}

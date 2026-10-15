@@ -71,7 +71,7 @@ export default function Investments() {
             <SectionTitle icon={LineChart}>שווי התיק לאורך זמן</SectionTitle>
             {history.length > 1
               ? <SimpleLine data={history} dataKey="value" formatX={day} height={240} />
-              : <div className="text-sm text-zinc-500">הגרף מתחיל מתאריך הקנייה של כל נייר. בלי תאריך קנייה — הוא יתמלא מהיום והלאה; אפשר להוסיף תאריך בעריכת הנייר.</div>}
+              : <div className="text-sm text-muted-foreground">הגרף מתחיל מתאריך הקנייה של כל נייר. בלי תאריך קנייה — הוא יתמלא מהיום והלאה; אפשר להוסיף תאריך בעריכת הנייר.</div>}
           </div>
           <div className="card min-w-0">
             <SectionTitle icon={ChartPie} color="var(--chart-5)">פיזור</SectionTitle>
@@ -91,7 +91,7 @@ export default function Investments() {
                 <tr key={h.id}>
                   <td className="min-w-48">
                     <div className="font-medium">{h.name}</div>
-                    <div className="text-xs text-zinc-500" dir="ltr" style={{ textAlign: 'right' }}>
+                    <div className="text-xs text-muted-foreground" dir="ltr" style={{ textAlign: 'right' }}>
                       {h.priceSource === 'manual' ? 'מחיר ידני' : h.symbol}{h.exchange && h.priceSource !== 'manual' ? ` · ${h.exchange}` : ''}
                     </div>
                     {h.quoteError && <div className="text-xs text-warning">לא התעדכן: {h.quoteError}</div>}
@@ -100,22 +100,22 @@ export default function Investments() {
                   <td className="num whitespace-nowrap text-end">
                     {priceIn(h.price, h.currency)}
                     {h.priceSource === 'manual'
-                      ? h.manualPriceDate && <div className="text-xs text-zinc-500">{day(h.manualPriceDate)}</div>
-                      : <div className={cn('text-xs', toneOf(h.dayChangePct) || 'text-zinc-500')}>{h.dayChangePct == null ? 'לא נסחר היום' : signedPct(h.dayChangePct)}</div>}
+                      ? h.manualPriceDate && <div className="text-xs text-muted-foreground">{day(h.manualPriceDate)}</div>
+                      : <div className={cn('text-xs', toneOf(h.dayChangePct) || 'text-muted-foreground')}>{h.dayChangePct == null ? 'לא נסחר היום' : signedPct(h.dayChangePct)}</div>}
                   </td>
                   <td className="whitespace-nowrap text-end">
                     <Money value={h.valueIls} />
-                    {h.currency !== 'ILS' && <div className="num text-xs text-zinc-500">{moneyIn(h.value, h.currency)}</div>}
+                    {h.currency !== 'ILS' && <div className="num text-xs text-muted-foreground">{moneyIn(h.value, h.currency)}</div>}
                   </td>
                   <td className={cn('whitespace-nowrap text-end', toneOf(h.gainIls))}>
                     {h.gainIls != null ? <Money value={h.gainIls} /> : '—'}
                     <div className="num text-xs">{signedPct(h.gainIlsPct)}
-                      {h.currency !== 'ILS' && h.gainPct != null && Math.abs(h.gainPct - (h.gainIlsPct ?? 0)) >= 0.05 && <span className="text-zinc-500"> · ב-{h.currency} {signedPct(h.gainPct)}</span>}
+                      {h.currency !== 'ILS' && h.gainPct != null && Math.abs(h.gainPct - (h.gainIlsPct ?? 0)) >= 0.05 && <span className="text-muted-foreground"> · ב-{h.currency} {signedPct(h.gainPct)}</span>}
                     </div>
                   </td>
                   <td className="whitespace-nowrap text-end text-sm">
                     {h.costIls != null ? <Money value={h.costIls} /> : '—'}
-                    <div className="text-xs text-zinc-500">
+                    <div className="text-xs text-muted-foreground">
                       {h.basis === 'buy' ? `קנייה ${priceIn(h.buyPrice, h.currency)}` : h.basis === 'baseline' ? `בסיס מ-${day(h.baselineDate)}` : ''}
                     </div>
                   </td>
@@ -129,7 +129,7 @@ export default function Investments() {
             </tbody>
           </table></div>
         </div>
-        <p className="mt-3 text-xs text-zinc-500">
+        <p className="mt-3 text-xs text-muted-foreground">
           רווח בשקלים כולל את השפעת שער המטבע (עלות לפי השער ביום הקנייה, כשהוא ידוע). המחירים עשויים להתעכב עד 15 דקות בבורסה.
           לשרת המחירים נשלחים רק סימולי הניירות — לא כמויות ולא שווי.
         </p>
@@ -206,23 +206,23 @@ function HoldingEditor({ draft, onClose, onSaved }: { draft: Draft; onClose: () 
               onKeyDown={e => { if (e.key === 'Enter' && query.trim()) set({ symbol: query.trim().toUpperCase() }); }} />
           </div>
           {!d.symbol && (results.data?.length ?? 0) > 0 && (
-            <div className="mt-1 max-h-56 overflow-y-auto rounded-lg border border-line">
+            <div className="mt-1 max-h-56 overflow-y-auto rounded-lg border border-border">
               {results.data!.map(r => (
-                <button key={r.symbol} type="button" className="flex w-full items-center justify-between gap-3 px-3 py-2 text-start text-sm hover:bg-surface-muted"
+                <button key={r.symbol} type="button" className="flex w-full items-center justify-between gap-3 px-3 py-2 text-start text-sm hover:bg-muted"
                   onClick={() => { set({ symbol: r.symbol, name: d.name }); setQuery(r.symbol); }}>
                   <span className="min-w-0 truncate">{r.name}</span>
-                  <span className="shrink-0 text-xs text-zinc-500" dir="ltr">{r.symbol} · {r.exchange}</span>
+                  <span className="shrink-0 text-xs text-muted-foreground" dir="ltr">{r.symbol} · {r.exchange}</span>
                 </button>
               ))}
             </div>
           )}
-          {/[֐-׿]/.test(query) && <div className="mt-1 text-xs text-zinc-500">החיפוש עובד באנגלית בלבד. מניות בתל אביב: הסימול עם ‎.TA (למשל LUMI.TA)</div>}
+          {/[֐-׿]/.test(query) && <div className="mt-1 text-xs text-muted-foreground">החיפוש עובד באנגלית בלבד. מניות בתל אביב: הסימול עם ‎.TA (למשל LUMI.TA)</div>}
           {d.symbol && (
-            <div className="mt-2 rounded-lg bg-surface-muted px-3 py-2 text-sm">
+            <div className="mt-2 rounded-lg bg-muted px-3 py-2 text-sm">
               {quote.isLoading ? 'בודק מחיר…' : quote.error ? <span className="text-negative">{(quote.error as Error).message}</span> : quote.data && <>
                 <span className="font-medium">{quote.data.name ?? quote.data.symbol}</span> · <span dir="ltr">{quote.data.symbol}</span> ·{' '}
                 <span className="num font-semibold">{priceIn(quote.data.price, quote.data.currency)}</span>
-                {quote.data.exchange && <span className="text-zinc-500"> · {quote.data.exchange}</span>}
+                {quote.data.exchange && <span className="text-muted-foreground"> · {quote.data.exchange}</span>}
               </>}
             </div>
           )}
@@ -245,7 +245,7 @@ function HoldingEditor({ draft, onClose, onSaved }: { draft: Draft; onClose: () 
         <Field label="איפה (בית השקעות / ברוקר)"><input className="input" value={d.broker ?? ''} onChange={e => set({ broker: e.target.value })} placeholder="IBKR, מיטב טרייד…" /></Field>
         <Field label="של מי"><MemberSelect value={d.ownerMemberId ?? null} emptyLabel="משותף" onChange={id => set({ ownerMemberId: id })} /></Field>
       </div>
-      <div className="text-xs text-zinc-500">
+      <div className="text-xs text-muted-foreground">
         {d.buyPrice != null
           ? 'התשואה תחושב ממחיר הקנייה.'
           : !isNew && d.baselineDate ? `בלי מחיר קנייה — התשואה נמדדת מהמחיר ב-${fullDate(d.baselineDate)} (${priceIn(d.baselinePrice, currency || 'ILS')}).`

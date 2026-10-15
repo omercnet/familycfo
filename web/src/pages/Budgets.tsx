@@ -148,7 +148,7 @@ export default function Budgets() {
                       <td className="text-end"><Money value={b.spent} /></td>
                       <td className={`text-end ${b.budget != null && b.projected > b.budget ? 'text-rose-600' : ''}`}>
                         <Money value={b.projected} />
-                        {b.planned > 0 && <div className="text-[11px] text-muted-foreground" title="הוצאות שהזנת מראש ועוד לא חויבו">כולל צפוי <Money value={b.planned} /></div>}
+                        {b.planned > 0 && <div className="text-2xs text-muted-foreground" title="הוצאות שהזנת מראש ועוד לא חויבו">כולל צפוי <Money value={b.planned} /></div>}
                       </td>
                       <td className="whitespace-nowrap text-end text-muted-foreground">
                         <Money value={b.typical} />
@@ -194,17 +194,17 @@ function AllocationCard({ income, budgeted, month }: { income: MonthIncome; budg
         <div className="rounded-lg bg-muted/60 px-3 py-2">
           <div className="label">הכנסה בחודש</div>
           <Money value={income.total} animated className="text-lg font-semibold text-positive" />
-          {income.pending > 0 && <div className="text-[11px] text-muted-foreground">מתוכה <Money value={income.pending} /> עוד לא נכנסו</div>}
+          {income.pending > 0 && <div className="text-2xs text-muted-foreground">מתוכה <Money value={income.pending} /> עוד לא נכנסו</div>}
         </div>
         <div className="rounded-lg bg-muted/60 px-3 py-2">
           <div className="label">הוקצה לתקציבים</div>
           <Money value={budgeted} animated className="text-lg font-semibold" />
-          <div className="text-[11px] text-muted-foreground num">{Math.round(used)}% מההכנסה</div>
+          <div className="text-2xs text-muted-foreground num">{Math.round(used)}% מההכנסה</div>
         </div>
         <div className="rounded-lg bg-muted/60 px-3 py-2">
           <div className="label">{free >= 0 ? 'עוד לא הוקצה' : 'הוקצה יותר מההכנסה'}</div>
           <Money value={free} animated colored className="text-lg font-semibold" />
-          <div className="text-[11px] text-muted-foreground">{free >= 0 ? 'לחיסכון או לקטגוריות בלי תקציב' : 'כדאי להקטין תקציבים'}</div>
+          <div className="text-2xs text-muted-foreground">{free >= 0 ? 'לחיסכון או לקטגוריות בלי תקציב' : 'כדאי להקטין תקציבים'}</div>
         </div>
       </div>
       <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
@@ -233,7 +233,7 @@ function CategoryTransactions({ categoryId, cycle, memberId }: { categoryId: num
         <table className="w-full text-sm">
           <tbody>
             {rows.slice(0, 50).map(t => (
-              <tr key={t.id} className="border-b border-line-soft last:border-0">
+              <tr key={t.id} className="border-b border-border/65 last:border-0">
                 <td className="w-24 whitespace-nowrap py-1.5 text-muted-foreground">{day(t.date)}</td>
                 <td className="py-1.5">{t.description}{t.categoryParentId === categoryId && <span className="ms-2 text-xs text-muted-foreground">{t.categoryName}</span>}</td>
                 <td className="w-28 whitespace-nowrap py-1.5 text-end"><Money value={t.amount} cents colored /></td>
@@ -242,7 +242,7 @@ function CategoryTransactions({ categoryId, cycle, memberId }: { categoryId: num
           </tbody>
         </table>
       )}
-      <Link className="mt-1.5 inline-block text-xs font-medium text-brand-600 hover:underline dark:text-brand-400" to={`/transactions?category=${categoryId}&cycle=${cycle}`}>
+      <Link className="mt-1.5 inline-block text-xs font-medium text-primary hover:underline" to={`/transactions?category=${categoryId}&cycle=${cycle}`}>
         {data && data.total > 50 ? `כל ${data.total} התנועות ←` : 'פתח בעמוד התנועות ←'}
       </Link>
     </div>

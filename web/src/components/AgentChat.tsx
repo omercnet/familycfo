@@ -237,7 +237,7 @@ export function AgentChat() {
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <button type="button" aria-label="שאל את העוזר על הנתונים" title="שאל את העוזר על הנתונים" className="btn-ghost btn-icon relative text-fg-muted">
+        <button type="button" aria-label="שאל את העוזר על הנתונים" title="שאל את העוזר על הנתונים" className="btn-ghost btn-icon relative text-muted-foreground">
           <Sparkles className="h-[1.15rem] w-[1.15rem]" />
           {busy && <span className="absolute end-1 top-1 h-2 w-2 animate-pulse rounded-full bg-primary ring-2 ring-background" />}
         </button>
@@ -245,7 +245,7 @@ export function AgentChat() {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-[oklch(0.2_0.04_272/0.35)] backdrop-blur-[1px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
         <Dialog.Content dir="rtl" aria-describedby={undefined}
-          className="fixed inset-y-0 left-0 z-50 flex w-full flex-col border-e bg-background shadow-(--shadow-overlay) sm:w-[min(30rem,92vw)]
+          className="fixed inset-y-0 end-0 z-50 flex w-full flex-col border-e bg-background shadow-(--shadow-overlay) sm:w-[min(30rem,92vw)]
             pt-[env(safe-area-inset-top)] data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left data-[state=open]:animate-in data-[state=open]:slide-in-from-left data-[state=closed]:duration-200 data-[state=open]:duration-300">
           <div className="flex items-center gap-2 border-b px-4 py-3">
             <span className="icon-tile h-8 w-8 rounded-lg [&_svg]:h-4 [&_svg]:w-4"><Sparkles /></span>
@@ -278,7 +278,7 @@ export function AgentChat() {
                 {m.tools.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {[...new Set(m.tools)].map(t => (
-                      <span key={t} className="chip text-[11px] text-muted-foreground"><Database className="h-3 w-3" />{t}</span>
+                      <span key={t} className="chip text-2xs text-muted-foreground"><Database className="h-3 w-3" />{t}</span>
                     ))}
                   </div>
                 )}

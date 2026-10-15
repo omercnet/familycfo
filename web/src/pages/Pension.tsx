@@ -82,12 +82,12 @@ export default function Pension() {
             return { key: g.type, name: SHORT_LABELS[g.type], value: totals.byType[g.type] ?? 0, icon: <Icon /> };
           })} />
           {s?.byProvider?.length ? (
-            <div className="mt-3 space-y-1.5 border-t border-line-soft pt-3 text-sm">
-              <div className="text-xs font-medium text-fg-subtle">לפי גוף מנהל</div>
+            <div className="mt-3 space-y-1.5 border-t border-border/65 pt-3 text-sm">
+              <div className="text-xs font-medium text-muted-foreground">לפי גוף מנהל</div>
               {s.byProvider.map(p => (
                 <div key={p.name} className="flex items-center justify-between gap-2">
                   <span className="truncate">{p.name}</span>
-                  <span className="shrink-0 text-fg-subtle"><Money value={p.amount} /> · {p.pct}%</span>
+                  <span className="shrink-0 text-muted-foreground"><Money value={p.amount} /> · {p.pct}%</span>
                 </div>
               ))}
             </div>
@@ -105,9 +105,9 @@ export default function Pension() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 space-y-1 border-t border-line-soft pt-3 text-sm">
+            <div className="mt-4 space-y-1 border-t border-border/65 pt-3 text-sm">
               {s.assetMixPct.filter(a => a.pct > 0).map(a => (
-                <div key={a.name} className="flex justify-between gap-2"><span className="truncate text-fg-muted">{a.name}</span><span className="num">{a.pct}%</span></div>
+                <div key={a.name} className="flex justify-between gap-2"><span className="truncate text-muted-foreground">{a.name}</span><span className="num">{a.pct}%</span></div>
               ))}
             </div>
           </div>
@@ -129,7 +129,7 @@ export default function Pension() {
               <li>בדוח אין מידע על: {s.coverage.noInfo.join(', ')}. אם יש לכם ביטוחים כאלה (למשל בקופת חולים או דרך הבנק), אפשר להוסיף אותם ב<Link to="/insurance" className="underline">ביטוחים</Link>.</li>
             ) : null}
           </ul>
-          <p className="mt-3 text-xs text-fg-subtle">עובדות מהדוח בלבד, לא המלצה. לשינוי מסלול, איחוד קופות או ניוד — כדאי לדבר עם יועץ פנסיוני{s?.agent ? ` (${s.agent.name})` : ''}.</p>
+          <p className="mt-3 text-xs text-muted-foreground">עובדות מהדוח בלבד, לא המלצה. לשינוי מסלול, איחוד קופות או ניוד — כדאי לדבר עם יועץ פנסיוני{s?.agent ? ` (${s.agent.name})` : ''}.</p>
         </div>
       </div>
 
@@ -141,7 +141,7 @@ export default function Pension() {
             && g.products.some(p => p.details?.periodReturn != null);
           return (
             <section key={g.type} className="card p-0">
-              <SectionTitle icon={Icon} as="h2" action={<span className="text-sm font-normal text-fg-subtle"><Money value={totals.byType[g.type]} /></span>}>{TYPE_LABELS[g.type]}</SectionTitle>
+              <SectionTitle icon={Icon} as="h2" action={<span className="text-sm font-normal text-muted-foreground"><Money value={totals.byType[g.type]} /></span>}>{TYPE_LABELS[g.type]}</SectionTitle>
               <div className="scroll-x">
                 <table className="table">
                   <thead><tr>
@@ -154,10 +154,10 @@ export default function Pension() {
                       <tr key={p.id} className="cursor-pointer hover:bg-accent/40" onClick={() => setOpen(p)}>
                         <td className="min-w-48">
                           <div className="font-medium">{p.details?.product ?? p.name}</div>
-                          <div className="text-xs text-fg-subtle">{p.employer} · {p.policyNumber}</div>
+                          <div className="text-xs text-muted-foreground">{p.employer} · {p.policyNumber}</div>
                         </td>
                         <td className="min-w-36 text-sm">{p.provider}</td>
-                        <td><span className={cn('chip text-[11px]', p.status === 'active' ? 'border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300' : 'text-fg-subtle')}>
+                        <td><span className={cn('chip text-2xs', p.status === 'active' ? 'border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300' : 'text-muted-foreground')}>
                           {p.status === 'active' ? 'פעיל' : 'לא פעיל'}</span></td>
                         <td className="text-end"><Money value={p.value} /></td>
                         <td className="whitespace-nowrap text-end text-xs">{p.managementFee ?? '—'}</td>
@@ -229,7 +229,7 @@ function ProductDetails({ product: p, onClose }: { product: PensionProduct; onCl
               </tbody>
             </table>
           </div>
-          <p className="mt-1 text-xs text-fg-subtle">{periodOnly
+          <p className="mt-1 text-xs text-muted-foreground">{periodOnly
             ? <>תשואה נטו לתקופת הדוח, כפי שדווחה במסלקה הפנסיונית{d.periodReturn != null ? <> · בחשבון כולו: {pct(d.periodReturn)}</> : null}.</>
             : 'תשואות לפי דיווח משרד האוצר למסלול, לא לחשבון הספציפי.'}</p>
         </div>
@@ -241,7 +241,7 @@ function ProductDetails({ product: p, onClose }: { product: PensionProduct; onCl
           <div className="grid gap-2 sm:grid-cols-4">
             {d.coverages.map(c => <Fact key={c.name} label={`${c.name} (${c.pct}%)`} value={<><Money value={c.monthly} /> לחודש</>} />)}
           </div>
-          {d.coverageCost && <p className="mt-1 text-xs text-fg-subtle">עלות: נכות <Money value={d.coverageCost.disability} /> + שארים <Money value={d.coverageCost.survivors} /> בחודש, מתוך ההפקדות.</p>}
+          {d.coverageCost && <p className="mt-1 text-xs text-muted-foreground">עלות: נכות <Money value={d.coverageCost.disability} /> + שארים <Money value={d.coverageCost.survivors} /> בחודש, מתוך ההפקדות.</p>}
         </div>
       ) : null}
 
@@ -269,7 +269,7 @@ function ProductDetails({ product: p, onClose }: { product: PensionProduct; onCl
             </table>
           </div>
           {p.status === 'active' && deposits.at(-1)!.salaryMonth! < todayIso().slice(0, 7) && (
-            <p className="mt-1 flex items-center gap-1.5 text-xs text-fg-subtle"><CalendarClock className="h-3.5 w-3.5" />ההפקדה האחרונה בדוח היא על {monthName(deposits.at(-1)!.salaryMonth!)}.</p>
+            <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground"><CalendarClock className="h-3.5 w-3.5" />ההפקדה האחרונה בדוח היא על {monthName(deposits.at(-1)!.salaryMonth!)}.</p>
           )}
         </div>
       )}
@@ -284,9 +284,9 @@ function ProductDetails({ product: p, onClose }: { product: PensionProduct; onCl
 function Fact({ label, value, sub }: { label: string; value: React.ReactNode; sub?: string }) {
   return (
     <div className="rounded-xl border bg-card px-3 py-2.5">
-      <div className="text-xs text-fg-subtle">{label}</div>
+      <div className="text-xs text-muted-foreground">{label}</div>
       <div className="mt-0.5 font-semibold">{value}</div>
-      {sub && <div className="text-xs text-fg-subtle">{sub}</div>}
+      {sub && <div className="text-xs text-muted-foreground">{sub}</div>}
     </div>
   );
 }

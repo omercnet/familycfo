@@ -65,7 +65,7 @@ export default function Insights() {
 
       <div className="grid gap-4 lg:grid-cols-5">
         <div className="min-w-0 space-y-3 lg:col-span-3">
-          <h2 className="flex items-center gap-2 text-[0.9375rem] font-semibold tracking-tight"><Sparkles className="h-4 w-4 text-primary" />איפה אפשר לחסוך</h2>
+          <h2 className="flex items-center gap-2 text-md font-semibold tracking-tight"><Sparkles className="h-4 w-4 text-primary" />איפה אפשר לחסוך</h2>
           {recs.data && recs.data.some(r => r.annualSaving > 0) && (
             <div className="card animate-rise-in">
               <BarList color="var(--positive)" items={[...recs.data].filter(r => r.annualSaving > 0).sort((a, b) => b.annualSaving - a.annualSaving)
@@ -97,7 +97,7 @@ export default function Insights() {
                   })}
                 </div>
               )}
-              <div className="mt-4 flex flex-wrap gap-1.5 border-t border-line-soft pt-3">
+              <div className="mt-4 flex flex-wrap gap-1.5 border-t border-border/65 pt-3">
                 {r.action && <Link to={r.action.href} className="btn btn-primary">{r.action.label}<ArrowLeft /></Link>}
                 <button className="btn" onClick={() => recState.mutate({ key: r.key, state: 'done' })}>✓ טיפלתי</button>
                 <button className="btn-ghost" onClick={() => recState.mutate({ key: r.key, state: 'snoozed', until: snoozeUntil() })}>הזכר בעוד חודש</button>
@@ -121,9 +121,9 @@ export default function Insights() {
               <tbody>
                 {subs.map(s => (
                   <tr key={s.merchantKey + s.accountId}>
-                    <td className="min-w-32 font-medium">{s.merchantKey}</td><td className="text-xs text-zinc-500">{s.categoryName}</td>
+                    <td className="min-w-32 font-medium">{s.merchantKey}</td><td className="text-xs text-muted-foreground">{s.categoryName}</td>
                     <td className="text-end"><Money value={s.typicalAmount} cents /></td><td className="text-end"><Money value={s.typicalAmount * 12} /></td>
-                    <td className="whitespace-nowrap text-xs text-zinc-500">{day(s.lastDate)}{s.lastAmount > s.typicalAmount * 1.05 && <span className="ms-1 text-rose-600">↑ <Money value={s.lastAmount} /></span>}</td>
+                    <td className="whitespace-nowrap text-xs text-muted-foreground">{day(s.lastDate)}{s.lastAmount > s.typicalAmount * 1.05 && <span className="ms-1 text-rose-600">↑ <Money value={s.lastAmount} /></span>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -133,8 +133,8 @@ export default function Insights() {
 
         <div className="min-w-0 lg:col-span-2">
           <div className="mb-3 flex min-h-9 items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 text-[0.9375rem] font-semibold tracking-tight"><Bell className="h-4 w-4 text-primary" />התראות</h2>
-            <label className="flex min-h-8 items-center gap-2 text-sm text-fg-muted"><input type="checkbox" checked={showAll} onChange={e => setShowAll(e.target.checked)} /> כולל שנסגרו</label>
+            <h2 className="flex items-center gap-2 text-md font-semibold tracking-tight"><Bell className="h-4 w-4 text-primary" />התראות</h2>
+            <label className="flex min-h-8 items-center gap-2 text-sm text-muted-foreground"><input type="checkbox" checked={showAll} onChange={e => setShowAll(e.target.checked)} /> כולל שנסגרו</label>
           </div>
           {alerts.isLoading ? <Loading /> : (alerts.data ?? []).length === 0 ? <Empty>אין התראות</Empty> : (
             <div className="stagger space-y-2">
@@ -150,10 +150,10 @@ export default function Insights() {
                       <span className="chip gap-1" style={{ color: SEVERITY_TILE[a.severity], backgroundColor: SEVERITY_TILE[a.severity] ? `color-mix(in oklab, ${SEVERITY_TILE[a.severity]} 12%, transparent)` : undefined }}>
                         <TypeIcon className="h-3 w-3" />{ALERT_TYPES[a.type] ?? a.type}
                       </span>
-                      <span className="text-xs text-zinc-500">{day(a.createdAt)}</span>
+                      <span className="text-xs text-muted-foreground">{day(a.createdAt)}</span>
                     </div>
                     <div className="mt-1.5 text-sm font-medium">{a.title}</div>
-                    <div className="mt-0.5 text-xs leading-relaxed text-zinc-500">{a.message}</div>
+                    <div className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{a.message}</div>
                     {a.action && (
                       <Link to={a.action.href} onClick={e => e.stopPropagation()} className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
                         {a.action.label}<ArrowLeft className="h-3 w-3" />

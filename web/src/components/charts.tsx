@@ -106,7 +106,7 @@ function DayTooltip({ date, point, events, dailyRate }: { date: string; point?: 
       rows={events.length
         ? events.map(e => ({ label: `${e.name}${e.estimated ? ' ~' : ''}`, value: <span className={e.amount < 0 ? 'text-negative' : 'text-positive'}>{money(e.amount)}</span>, color: e.amount < 0 ? 'var(--negative)' : 'var(--positive)' }))
         : [{ label: <span className="text-muted-foreground">אין חיובים מתוכננים ביום הזה</span>, value: '' }]}
-      footer={<>{dailyRate > 0 && <div>+ שוטף משוער ~{money(dailyRate)} ליום</div>}<div className="text-[10px]">לחצו על היום לפירוט</div></>} />
+      footer={<>{dailyRate > 0 && <div>+ שוטף משוער ~{money(dailyRate)} ליום</div>}<div className="text-2xs">לחצו על היום לפירוט</div></>} />
   );
 }
 
@@ -250,9 +250,9 @@ export function DonutChart({ data, centerLabel, height = 220, max = 7, otherLabe
           </PieChart>
         </ResponsiveContainer>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center" dir="rtl">
-          <span className="max-w-[70%] truncate text-[11px] text-muted-foreground">{shown ? shown.name : centerLabel ?? 'סה״כ'}</span>
+          <span className="max-w-[70%] truncate text-2xs text-muted-foreground">{shown ? shown.name : centerLabel ?? 'סה״כ'}</span>
           <span className="num text-lg font-bold tracking-tight">{money(shown ? shown.value : total)}</span>
-          {shown && <span className="num text-[11px] font-medium text-muted-foreground">{Math.round((shown.value / total) * 100)}%</span>}
+          {shown && <span className="num text-2xs font-medium text-muted-foreground">{Math.round((shown.value / total) * 100)}%</span>}
         </div>
       </div>
       <ul className="min-w-0 space-y-0.5 text-sm">
@@ -338,8 +338,8 @@ export function Gauge({ value, max, label, sub, size = 132, status }: { value: n
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <span className="num text-xl font-bold tracking-tight">{Math.round(pctv * 100)}%</span>
-        {label && <span className="text-[11px] text-muted-foreground">{label}</span>}
-        {sub && <span className="text-[11px] text-muted-foreground">{sub}</span>}
+        {label && <span className="text-2xs text-muted-foreground">{label}</span>}
+        {sub && <span className="text-2xs text-muted-foreground">{sub}</span>}
       </div>
     </div>
   );

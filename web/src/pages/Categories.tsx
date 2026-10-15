@@ -49,7 +49,7 @@ export default function Categories() {
     const parentName = c.parentId != null ? all.find(p => p.id === c.parentId)?.name : undefined;
     const Icon = categoryIcon(parentName ? `${c.name} ${parentName}` : c.name);
     return (
-      <tr key={c.id} className={depth === 0 && hasChildren ? 'bg-surface-muted' : ''}>
+      <tr key={c.id} className={depth === 0 && hasChildren ? 'bg-muted' : ''}>
         <td className="min-w-56" style={{ paddingInlineStart: depth ? 32 : 8 }}>
           <div className="flex items-center gap-2">
             {depth > 0 && <CornerDownLeft className="h-3.5 w-3.5 shrink-0 text-zinc-400" aria-hidden />}
@@ -59,7 +59,7 @@ export default function Categories() {
           </div>
         </td>
         <td className="min-w-44">
-          {hasChildren ? <span className="text-xs text-zinc-500">קטגוריה ראשית · {childrenOf(c.id).length} תתי-קטגוריות</span> : (
+          {hasChildren ? <span className="text-xs text-muted-foreground">קטגוריה ראשית · {childrenOf(c.id).length} תתי-קטגוריות</span> : (
             <CategorySelect className="input py-1" value={c.parentId} onlyTopLevel exclude={c.id} emptyLabel="— ראשית —"
               onChange={parentId => patch.mutate({ id: c.id, body: { parentId } })} />
           )}
@@ -70,7 +70,7 @@ export default function Categories() {
         </td>
         <td className="text-center"><input type="checkbox" checked={!!c.defaultFixed} onChange={e => patch.mutate({ id: c.id, body: { defaultFixed: e.target.checked ? 1 : 0 } })} /></td>
         <td className="text-center"><input type="checkbox" checked={!!c.discretionary} onChange={e => patch.mutate({ id: c.id, body: { discretionary: e.target.checked ? 1 : 0 } })} /></td>
-        <td className="text-end text-xs text-zinc-500">
+        <td className="text-end text-xs text-muted-foreground">
           {c.transactions > 0 ? <Link className="hover:underline" to={`/transactions`}>{c.transactions} תנועות</Link> : '—'}
           {c.transactions > 0 && <div><Money value={c.total} /></div>}
         </td>
@@ -123,7 +123,7 @@ export default function Categories() {
           <Field label="קטגוריית אב (לא חובה)">
             <CategorySelect value={adding.parentId} onlyTopLevel emptyLabel="— ראשית —" onChange={parentId => setAdding({ ...adding, parentId })} />
           </Field>
-          <p className="text-xs leading-relaxed text-zinc-500">תת-קטגוריה יורשת מהאב את הסוג ואת ההגדרה קבועה/ניתנת לצמצום.</p>
+          <p className="text-xs leading-relaxed text-muted-foreground">תת-קטגוריה יורשת מהאב את הסוג ואת ההגדרה קבועה/ניתנת לצמצום.</p>
         </Modal>
       )}
 

@@ -77,7 +77,7 @@ export function CategoryReport({ rows, truncated, onPick }: { rows: Tx[]; trunca
           return { key: g.key, name: g.name, value: g.spend, color: colorAt(i), icon: <Icon /> };
         })} />
 
-      <ul className="divide-y divide-line-soft border-t border-line-soft">
+      <ul className="divide-y divide-border/65 border-t border-border/65">
         {groups.map((g, i) => {
           const Icon = categoryIcon(g.name);
           const color = colorAt(i);

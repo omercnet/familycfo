@@ -83,7 +83,7 @@ export default function Dashboard() {
             <DayDetails date={selectedDate} events={forecast.events} points={forecast.total.points ?? []}
               dailyRate={forecast.total.dailyRate} onClose={() => setSelectedDate(null)} />
           )}
-          <div className="mt-4 border-t border-line-soft pt-3 text-xs text-muted-foreground">מהיום עד סוף {periodName}:</div>
+          <div className="mt-4 border-t border-border/65 pt-3 text-xs text-muted-foreground">מהיום עד סוף {periodName}:</div>
           <div className="mt-2 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
             {[
               { label: 'הכנסות צפויות', value: forecast.remaining.income, color: 'var(--positive)' },
@@ -103,10 +103,10 @@ export default function Dashboard() {
           <SectionTitle icon={Landmark} color="var(--chart-5)">חשבונות בנק</SectionTitle>
           <div className="space-y-2">
             {forecast.accounts.map(a => (
-              <div key={a.accountId} className="flex items-center justify-between gap-3 rounded-lg border border-line-soft bg-muted/40 px-3 py-2.5">
+              <div key={a.accountId} className="flex items-center justify-between gap-3 rounded-lg border border-border/65 bg-muted/40 px-3 py-2.5">
                 <div className="min-w-0">
                   <div className="truncate font-medium">{a.displayName}</div>
-                  <div className="text-xs text-zinc-500">
+                  <div className="text-xs text-muted-foreground">
                     {a.stale ? <span className="text-amber-600">עודכן {day(a.balanceDate)}</span> : `עודכן ${day(a.balanceDate)}`}
                     {' · '}סוף {periodName} <Money value={a.endOfCycle} />
                   </div>
@@ -118,17 +118,17 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
-          <div className="mt-6 border-t border-line-soft pt-5">
+          <div className="mt-6 border-t border-border/65 pt-5">
             <SectionTitle icon={CreditCard} color="var(--chart-6)">חיובי כרטיסים קרובים</SectionTitle>
           </div>
           <div className="space-y-1 text-sm">
-            {data.cardCharges.length === 0 && <div className="text-zinc-500">אין חיובים עתידיים ידועים</div>}
+            {data.cardCharges.length === 0 && <div className="text-muted-foreground">אין חיובים עתידיים ידועים</div>}
             {data.cardCharges.map(c => (
               <Link key={`${c.cardAccountId}${c.chargeDate}`} to={`/transactions?account=${encodeURIComponent(c.cardAccountId)}&charge=${c.chargeDate}`}
                 title="הצג את העסקאות שבחיוב הזה"
                 className="group -mx-2 flex items-center justify-between gap-3 rounded-lg px-2 py-1.5 transition-colors duration-(--duration-fast) hover:bg-accent/60">
                 <div className="flex min-w-0 items-center gap-2.5">
-                  <span className="flex h-8 w-8 shrink-0 flex-col items-center justify-center rounded-lg bg-muted text-[10px] font-semibold leading-tight text-muted-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                  <span className="flex h-8 w-8 shrink-0 flex-col items-center justify-center rounded-lg bg-muted text-2xs font-semibold leading-tight text-muted-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                     <span className="num text-sm font-bold leading-none">{Number(c.chargeDate.slice(8, 10))}</span>
                     {shortMonth(c.chargeDate.slice(0, 7))}
                   </span>
@@ -136,24 +136,24 @@ export default function Dashboard() {
                     <div className="flex min-w-0 items-center gap-1.5">
                       <span className="truncate">{c.displayName}</span>
                       {cardOwner(c.cardAccountId) != null ? <MemberBadge id={cardOwner(c.cardAccountId)} />
-                        : <span className="chip text-[11px] text-muted-foreground" title="אפשר לשייך בהגדרות › חשבונות וכרטיסים">לא משויך</span>}
+                        : <span className="chip text-2xs text-muted-foreground" title="אפשר לשייך בהגדרות › חשבונות וכרטיסים">לא משויך</span>}
                     </div>
-                    <div className="text-xs text-zinc-500">מ{accountName(c.billingBankAccountId)}</div>
+                    <div className="text-xs text-muted-foreground">מ{accountName(c.billingBankAccountId)}</div>
                   </div>
                 </div>
                 <div className="text-end">
                   {c.transactions > 0 || c.projectedInstallments > 0 || c.projectedFixed > 0 || c.projectedPlanned > 0 ? (
                     <>
                       <Money value={c.knownAmount + c.projectedInstallments + c.projectedFixed + c.projectedPlanned} className="font-semibold" />
-                      {c.projectedInstallments > 0 && <div className="text-xs text-zinc-500" title="תשלומים של עסקאות בתשלומים שהכרטיס עוד לא דיווח עליהם">כולל תשלומים <Money value={c.projectedInstallments} /></div>}
-                      {c.projectedPlanned > 0 && <div className="text-xs text-zinc-500" title={`הוצאות צפויות שהזנת מראש: ${c.plannedItems.map(p => p.of > 1 ? `${p.name} (${p.n}/${p.of})` : p.name).join(', ')}`}>כולל צפויות <Money value={c.projectedPlanned} /></div>}
-                      {c.projectedFixed > 0 && <div className="text-xs text-zinc-500" title={`קבועות בכרטיס שעוד לא דווחו: ${c.fixedItems.map(f => f.name).join(', ')}`}>כולל קבועות <Money value={c.projectedFixed} /></div>}
-                      {c.expectedAmount > c.knownAmount + c.projectedInstallments + c.projectedFixed + c.projectedPlanned && <div className="text-xs text-zinc-500" title={`החיוב עוד פתוח. קניות שוטפות בחיוב רגיל: כ-₪${Math.round(c.typicalVariable).toLocaleString('he-IL')} (חציון 3 החיובים האחרונים, בלי תשלומים וקבועות). התחזית מניחה את הסכום הזה`}>עד כה · צפוי כ-<Money value={c.expectedAmount} /></div>}
+                      {c.projectedInstallments > 0 && <div className="text-xs text-muted-foreground" title="תשלומים של עסקאות בתשלומים שהכרטיס עוד לא דיווח עליהם">כולל תשלומים <Money value={c.projectedInstallments} /></div>}
+                      {c.projectedPlanned > 0 && <div className="text-xs text-muted-foreground" title={`הוצאות צפויות שהזנת מראש: ${c.plannedItems.map(p => p.of > 1 ? `${p.name} (${p.n}/${p.of})` : p.name).join(', ')}`}>כולל צפויות <Money value={c.projectedPlanned} /></div>}
+                      {c.projectedFixed > 0 && <div className="text-xs text-muted-foreground" title={`קבועות בכרטיס שעוד לא דווחו: ${c.fixedItems.map(f => f.name).join(', ')}`}>כולל קבועות <Money value={c.projectedFixed} /></div>}
+                      {c.expectedAmount > c.knownAmount + c.projectedInstallments + c.projectedFixed + c.projectedPlanned && <div className="text-xs text-muted-foreground" title={`החיוב עוד פתוח. קניות שוטפות בחיוב רגיל: כ-₪${Math.round(c.typicalVariable).toLocaleString('he-IL')} (חציון 3 החיובים האחרונים, בלי תשלומים וקבועות). התחזית מניחה את הסכום הזה`}>עד כה · צפוי כ-<Money value={c.expectedAmount} /></div>}
                     </>
                   ) : (
                     <>
-                      <Money value={c.expectedAmount} className="font-semibold text-zinc-500" />
-                      <div className="text-xs text-zinc-500" title="תשלומים וקבועות ידועים + קניות שוטפות כמו בחיוב רגיל (חציון 3 החיובים האחרונים)">הערכה — אין עדיין פירוט</div>
+                      <Money value={c.expectedAmount} className="font-semibold text-muted-foreground" />
+                      <div className="text-xs text-muted-foreground" title="תשלומים וקבועות ידועים + קניות שוטפות כמו בחיוב רגיל (חציון 3 החיובים האחרונים)">הערכה — אין עדיין פירוט</div>
                     </>
                   )}
                 </div>
@@ -183,7 +183,7 @@ export default function Dashboard() {
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <div className="card min-w-0">
           <SectionTitle icon={GaugeIcon} action={<MoreLink to="/budgets">הכל</MoreLink>}>תקציב</SectionTitle>
-          {data.budgets.length === 0 && <div className="text-sm text-zinc-500">עוד לא הוגדרו תקציבים. <Link className="text-primary" to="/budgets">להגדרה</Link></div>}
+          {data.budgets.length === 0 && <div className="text-sm text-muted-foreground">עוד לא הוגדרו תקציבים. <Link className="text-primary" to="/budgets">להגדרה</Link></div>}
           {data.budgets.length > 0 && (
             <div className="mb-4 flex items-center gap-4 rounded-xl bg-muted/50 p-3">
               <Gauge value={budgetSpent} max={budgetTotal} size={96} label="נוצל"
@@ -202,7 +202,7 @@ export default function Dashboard() {
                 <div key={b.categoryId}>
                   <div className="mb-1.5 flex items-center justify-between gap-2 text-sm">
                     <span className="flex min-w-0 items-center gap-2"><Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /><span className="truncate">{b.categoryName}</span></span>
-                    <span className="shrink-0 text-xs text-zinc-500"><Money value={b.spent} /> / <Money value={b.budget} /></span>
+                    <span className="shrink-0 text-xs text-muted-foreground"><Money value={b.spent} /> / <Money value={b.budget} /></span>
                   </div>
                   <Progress value={b.spent} max={b.budget ?? 0} status={b.status} />
                 </div>
@@ -213,7 +213,7 @@ export default function Dashboard() {
 
         <div className="card min-w-0">
           <SectionTitle icon={Users} color="var(--chart-5)">הוצאות לפי בן משפחה</SectionTitle>
-          {members.length === 0 ? <div className="text-sm text-zinc-500">אין עדיין הוצאות במחזור</div> : (
+          {members.length === 0 ? <div className="text-sm text-muted-foreground">אין עדיין הוצאות במחזור</div> : (
             <BarList items={members.sort((a, b) => b.spend - a.spend).map(m => {
               const mm = member(m.id);
               return {
@@ -223,7 +223,7 @@ export default function Dashboard() {
               };
             })} />
           )}
-          <div className="mt-5 border-t border-line-soft pt-4">
+          <div className="mt-5 border-t border-border/65 pt-4">
             <div className="label">הקטגוריות הגדולות</div>
             <BarList color="var(--chart-6)" items={categories.slice(0, 5).map(c => {
               const Icon = categoryIcon(c.name);
@@ -234,14 +234,14 @@ export default function Dashboard() {
 
         <div className="card min-w-0">
           <SectionTitle icon={TriangleAlert} color="var(--negative)" action={<MoreLink to="/insights">הכל</MoreLink>}>התראות</SectionTitle>
-          {data.alerts.length === 0 && <div className="text-sm text-zinc-500">אין התראות פתוחות 🎉</div>}
+          {data.alerts.length === 0 && <div className="text-sm text-muted-foreground">אין התראות פתוחות 🎉</div>}
           <div className="stagger space-y-1">
             {data.alerts.map((a, i) => (
               <Link key={a.id} to={a.action?.href ?? '/insights'} style={{ ['--i' as string]: i }} className="flex gap-2.5 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent/50">
                 <SeverityDot severity={a.severity} />
                 <div className="min-w-0">
                   <div className="font-medium">{a.title}</div>
-                  <div className="text-xs leading-relaxed text-zinc-500">{a.message}</div>
+                  <div className="text-xs leading-relaxed text-muted-foreground">{a.message}</div>
                   {a.action && <div className="mt-0.5 text-xs font-medium text-primary">{a.action.label} ←</div>}
                 </div>
               </Link>
@@ -264,11 +264,11 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
-        <p className="mt-4 text-xs leading-relaxed text-zinc-500">
+        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
           הכנסה צפויה <Money value={capacity.expectedIncome} /> − קבועות <Money value={capacity.averageFixed} /> − משתנות <Money value={capacity.averageDynamic} />
           {' '}− רזרבה להוצאות חריגות <Money value={capacity.irregularReserve} /> = <Money value={capacity.monthlyCapacity} colored />
         </p>
-        <p className="mt-1 text-xs leading-relaxed text-zinc-500">
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
           הממוצעים מחושבים מהחודשים: {capacity.monthsUsed.join(', ')} (חודשים בלי נתונים מלאים לא נכללים). הרזרבה = הוצאות חד-פעמיות מעל ₪1,500 בשנה האחרונה, מחולקות לחודשים.
         </p>
       </div>
@@ -288,9 +288,9 @@ function InstallmentsCard({ plans }: { plans: InstallmentPlan[] }) {
     <div className="card mt-4">
       <SectionTitle icon={CreditCard} color="var(--chart-6)" action={<MoreLink to="/cashflow">לפי חודש</MoreLink>}>עסקאות בתשלומים</SectionTitle>
       <div className="mb-4 flex flex-wrap gap-2 text-sm">
-        <span className="rounded-lg bg-muted/70 px-3 py-1.5 text-zinc-500"><b className="num text-foreground">{plans.length}</b> עסקאות פתוחות</span>
-        <span className="rounded-lg bg-muted/70 px-3 py-1.5 text-zinc-500">נשאר לשלם <Money value={totalLeft} animated className="font-semibold text-foreground" /></span>
-        {thisMonth && <span className="rounded-lg bg-muted/70 px-3 py-1.5 text-zinc-500">ב{monthName(thisMonth)} <Money value={nextMonthTotal} animated className="font-semibold text-foreground" /></span>}
+        <span className="rounded-lg bg-muted/70 px-3 py-1.5 text-muted-foreground"><b className="num text-foreground">{plans.length}</b> עסקאות פתוחות</span>
+        <span className="rounded-lg bg-muted/70 px-3 py-1.5 text-muted-foreground">נשאר לשלם <Money value={totalLeft} animated className="font-semibold text-foreground" /></span>
+        {thisMonth && <span className="rounded-lg bg-muted/70 px-3 py-1.5 text-muted-foreground">ב{monthName(thisMonth)} <Money value={nextMonthTotal} animated className="font-semibold text-foreground" /></span>}
       </div>
       <div className="scroll-x card-bleed">
         <table className="table">
@@ -302,12 +302,12 @@ function InstallmentsCard({ plans }: { plans: InstallmentPlan[] }) {
               <tr key={`${p.cardAccountId}|${p.description}|${p.purchaseDate}`}>
                 <td>
                   <div className="font-medium">{p.description}</div>
-                  <div className="text-xs text-zinc-500">נרכש {day(p.purchaseDate)} · מסתיים ב{monthName(p.lastChargeMonth)}</div>
+                  <div className="text-xs text-muted-foreground">נרכש {day(p.purchaseDate)} · מסתיים ב{monthName(p.lastChargeMonth)}</div>
                 </td>
-                <td className="text-xs text-zinc-500">{accountName(p.cardAccountId)}</td>
+                <td className="text-xs text-muted-foreground">{accountName(p.cardAccountId)}</td>
                 <td><MemberBadge id={p.memberId} /></td>
                 <td>
-                  <div className="mb-1 text-xs text-zinc-500">{p.paid} מתוך {p.total} שולמו</div>
+                  <div className="mb-1 text-xs text-muted-foreground">{p.paid} מתוך {p.total} שולמו</div>
                   <Progress value={p.paid} max={p.total} />
                 </td>
                 <td className="whitespace-nowrap font-semibold">{p.remaining === 1 ? 'תשלום אחרון' : `${p.remaining} תשלומים`}</td>

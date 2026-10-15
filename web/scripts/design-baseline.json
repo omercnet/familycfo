@@ -1,8 +1,8 @@
 {
-  "palette": 236,
-  "font-size": 37,
-  "direction": 1,
-  "dark-variant": 70,
+  "palette": 156,
+  "font-size": 2,
+  "direction": 0,
+  "dark-variant": 58,
   "literal-color": 14,
   "amounts": 2
 }

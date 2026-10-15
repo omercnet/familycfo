@@ -70,13 +70,13 @@ export default function Events() {
                   <span className="icon-tile h-6 w-6 rounded-md [&_svg]:h-3.5 [&_svg]:w-3.5" style={{ ['--tile' as string]: e.color ?? hueFor(e.name) }}><Tags /></span>
                   <div className="min-w-0 truncate font-semibold">{e.name}</div>
                 </div>
-                <div className="mt-0.5 text-xs text-zinc-500">
+                <div className="mt-0.5 text-xs text-muted-foreground">
                   {e.startDate ? `${day(e.startDate)} – ${day(e.endDate ?? e.startDate)}` : e.firstDate ? `${day(e.firstDate)} – ${day(e.lastDate)}` : 'ללא תאריכים'}
                   {' · '}{e.count} תנועות
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <Money value={e.total} className="text-lg font-semibold tracking-tight" />
-                  {e.budget ? <span className="text-xs text-zinc-500">מתוך <Money value={e.budget} /></span> : null}
+                  {e.budget ? <span className="text-xs text-muted-foreground">מתוך <Money value={e.budget} /></span> : null}
                 </div>
                 {e.budget ? <Progress className="mt-2 h-1" value={e.total} max={e.budget} status={e.total > e.budget ? 'over' : e.total > e.budget * 0.8 ? 'warning' : 'ok'} /> : null}
               </button>
@@ -101,7 +101,7 @@ export default function Events() {
           </div>
           <Field label="תקציב (לא חובה)"><input className="input num" type="number" value={editing.budget ?? ''} onChange={e => setEditing({ ...editing, budget: e.target.value ? Number(e.target.value) : null })} /></Field>
           <Field label="הערות"><textarea className="input" rows={2} value={editing.notes ?? ''} onChange={e => setEditing({ ...editing, notes: e.target.value })} /></Field>
-          <p className="text-xs leading-relaxed text-zinc-500">התאריכים משמשים להצעת תנועות מתאימות. אפשר לתייג גם תנועות מחוץ לתאריכים (למשל טיסות שנקנו מראש).</p>
+          <p className="text-xs leading-relaxed text-muted-foreground">התאריכים משמשים להצעת תנועות מתאימות. אפשר לתייג גם תנועות מחוץ לתאריכים (למשל טיסות שנקנו מראש).</p>
         </Modal>
       )}
     </>
@@ -155,7 +155,7 @@ function EventDetailView({ id, onEdit }: { id: number; onEdit: (e: EventRow) => 
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold tracking-tight">{ev.name}</h2>
-            <div className="mt-0.5 text-sm text-zinc-500">
+            <div className="mt-0.5 text-sm text-muted-foreground">
               {ev.startDate ? `${fullDate(ev.startDate)} – ${fullDate(ev.endDate ?? ev.startDate)}` : 'ללא תאריכים'}
               {ev.notes && <> · {ev.notes}</>}
             </div>
@@ -195,10 +195,10 @@ function EventDetailView({ id, onEdit }: { id: number; onEdit: (e: EventRow) => 
             <SectionTitle icon={PieChart}>לפי קטגוריה</SectionTitle>
             <DonutChart data={catSlices} max={8} />
             {catNegative.length > 0 && (
-              <div className="mt-3 space-y-0.5 border-t border-line-soft pt-3 text-sm">
+              <div className="mt-3 space-y-0.5 border-t border-border/65 pt-3 text-sm">
                 {catNegative.map(c => (
                   <div key={c.key} className="flex items-center justify-between gap-3 px-2 py-1">
-                    <span className="min-w-0 truncate">{c.key} <span className="text-xs text-zinc-500">({c.count})</span></span><Money value={c.amount} colored />
+                    <span className="min-w-0 truncate">{c.key} <span className="text-xs text-muted-foreground">({c.count})</span></span><Money value={c.amount} colored />
                   </div>
                 ))}
               </div>
@@ -208,7 +208,7 @@ function EventDetailView({ id, onEdit }: { id: number; onEdit: (e: EventRow) => 
             <div className="card">
               <SectionTitle icon={Coins} color="var(--chart-5)">לפי מטבע</SectionTitle>
               {d.byCurrency.map(c => (
-                <div key={c.currency} className="flex justify-between gap-3 border-b border-line-soft py-2 text-sm last:border-0">
+                <div key={c.currency} className="flex justify-between gap-3 border-b border-border/65 py-2 text-sm last:border-0">
                   <span className="num">{moneyIn(c.original, c.currency)}</span><Money value={c.ils} />
                 </div>
               ))}
@@ -218,7 +218,7 @@ function EventDetailView({ id, onEdit }: { id: number; onEdit: (e: EventRow) => 
               {d.byMember.map(m => {
                 const mm = member(Number(m.key));
                 return (
-                  <div key={m.key} className="flex items-center justify-between gap-3 border-b border-line-soft py-2 text-sm last:border-0">
+                  <div key={m.key} className="flex items-center justify-between gap-3 border-b border-border/65 py-2 text-sm last:border-0">
                     <span className="flex min-w-0 items-center gap-2">{mm && <MemberAvatar name={mm.name} color={mm.color} size={20} />}<span className="truncate">{mm?.name ?? '—'}</span></span>
                     <Money value={m.amount} />
                   </div>
@@ -231,17 +231,17 @@ function EventDetailView({ id, onEdit }: { id: number; onEdit: (e: EventRow) => 
 
       <div className="card p-0">
         <div className="card-title">התנועות באירוע</div>
-        {d.transactions.length === 0 ? <div className="px-4 pb-4 text-sm text-zinc-500 md:px-5 md:pb-5">עוד לא תויגו תנועות — בחרו מהרשימה למטה</div> : (
+        {d.transactions.length === 0 ? <div className="px-4 pb-4 text-sm text-muted-foreground md:px-5 md:pb-5">עוד לא תויגו תנועות — בחרו מהרשימה למטה</div> : (
           <div className="scroll-x"><table className="table">
             <thead><tr><th>תאריך</th><th>תיאור</th><th>קטגוריה</th><th>של מי</th><th className="text-end">מקור</th><th className="text-end">בשקלים</th><th /></tr></thead>
             <tbody>
               {d.transactions.map(t => (
                 <tr key={t.id}>
-                  <td className="whitespace-nowrap text-zinc-500">{day(t.date)}</td>
+                  <td className="whitespace-nowrap text-muted-foreground">{day(t.date)}</td>
                   <td className="font-medium">{t.description}</td>
-                  <td className="text-xs text-zinc-500">{t.categoryName}</td>
+                  <td className="text-xs text-muted-foreground">{t.categoryName}</td>
                   <td><MemberBadge id={t.memberId} /></td>
-                  <td className="text-end text-xs text-zinc-500 num">{t.originalCurrency && t.originalCurrency !== 'ILS' && t.originalAmount != null ? moneyIn(t.originalAmount, t.originalCurrency.replace('€', 'EUR').replace('$', 'USD')) : ''}</td>
+                  <td className="text-end text-xs text-muted-foreground num">{t.originalCurrency && t.originalCurrency !== 'ILS' && t.originalAmount != null ? moneyIn(t.originalAmount, t.originalCurrency.replace('€', 'EUR').replace('$', 'USD')) : ''}</td>
                   <td className="text-end"><Money value={t.amount} cents colored /></td>
                   <td><button className="btn-ghost btn-icon" aria-label="הסר מהאירוע" title="הסר מהאירוע" onClick={() => change.mutate({ remove: [t.id] })}>✕</button></td>
                 </tr>
@@ -255,7 +255,7 @@ function EventDetailView({ id, onEdit }: { id: number; onEdit: (e: EventRow) => 
         <div className="flex flex-wrap items-end justify-between gap-3 px-4 pb-1 pt-4 md:px-5 md:pt-5">
           <div>
             <div className="font-semibold">הוספת תנועות</div>
-            <div className="text-xs text-zinc-500">תנועות לא מתויגות בתאריכים — עסקאות במט״ח מסומנות מראש</div>
+            <div className="text-xs text-muted-foreground">תנועות לא מתויגות בתאריכים — עסקאות במט״ח מסומנות מראש</div>
           </div>
           <div className="flex flex-wrap items-end gap-2 max-sm:w-full">
             <label className="max-sm:flex-1"><span className="label">מ-</span><input className="input" type="date" value={range?.from ?? candidates.data?.from ?? ''}
@@ -268,8 +268,8 @@ function EventDetailView({ id, onEdit }: { id: number; onEdit: (e: EventRow) => 
           </div>
         </div>
         {!candidates.data?.from ? (
-          <div className="p-4 text-sm leading-relaxed text-zinc-500 md:px-5 md:pb-5">הגדירו תאריכים לאירוע (✎ עריכה) או בחרו טווח כאן כדי לראות תנועות מתאימות. אפשר גם לתייג מעמוד התנועות.</div>
-        ) : cands.length === 0 ? <div className="p-4 text-sm text-zinc-500 md:px-5 md:pb-5">אין תנועות נוספות בטווח הזה</div> : (
+          <div className="p-4 text-sm leading-relaxed text-muted-foreground md:px-5 md:pb-5">הגדירו תאריכים לאירוע (✎ עריכה) או בחרו טווח כאן כדי לראות תנועות מתאימות. אפשר גם לתייג מעמוד התנועות.</div>
+        ) : cands.length === 0 ? <div className="p-4 text-sm text-muted-foreground md:px-5 md:pb-5">אין תנועות נוספות בטווח הזה</div> : (
           <div className="scroll-x mt-3"><table className="table">
             <thead><tr>
               <th className="w-8"><input type="checkbox" checked={cands.every(c => picked.has(c.id))}
@@ -278,13 +278,13 @@ function EventDetailView({ id, onEdit }: { id: number; onEdit: (e: EventRow) => 
             </tr></thead>
             <tbody>
               {cands.map(t => (
-                <tr key={t.id} className={picked.has(t.id) ? 'bg-selected' : ''}>
+                <tr key={t.id} className={picked.has(t.id) ? 'bg-accent' : ''}>
                   <td><input type="checkbox" checked={picked.has(t.id)}
                     onChange={() => setPicked(p => { const n = new Set(p); n.has(t.id) ? n.delete(t.id) : n.add(t.id); return n; })} /></td>
-                  <td className="whitespace-nowrap text-zinc-500">{day(t.date)}</td>
+                  <td className="whitespace-nowrap text-muted-foreground">{day(t.date)}</td>
                   <td className="font-medium">{t.description}{t.foreign && <span className="chip ms-2">מט״ח</span>}</td>
-                  <td className="text-xs text-zinc-500">{t.categoryName}</td>
-                  <td className="text-end text-xs text-zinc-500 num">{t.foreign && t.originalAmount != null ? moneyIn(t.originalAmount, (t.originalCurrency ?? 'ILS').replace('€', 'EUR').replace('$', 'USD')) : ''}</td>
+                  <td className="text-xs text-muted-foreground">{t.categoryName}</td>
+                  <td className="text-end text-xs text-muted-foreground num">{t.foreign && t.originalAmount != null ? moneyIn(t.originalAmount, (t.originalCurrency ?? 'ILS').replace('€', 'EUR').replace('$', 'USD')) : ''}</td>
                   <td className="text-end"><Money value={t.amount} cents colored /></td>
                 </tr>
               ))}

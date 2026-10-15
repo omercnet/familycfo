@@ -76,13 +76,13 @@ export default function Savings() {
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <div className="card min-w-0 lg:col-span-2">
           <SectionTitle icon={LineChart}>שווי נקי לאורך זמן</SectionTitle>
-          {history.length > 1 ? <SimpleLine data={history} dataKey="netWorth" formatX={day} height={240} /> : <div className="text-sm text-zinc-500">הגרף יתמלא ככל שיתעדכנו שווי הנכסים והיתרות</div>}
+          {history.length > 1 ? <SimpleLine data={history} dataKey="netWorth" formatX={day} height={240} /> : <div className="text-sm text-muted-foreground">הגרף יתמלא ככל שיתעדכנו שווי הנכסים והיתרות</div>}
         </div>
         <div className="card min-w-0">
           <SectionTitle icon={Wallet} color="var(--chart-5)">לפי סוג</SectionTitle>
           <DonutChart data={typeSlices} centerLabel="נכסים" height={200} />
           {typeNegative.length > 0 && (
-            <div className={`space-y-0.5 text-sm ${typeSlices.length ? 'mt-3 border-t border-line-soft pt-3' : ''}`}>
+            <div className={`space-y-0.5 text-sm ${typeSlices.length ? 'mt-3 border-t border-border/65 pt-3' : ''}`}>
               {typeNegative.map(([type, v]) => {
                 const Icon = typeIcon(type);
                 return (
@@ -113,16 +113,16 @@ export default function Savings() {
                     <td className="min-w-40 font-medium">
                       <div className="flex items-center gap-2.5">
                         {(() => { const Icon = typeIcon(i.type); return <span className="icon-tile h-8 w-8" style={{ ['--tile' as string]: hueFor(i.type) }}><Icon /></span>; })()}
-                        <div className="min-w-0">{i.name}{asset?.notes && <div className="text-xs font-normal text-zinc-500">{asset.notes}</div>}</div>
+                        <div className="min-w-0">{i.name}{asset?.notes && <div className="text-xs font-normal text-muted-foreground">{asset.notes}</div>}</div>
                       </div>
                     </td>
                     <td className="whitespace-nowrap">{ASSET_TYPE_LABELS[i.type] ?? i.type}</td>
-                    <td className="text-sm">{i.provider}{asset?.managementFee && <div className="text-xs text-zinc-500">דמי ניהול {asset.managementFee}</div>}</td>
+                    <td className="text-sm">{i.provider}{asset?.managementFee && <div className="text-xs text-muted-foreground">דמי ניהול {asset.managementFee}</div>}</td>
                     <td><MemberBadge id={i.ownerMemberId} /></td>
                     <td className="num whitespace-nowrap text-end">{moneyIn(i.value, i.currency)}</td>
                     <td className="text-end"><Money value={i.valueIls} /></td>
                     <td className="whitespace-nowrap text-xs">{i.liquidityDate ? day(i.liquidityDate) : 'נזיל'}</td>
-                    <td className="whitespace-nowrap text-xs text-zinc-500">{day(i.asOf)}</td>
+                    <td className="whitespace-nowrap text-xs text-muted-foreground">{day(i.asOf)}</td>
                     <td className="whitespace-nowrap">
                       {i.id.startsWith('portfolio:') && <Link className="btn-ghost" to="/investments">לתיק ההשקעות</Link>}
                       {asset && <>
@@ -144,7 +144,7 @@ export default function Savings() {
         </SectionTitle>
         <div className="stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {meta?.funds.map((f, idx) => (
-            <div key={f.id} style={{ ['--i' as string]: idx }} className="card-hover min-w-0 rounded-lg border border-line bg-surface-muted p-3 focus-within:border-brand-300 dark:focus-within:border-brand-700">
+            <div key={f.id} style={{ ['--i' as string]: idx }} className="card-hover min-w-0 rounded-lg border border-border bg-muted p-3 focus-within:border-primary/50">
               <div className="mb-3 flex items-center gap-2.5">
                 <span className="icon-tile h-9 w-9" style={{ ['--tile' as string]: hueFor(f.name) }}><PiggyBank /></span>
                 <input className="input min-w-0 flex-1 font-medium" defaultValue={f.name} onBlur={e => e.target.value !== f.name && saveFund.mutate({ id: f.id, name: e.target.value })} />
@@ -160,7 +160,7 @@ export default function Savings() {
                   onBlur={e => saveFund.mutate({ id: f.id, goalDate: e.target.value || null })} /></Field>
               </div>
               {f.goalAmount ? (
-                <div className="mt-3 text-xs text-zinc-500">
+                <div className="mt-3 text-xs text-muted-foreground">
                   <Progress className="mb-1.5" value={f.balance} max={f.goalAmount} />
                   {Math.round((f.balance / f.goalAmount) * 100)}% מהמטרה
                   {f.goalDate && (() => {

@@ -105,12 +105,12 @@ function BrandMark() {
 
 function AlertsBell({ unseen }: { unseen: number }) {
   return (
-    <Link to="/insights" aria-label="התראות" className="btn-ghost btn-icon relative text-fg-muted">
+    <Link to="/insights" aria-label="התראות" className="btn-ghost btn-icon relative text-muted-foreground">
       <motion.span animate={unseen ? { rotate: [0, -14, 12, -8, 0] } : {}} transition={{ duration: 0.9, delay: 0.6 }} className="inline-flex">
         <Bell className="h-[1.15rem] w-[1.15rem]" />
       </motion.span>
       {unseen > 0 && (
-        <span className="num absolute end-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white ring-2 ring-background">
+        <span className="num absolute end-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-2xs font-semibold text-white ring-2 ring-background">
           {unseen}
         </span>
       )}
@@ -173,7 +173,7 @@ export default function App() {
 
         <div className="relative flex h-(--header-h) shrink-0 items-center gap-2.5 px-4 pt-[env(safe-area-inset-top)] md:justify-center md:px-0 lg:justify-start lg:px-5">
           <BrandMark />
-          <span className="truncate text-[0.9375rem] font-bold tracking-tight text-white md:max-lg:sr-only">הכספים של הבית</span>
+          <span className="truncate text-md font-bold tracking-tight text-white md:max-lg:sr-only">הכספים של הבית</span>
           <button type="button" className="btn-ghost btn-icon ms-auto text-sidebar-foreground hover:bg-sidebar-accent hover:text-white md:hidden"
             aria-label="סגור תפריט" onClick={() => setNavOpen(false)}>
             <X />
@@ -201,8 +201,8 @@ export default function App() {
                         isActive ? 'text-sidebar-primary' : 'text-sidebar-muted group-hover:text-sidebar-foreground')} />
                       <span className="relative flex-1 truncate md:max-lg:sr-only">{n.label}</span>
                       {n.to === '/insights' && unseen > 0 && (
-                        <span className="num relative flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-rose-500 px-1 text-[0.6875rem] font-semibold leading-none text-white
-                          md:max-lg:absolute md:max-lg:end-1 md:max-lg:top-1 md:max-lg:h-4 md:max-lg:min-w-4 md:max-lg:text-[0.625rem]">
+                        <span className="num relative flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-rose-500 px-1 text-2xs font-semibold leading-none text-white
+                          md:max-lg:absolute md:max-lg:end-1 md:max-lg:top-1 md:max-lg:h-4 md:max-lg:min-w-4 md:max-lg:text-2xs">
                           {unseen}
                         </span>
                       )}
@@ -228,11 +228,11 @@ export default function App() {
       <div className="min-w-0 flex-1">
         <header className="sticky top-0 z-30 border-b bg-background/75 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
           <div className="flex min-h-(--header-h) items-center gap-2 px-3 py-2.5 sm:px-6 lg:px-8">
-            <button ref={menuButton} type="button" className="btn-ghost btn-icon -ms-1 text-fg md:hidden" aria-label="פתח תפריט"
+            <button ref={menuButton} type="button" className="btn-ghost btn-icon -ms-1 text-foreground md:hidden" aria-label="פתח תפריט"
               aria-expanded={navOpen} aria-controls="app-nav" onClick={() => setNavOpen(true)}>
               <Menu className="h-5 w-5" />
             </button>
-            <span className="flex min-w-0 items-center gap-2 truncate text-[0.9375rem] font-bold tracking-tight md:hidden">
+            <span className="flex min-w-0 items-center gap-2 truncate text-md font-bold tracking-tight md:hidden">
               {current && <current.icon className="h-4 w-4 text-primary" />}
               {current?.label ?? 'הכספים של הבית'}
             </span>

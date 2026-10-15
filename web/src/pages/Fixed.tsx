@@ -138,7 +138,7 @@ export default function Fixed() {
               {' '}״קבוע״ = פריט ברשימה למטה, או תנועה בקטגוריה שמסומנת כקבועה.
             </p>
           </div>
-          <div className="min-w-0 border-line-soft max-lg:border-t max-lg:pt-4 lg:border-s lg:ps-6">
+          <div className="min-w-0 border-border/65 max-lg:border-t max-lg:pt-4 lg:border-s lg:ps-6">
             <DonutChart centerLabel={monthName(data.cycle.key)}
               data={composition.map(c => ({ key: c.key, name: c.legend, value: c.value, color: c.color, icon: <c.Icon /> }))} />
           </div>
@@ -151,7 +151,7 @@ export default function Fixed() {
             action={<button className="btn btn-primary" onClick={() => suggested.forEach(c => patch.mutate({ id: c.id, body: { status: 'confirmed' } }))}>הוסף הכל</button>}>
             <span>זיהינו {suggested.length} חיובים שחוזרים כל חודש — להוסיף לקבועות?</span>
           </SectionTitle>
-          <div className="stagger divide-y divide-line-soft">
+          <div className="stagger divide-y divide-border/65">
             {suggested.map((c, i) => {
               const Icon = categoryIcon(c.categoryName ?? c.name);
               return (
@@ -211,8 +211,8 @@ export default function Fixed() {
                       {c.categoryName && c.categoryName !== group && <div className="text-xs text-muted-foreground">{c.categoryName}</div>}
                     </td>
                     <td className="min-w-32 text-xs text-muted-foreground">
-                      {c.method === 'card' ? <>בכרטיס {accountName(c.accountId)}<div className="text-[11px]">נכלל בחיוב הכרטיס</div></> : <>מהבנק {accountName(c.accountId)}</>}
-                      {c.liabilityId && <div><Link className="text-brand-600 hover:underline" to="/loans">מההלוואות</Link></div>}
+                      {c.method === 'card' ? <>בכרטיס {accountName(c.accountId)}<div className="text-2xs">נכלל בחיוב הכרטיס</div></> : <>מהבנק {accountName(c.accountId)}</>}
+                      {c.liabilityId && <div><Link className="text-primary hover:underline" to="/loans">מההלוואות</Link></div>}
                     </td>
                     <td><MemberBadge id={c.memberId} /></td>
                     <td className="whitespace-nowrap text-sm">{day(c.dueDate)}</td>
@@ -238,7 +238,7 @@ export default function Fixed() {
         {data.otherFixed.count > 0 && (
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
             בנוסף, <Money value={data.otherFixed.amount} /> ב-{data.otherFixed.count} תנועות נספרו כקבועות כי הקטגוריה שלהן מסומנת כקבועה, אבל הן לא ברשימה.
-            {' '}<Link className="text-brand-600 hover:underline" to="/categories">הגדרת קטגוריות</Link>
+            {' '}<Link className="text-primary hover:underline" to="/categories">הגדרת קטגוריות</Link>
           </p>
         )}
       </div>
@@ -376,7 +376,7 @@ function PlannedCard({ items, all, month, onAdd, onEdit, onAction }: {
         </table></div>
       )}
       {later.length > 0 && (
-        <div className="mt-4 border-t border-line-soft pt-3 text-sm">
+        <div className="mt-4 border-t border-border/65 pt-3 text-sm">
           <div className="label">בחודשים הבאים</div>
           <div className="space-y-1">
             {later.map(i => (

@@ -73,17 +73,17 @@ export function Stat({ label, value, hint, tone, icon: Icon, color, spark, delta
       <div aria-hidden className="pointer-events-none absolute -end-10 -top-12 h-32 w-32 rounded-full opacity-60 blur-2xl"
         style={{ background: `color-mix(in oklab, ${tile} 16%, transparent)` }} />
       <div className="relative flex items-start justify-between gap-3">
-        <div className="min-w-0 text-xs font-medium leading-4 text-fg-subtle">{label}</div>
+        <div className="min-w-0 text-xs font-medium leading-4 text-muted-foreground">{label}</div>
         {Icon && <span className="icon-tile -mt-0.5 h-8 w-8" style={{ ['--tile' as string]: tile }}><Icon /></span>}
       </div>
       <div className="relative mt-1.5 flex items-end justify-between gap-3">
-        <div className={cn('min-w-0 text-xl font-bold leading-7 tracking-tight sm:text-[1.625rem] sm:leading-8', tone && TONE_TEXT[tone])}>
+        <div className={cn('min-w-0 text-xl font-bold leading-7 tracking-tight sm:text-kpi sm:leading-8', tone && TONE_TEXT[tone])}>
           {typeof value === 'number' ? (format ? <AnimatedNumber value={value} format={format} className="num" /> : <Money value={value} animated />) : value}
         </div>
         {spark && spark.length > 1 && <Sparkline data={spark} color={tile} className="-mb-0.5 h-9 w-16 shrink-0 sm:w-24" />}
       </div>
       <div className="relative mt-auto pt-2">
-        <div className="min-w-0 text-xs leading-relaxed text-fg-subtle">
+        <div className="min-w-0 text-xs leading-relaxed text-muted-foreground">
           {delta && (
             <span className={cn('me-1.5 inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 font-semibold',
               deltaGood ? 'bg-positive/10 text-positive' : 'bg-negative/10 text-negative')}>
@@ -139,7 +139,7 @@ export function ErrorBox({ error }: { error: unknown }) {
 
 export function Empty({ children }: { children: ReactNode }) {
   return (
-    <div className="animate-rise-in rounded-(--radius-panel) border border-dashed border-line-strong bg-card/60 px-6 py-8 text-center text-sm leading-relaxed text-fg-subtle">
+    <div className="animate-rise-in rounded-(--radius-panel) border border-dashed border-input bg-card/60 px-6 py-8 text-center text-sm leading-relaxed text-muted-foreground">
       {children}
     </div>
   );
@@ -157,8 +157,8 @@ export function PageHeader({ title, subtitle, actions, icon: Icon }: { title: st
           </motion.span>
         )}
         <div className="min-w-0">
-          <h1 className="text-[1.375rem] font-bold leading-8 tracking-tight md:text-[1.625rem]">{title}</h1>
-          {subtitle && <p className="mt-0.5 max-w-3xl text-sm leading-relaxed text-fg-subtle">{subtitle}</p>}
+          <h1 className="text-[1.375rem] font-bold leading-8 tracking-tight md:text-kpi">{title}</h1>
+          {subtitle && <p className="mt-0.5 max-w-3xl text-sm leading-relaxed text-muted-foreground">{subtitle}</p>}
         </div>
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}

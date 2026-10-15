@@ -138,10 +138,10 @@ export default function Transactions() {
     });
   }, [data, sort, member, business]);
   const sortHeader = (key: SortKey, label: string, className = '') => (
-    <th className={`cursor-pointer select-none transition-colors duration-(--duration-fast) hover:text-fg ${sort.key === key ? 'text-fg' : ''} ${className}`}
+    <th className={`cursor-pointer select-none transition-colors duration-(--duration-fast) hover:text-foreground ${sort.key === key ? 'text-foreground' : ''} ${className}`}
       aria-sort={sort.key === key ? (sort.dir === 1 ? 'ascending' : 'descending') : undefined}
       onClick={() => setSort(s => ({ key, dir: s.key === key ? (s.dir === 1 ? -1 : 1) : key === 'date' || key === 'amount' ? -1 : 1 }))}>
-      {label}{sort.key === key && <span className="ms-1 inline-flex align-middle text-fg-subtle">{sort.dir === 1 ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}</span>}
+      {label}{sort.key === key && <span className="ms-1 inline-flex align-middle text-muted-foreground">{sort.dir === 1 ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}</span>}
     </th>
   );
   const allSelected = rows.length > 0 && rows.every(r => selected.has(r.id));
@@ -194,12 +194,12 @@ export default function Transactions() {
 
       <div className="card mb-4 grid grid-cols-2 gap-2.5 p-3 sm:grid-cols-3 md:p-4 lg:grid-cols-6">
         {ids || range ? (
-          <div className="input flex items-center justify-between gap-2 border-brand-200 bg-brand-50 py-0 pe-1 text-brand-800 dark:border-brand-700/60 dark:bg-brand-700/20 dark:text-brand-100">
+          <div className="input flex items-center justify-between gap-2 border-primary/25 bg-accent py-0 pe-1 text-accent-foreground">
             <span className="truncate">{ids ? `${ids.split(',').length} תנועות נבחרות` : range!.from === range!.to ? day(range!.from) : `${day(range!.from)} – ${day(range!.to)}`}</span>
             <button className="btn-ghost btn-icon min-h-7" onClick={() => { setIds(null); setRange(null); }} aria-label="הסר סינון"><X /></button>
           </div>
         ) : charge ? (
-          <div className="input flex items-center justify-between gap-2 border-brand-200 bg-brand-50 py-0 pe-1 text-brand-800 dark:border-brand-700/60 dark:bg-brand-700/20 dark:text-brand-100">
+          <div className="input flex items-center justify-between gap-2 border-primary/25 bg-accent py-0 pe-1 text-accent-foreground">
             <span className="truncate">חיוב של {day(charge)}</span>
             <button className="btn-ghost btn-icon min-h-7" onClick={() => setCharge(null)} aria-label="הסר סינון חיוב"><X /></button>
           </div>
@@ -210,7 +210,7 @@ export default function Transactions() {
         <CategorySelect value={category} onChange={setCategory} />
         <AccountSelect value={account} onChange={setAccount} emptyLabel="כל החשבונות" />
         <Picker className="input max-sm:col-span-2" value={kind} onChange={v => setKind(v ?? '')} options={kindFilterOptions} placeholder="כל הסוגים" searchable={false} />
-        <div className="col-span-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-fg-muted sm:col-span-1 sm:flex-col sm:items-start sm:justify-center sm:gap-1.5">
+        <div className="col-span-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted-foreground sm:col-span-1 sm:flex-col sm:items-start sm:justify-center sm:gap-1.5">
           <label className="flex min-h-8 items-center gap-2 max-sm:min-h-10"><input type="checkbox" checked={review} onChange={e => setReview(e.target.checked)} /> רק ללא קטגוריה</label>
           <label className="flex min-h-8 items-center gap-2 max-sm:min-h-10" title="שורות ״ויזה״/״כאל״ בבנק שמשלמות עסקאות שכבר מופיעות בכרטיס">
             <input type="checkbox" checked={hideCardPayments} onChange={e => setHideCardPayments(e.target.checked)} /> הסתר תשלומי כרטיס
@@ -219,8 +219,8 @@ export default function Transactions() {
       </div>
 
       {selected.size > 0 && (
-        <div className="card animate-rise-in sticky top-[calc(var(--header-h)+0.5rem)] z-20 mb-3 flex flex-wrap items-center gap-2 border-brand-200 bg-brand-50/95 p-3 shadow-(--shadow-overlay) backdrop-blur-md md:p-3 dark:border-brand-700/60 dark:bg-zinc-900/95">
-          <span className="min-w-14 px-1 text-sm font-semibold tabular-nums text-brand-800 dark:text-brand-100">{selected.size} נבחרו</span>
+        <div className="card animate-rise-in sticky top-[calc(var(--header-h)+0.5rem)] z-20 mb-3 flex flex-wrap items-center gap-2 border-primary/25 bg-accent/95 p-3 shadow-(--shadow-overlay) backdrop-blur-md md:p-3 dark:bg-zinc-900/95">
+          <span className="min-w-14 px-1 text-sm font-semibold tabular-nums text-accent-foreground">{selected.size} נבחרו</span>
           <CategorySelect className="input w-44 max-sm:w-[calc(50%-0.25rem)]" value={null} onChange={id => bulk.mutate({ categoryId: id })} />
           <MemberSelect className="input w-36 max-sm:w-[calc(50%-0.25rem)]" value={null} emptyLabel="שייך לבן משפחה…" onChange={id => bulk.mutate({ memberId: id })} />
           <BusinessSelect className="input w-40 max-sm:w-[calc(50%-0.25rem)]" value={null} onChange={id => bulk.mutate({ businessId: id })} />
@@ -256,15 +256,15 @@ export default function Transactions() {
             </thead>
             <tbody>
               {rows.map(t => (
-                <tr key={t.id} className={`transition-opacity ${t.excluded ? 'opacity-40' : ''} ${selected.has(t.id) ? 'bg-selected' : ''}`}>
+                <tr key={t.id} className={`transition-opacity ${t.excluded ? 'opacity-40' : ''} ${selected.has(t.id) ? 'bg-accent' : ''}`}>
                   <td><input type="checkbox" checked={selected.has(t.id)} onChange={() => toggle(t.id)} /></td>
-                  <td className="whitespace-nowrap text-zinc-500">
+                  <td className="whitespace-nowrap text-muted-foreground">
                     {day(t.date)}
-                    {t.processedDate !== t.date && t.accountKind === 'card' && <div className="text-[11px]">חיוב {day(t.processedDate)}</div>}
+                    {t.processedDate !== t.date && t.accountKind === 'card' && <div className="text-2xs">חיוב {day(t.processedDate)}</div>}
                   </td>
                   <td>
                     <div className="w-32 truncate font-medium sm:w-auto sm:max-w-72">{t.description}</div>
-                    <div className="mt-0.5 flex w-32 flex-wrap items-center gap-1 text-[11px] text-zinc-500 empty:hidden sm:w-auto sm:max-w-72 max-sm:[&_.chip]:whitespace-normal">
+                    <div className="mt-0.5 flex w-32 flex-wrap items-center gap-1 text-2xs text-muted-foreground empty:hidden sm:w-auto sm:max-w-72 max-sm:[&_.chip]:whitespace-normal">
                       {t.accountKind === 'manual' && <span className="chip gap-1" title="הוזן ידנית — לא מופיע באף חשבון או כרטיס"><PenLine className="h-3 w-3" />ידני</span>}
                       {t.kind !== 'expense' && <span className="chip">{KIND_LABELS[t.kind] ?? t.kind}</span>}
                       {t.link && t.matchedTxnId && <span className="chip" title="השורה בבנק היא החיוב של עסקה בכרטיס — נספרת פעם אחת">↔ חיוב מיידי של {t.link.description}</span>}
@@ -275,13 +275,13 @@ export default function Transactions() {
                       {t.paybackTotal > 0 && <span className="chip">הוחזרו <Money value={t.paybackTotal} /></span>}
                       {t.notes && <span title={t.notes}>📝</span>}
                       {t.tagIds.map(id => (
-                        <span key={id} className="chip gap-1 border border-brand-200 bg-brand-50 pe-1 text-brand-700 dark:border-brand-700/60 dark:bg-brand-700/25 dark:text-brand-100">
+                        <span key={id} className="chip gap-1 border border-primary/25 bg-accent pe-1 text-accent-foreground">
                           <Link to={`/events?id=${id}`} className="hover:underline">#{tag(id)?.name}</Link>
                           <button type="button" className="rounded opacity-60 hover:opacity-100" aria-label={`הסר תגית ${tag(id)?.name ?? ''}`}
                             onClick={() => patch.mutate({ id: t.id, body: { removeTagIds: [id] } })}><X className="h-3 w-3" /></button>
                         </span>
                       ))}
-                      <Picker className="chip min-h-5 cursor-pointer border border-dashed border-line px-1.5 text-[11px] text-muted-foreground hover:border-brand-300 hover:text-fg [&_svg]:hidden"
+                      <Picker className="chip min-h-5 cursor-pointer border border-dashed border-border px-1.5 text-2xs text-muted-foreground hover:border-primary/50 hover:text-foreground [&_svg]:hidden"
                         value="" aria-label="הוסף תגית" placeholder="+ תגית"
                         options={tagOptions.filter(o => o.value && !t.tagIds.includes(Number(o.value)))}
                         onChange={v => v && patch.mutate({ id: t.id, body: { addTagIds: [Number(v)] } })} />
@@ -299,10 +299,10 @@ export default function Transactions() {
                   <td className="min-w-40">
                     <BusinessSelect className="input py-1" value={t.businessId} onChange={id => patch.mutate({ id: t.id, body: { businessId: id } })} />
                     {t.businessId && t.businessAmount !== t.amount && (
-                      <div className="text-[11px] text-zinc-500">{business(t.businessId)?.name}: <Money value={t.businessAmount} /></div>
+                      <div className="text-2xs text-muted-foreground">{business(t.businessId)?.name}: <Money value={t.businessAmount} /></div>
                     )}
                   </td>
-                  <td className="whitespace-nowrap text-xs text-zinc-500">{t.accountName}</td>
+                  <td className="whitespace-nowrap text-xs text-muted-foreground">{t.accountName}</td>
                   <td><button className="btn-ghost btn-icon" aria-label="עריכה" onClick={() => (t.accountKind === 'manual' ? setManual(t) : setEditing(t))}><MoreHorizontal /></button></td>
                 </tr>
               ))}

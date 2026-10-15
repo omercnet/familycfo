@@ -56,7 +56,7 @@ export default function Settings() {
             <span className="label">יום תחילת מחזור חודשי</span>
             <input className="input num" type="number" min={1} max={28} defaultValue={meta.settings.cycle_start_day}
               onBlur={e => saveSettings.mutate({ cycle_start_day: e.target.value })} />
-            <span className="mt-1.5 block text-xs text-zinc-500">למשל 10 אם המשכורת נכנסת ב-10 לחודש</span>
+            <span className="mt-1.5 block text-xs text-muted-foreground">למשל 10 אם המשכורת נכנסת ב-10 לחודש</span>
           </label>
           <label className="block">
             <span className="label">כרית ביטחון (יתרה מינימלית רצויה)</span>
@@ -70,7 +70,7 @@ export default function Settings() {
         <div className="grid max-w-3xl gap-2 sm:grid-cols-2">
           {meta.members.map(m => (
             <div key={m.id} className="flex items-center gap-2">
-              <input type="color" aria-label={`צבע של ${m.name}`} className="h-9 w-10 shrink-0 cursor-pointer rounded-md border border-line bg-transparent p-1"
+              <input type="color" aria-label={`צבע של ${m.name}`} className="h-9 w-10 shrink-0 cursor-pointer rounded-md border border-border bg-transparent p-1"
                 defaultValue={m.color ?? '#6b7280'} onBlur={e => e.target.value !== m.color && patch.mutate({ path: `/members/${m.id}`, body: { color: e.target.value } })} />
               <input className="input" defaultValue={m.name} aria-label="שם"
                 onBlur={e => e.target.value.trim() && e.target.value !== m.name && patch.mutate({ path: `/members/${m.id}`, body: { name: e.target.value.trim() } })} />
@@ -86,14 +86,14 @@ export default function Settings() {
           <tbody>
             {[...banks, ...cards].map(a => (
               <tr key={a.id}>
-                <td className="whitespace-nowrap text-xs text-zinc-500">{a.kind === 'bank' ? '🏦' : '💳'} {a.id}</td>
+                <td className="whitespace-nowrap text-xs text-muted-foreground">{a.kind === 'bank' ? '🏦' : '💳'} {a.id}</td>
                 <td className="min-w-40"><input className="input py-1" defaultValue={a.displayName ?? ''} onBlur={e => e.target.value !== a.displayName && patch.mutate({ path: `/accounts/${encodeURIComponent(a.id)}`, body: { displayName: e.target.value } })} /></td>
                 <td className="min-w-32"><MemberSelect className="input py-1" value={a.ownerMemberId} emptyLabel="משותף" onChange={id => patch.mutate({ path: `/accounts/${encodeURIComponent(a.id)}`, body: { ownerMemberId: id } })} /></td>
                 <td className="min-w-40">{a.kind === 'card' ? (
                   <AccountSelect className="input py-1" kind="bank" value={a.billingBankAccountId} emptyLabel="זיהוי אוטומטי"
                     onChange={id => patch.mutate({ path: `/accounts/${encodeURIComponent(a.id)}`, body: { billingBankAccountId: id } })} />
                 ) : '—'}</td>
-                <td className="whitespace-nowrap text-xs text-zinc-500">{day(a.lastScrapedAt)}</td>
+                <td className="whitespace-nowrap text-xs text-muted-foreground">{day(a.lastScrapedAt)}</td>
                 <td><input type="checkbox" checked={!!a.active} onChange={e => patch.mutate({ path: `/accounts/${encodeURIComponent(a.id)}`, body: { active: e.target.checked ? 1 : 0 } })} /></td>
               </tr>
             ))}
@@ -102,15 +102,15 @@ export default function Settings() {
       </Section>
 
       <Section title="הכנסות והוצאות קבועות" icon={CalendarClock} color="var(--chart-3)">
-        <p className="text-sm">עברו לעמוד <Link className="text-brand-600 hover:underline" to="/fixed#scheduled">קבועות החודש</Link> — שם מנהלים את כל ההוצאות הקבועות, ההכנסות הקבועות ואומדני חיובי הכרטיסים.</p>
+        <p className="text-sm">עברו לעמוד <Link className="text-primary hover:underline" to="/fixed#scheduled">קבועות החודש</Link> — שם מנהלים את כל ההוצאות הקבועות, ההכנסות הקבועות ואומדני חיובי הכרטיסים.</p>
       </Section>
 
       <Section title="קטגוריות" icon={Layers} color="var(--chart-4)">
-        <p className="text-sm">ניהול קטגוריות, קטגוריות אב, מיזוג ומחיקה — <Link className="text-brand-600 hover:underline" to="/categories">בעמוד הקטגוריות</Link>.</p>
+        <p className="text-sm">ניהול קטגוריות, קטגוריות אב, מיזוג ומחיקה — <Link className="text-primary hover:underline" to="/categories">בעמוד הקטגוריות</Link>.</p>
       </Section>
 
       <Section title="כללי סיווג" icon={Wand2} color="var(--chart-5)" subtitle="נוצרים כשבוחרים ״החל על תנועות דומות״. חלים על תנועות חדשות בכל סריקה.">
-        {(rules.data ?? []).length === 0 ? <div className="text-sm text-zinc-500">אין כללים עדיין</div> : (
+        {(rules.data ?? []).length === 0 ? <div className="text-sm text-muted-foreground">אין כללים עדיין</div> : (
           <div className="scroll-x card-bleed"><table className="table">
             <thead><tr><th>כשהתיאור</th><th>קטגוריה</th><th>עסק</th><th>שייך ל</th><th /></tr></thead>
             <tbody>
@@ -132,7 +132,7 @@ export default function Settings() {
       <Section title="תגיות" icon={Tags} color="var(--chart-6)">
         <div className="flex flex-wrap gap-2">
           {meta.tags.map(t => (
-            <span key={t.id} className="chip min-h-7 gap-1 pe-1">#{t.name}<button type="button" aria-label={`מחק #${t.name}`} className="flex h-5 w-5 items-center justify-center rounded text-fg-subtle transition-colors hover:bg-zinc-200 hover:text-fg dark:hover:bg-zinc-700" onClick={() => remove.mutate(`/tags/${t.id}`)}><X className="h-3 w-3" /></button></span>
+            <span key={t.id} className="chip min-h-7 gap-1 pe-1">#{t.name}<button type="button" aria-label={`מחק #${t.name}`} className="flex h-5 w-5 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-zinc-200 hover:text-foreground dark:hover:bg-zinc-700" onClick={() => remove.mutate(`/tags/${t.id}`)}><X className="h-3 w-3" /></button></span>
           ))}
         </div>
         <div className="mt-4 flex gap-2">
@@ -152,7 +152,7 @@ export default function Settings() {
                 <td className="text-xs">{day(s.lastSuccess)}</td><td className="text-end">{s.newTransactions}</td>
               </tr>
             ))}
-            {!sync.data?.length && <tr><td colSpan={5} className="text-sm text-zinc-500">עוד לא נרשמו סריקות (מתחיל מהסריקה הבאה)</td></tr>}
+            {!sync.data?.length && <tr><td colSpan={5} className="text-sm text-muted-foreground">עוד לא נרשמו סריקות (מתחיל מהסריקה הבאה)</td></tr>}
           </tbody>
         </table></div>
       </Section>
@@ -181,9 +181,9 @@ function Section({ id, title, subtitle, icon: Icon, color, children }: {
     <section id={id} className="card animate-rise-in mb-4 scroll-mt-20">
       <div className="flex min-h-7 items-center gap-2.5">
         {Icon && <span className="icon-tile h-7 w-7 rounded-lg [&_svg]:h-4 [&_svg]:w-4" style={{ ['--tile' as string]: color ?? 'var(--primary)' }}><Icon /></span>}
-        <h2 className="text-[0.9375rem] font-semibold tracking-tight">{title}</h2>
+        <h2 className="text-md font-semibold tracking-tight">{title}</h2>
       </div>
-      {subtitle && <p className={`mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-zinc-500 ${Icon ? 'sm:ps-[2.375rem]' : ''}`}>{subtitle}</p>}
+      {subtitle && <p className={`mb-4 mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground ${Icon ? 'sm:ps-[2.375rem]' : ''}`}>{subtitle}</p>}
       <div className={subtitle ? '' : 'mt-4'}>{children}</div>
     </section>
   );
@@ -194,7 +194,7 @@ function RuleForm({ onCreate }: { onCreate: (body: Record<string, unknown>) => v
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [memberId, setMemberId] = useState<number | null>(null);
   return (
-    <div className="mt-4 flex flex-wrap items-end gap-2 border-t border-line-soft pt-4">
+    <div className="mt-4 flex flex-wrap items-end gap-2 border-t border-border/65 pt-4">
       <label className="max-sm:w-full"><span className="label">תיאור מכיל</span><input className="input w-48 max-sm:w-full" value={pattern} onChange={e => setPattern(e.target.value)} /></label>
       <label className="max-sm:min-w-0 max-sm:flex-1"><span className="label">קטגוריה</span><CategorySelect className="input w-48 max-sm:w-full" value={categoryId} onChange={setCategoryId} /></label>
       <label className="max-sm:min-w-0 max-sm:flex-1"><span className="label">שייך ל</span><MemberSelect className="input w-36 max-sm:w-full" value={memberId} emptyLabel="—" onChange={setMemberId} /></label>
@@ -202,7 +202,7 @@ function RuleForm({ onCreate }: { onCreate: (body: Record<string, unknown>) => v
         onClick={() => { onCreate({ pattern: pattern.trim(), setCategoryId: categoryId, setMemberId: memberId }); setPattern(''); }}>
         הוסף כלל
       </button>
-      <span className="self-center text-xs text-zinc-500">דוגמה: ״ארומה״ → מסעדות ובתי קפה</span>
+      <span className="self-center text-xs text-muted-foreground">דוגמה: ״ארומה״ → מסעדות ובתי קפה</span>
     </div>
   );
 }

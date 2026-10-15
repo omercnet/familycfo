@@ -48,7 +48,7 @@ function ByType({ transactions }: { transactions: Tx[] }) {
               return { key: c.name, name: c.name, value: c.value, color: i < 7 ? CHART_COLORS[i] : undefined, icon: <Icon /> };
             })} />
           {types.length > 7 && (
-            <div className="mt-4 border-t border-line-soft pt-3">
+            <div className="mt-4 border-t border-border/65 pt-3">
               <BarList items={types.slice(7).map(c => ({ key: c.name, label: c.name, value: c.value, sub: `${c.count} תנועות` }))} />
             </div>
           )}
@@ -134,7 +134,7 @@ export default function Businesses() {
                     </div>
                   )}
                   {report.data.months.map(m => (
-                    <div key={m.month} className="flex justify-between gap-3 border-b border-line-soft py-2 text-sm last:border-0">
+                    <div key={m.month} className="flex justify-between gap-3 border-b border-border/65 py-2 text-sm last:border-0">
                       <span>{monthName(m.month)}</span><span><Money value={-m.expenses} colored />{m.income > 0 && <> · <Money value={m.income} colored /></>}</span>
                     </div>
                   ))}
@@ -147,8 +147,8 @@ export default function Businesses() {
                     <tbody>
                       {report.data.transactions.map(t => (
                         <tr key={t.id}>
-                          <td className="whitespace-nowrap text-zinc-500">{day(t.date)}</td><td className="min-w-40">{t.description}</td>
-                          <td className="text-xs text-zinc-500">{t.categoryName}</td><td className="text-end"><Money value={t.amount} cents /></td>
+                          <td className="whitespace-nowrap text-muted-foreground">{day(t.date)}</td><td className="min-w-40">{t.description}</td>
+                          <td className="text-xs text-muted-foreground">{t.categoryName}</td><td className="text-end"><Money value={t.amount} cents /></td>
                           <td className="text-end font-medium"><Money value={t.businessAmount} cents /></td>
                         </tr>
                       ))}

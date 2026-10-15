@@ -4,9 +4,9 @@
 
 /* =========================================================================================
    Theme
-   shadcn/ui tokens (--background, --primary, --chart-1…) are the source of truth; the app's own
-   semantic tokens (surface, fg-muted, line…) are aliases of them, so kit components and
-   page-level utilities always agree. Dark mode follows the OS unless data-theme forces one (below).
+   shadcn/ui tokens (--background, --primary, --chart-1…) are the source of truth and the only
+   color names: kit components and page-level utilities both speak them (docs/design-system-plan.md, D1).
+   Dark mode follows the OS unless data-theme forces one (below).
    ========================================================================================= */
 :root {
   --radius: 0.875rem;
@@ -193,33 +193,6 @@
   --radius-lg: calc(var(--radius) - 2px);
   --radius-xl: var(--radius);
   --radius-2xl: calc(var(--radius) + 4px);
-
-  /* app aliases (used across the pages) */
-  --color-canvas: var(--background);
-  --color-surface: var(--card);
-  --color-surface-raised: var(--popover);
-  --color-surface-muted: var(--muted);
-  --color-hover: color-mix(in oklab, var(--accent) 70%, transparent);
-  --color-selected: var(--accent);
-  --color-fg: var(--foreground);
-  --color-fg-muted: color-mix(in oklab, var(--foreground) 72%, var(--muted-foreground));
-  --color-fg-subtle: var(--muted-foreground);
-  --color-line: var(--border);
-  --color-line-soft: color-mix(in oklab, var(--border) 65%, transparent);
-  --color-line-strong: var(--input);
-  --color-table-head: color-mix(in oklab, var(--muted) 70%, transparent);
-
-  /* brand = the primary hue (older markup uses brand-50…900) */
-  --color-brand-50: oklch(0.97 0.018 272);
-  --color-brand-100: oklch(0.94 0.035 272);
-  --color-brand-200: oklch(0.88 0.07 272);
-  --color-brand-300: oklch(0.8 0.11 272);
-  --color-brand-400: oklch(0.7 0.17 272);
-  --color-brand-500: oklch(0.6 0.21 272);
-  --color-brand-600: oklch(0.53 0.22 272);
-  --color-brand-700: oklch(0.46 0.2 272);
-  --color-brand-800: oklch(0.38 0.16 272);
-  --color-brand-900: oklch(0.3 0.12 272);
 
   --radius-control: var(--radius-md);
   --radius-panel: var(--radius-xl);
@@ -461,10 +434,10 @@
   .btn-ghost {
     min-height: 2rem;
     padding-inline: 0.625rem;
-    color: var(--color-fg-muted);
+    color: color-mix(in oklab, var(--foreground) 72%, var(--muted-foreground));
   }
   .btn-ghost:hover:not(:disabled) {
-    background: var(--color-hover);
+    background: color-mix(in oklab, var(--accent) 70%, transparent);
     color: var(--accent-foreground);
   }
   @media (pointer: coarse) {
@@ -534,7 +507,7 @@
   .table th {
     height: 2.5rem;
     border-bottom: 1px solid var(--border);
-    background: var(--color-table-head);
+    background: color-mix(in oklab, var(--muted) 70%, transparent);
     padding: 0.5rem 0.625rem;
     text-align: start;
     vertical-align: middle;
@@ -545,7 +518,7 @@
     white-space: nowrap;
   }
   .table td {
-    border-bottom: 1px solid var(--color-line-soft);
+    border-bottom: 1px solid color-mix(in oklab, var(--border) 65%, transparent);
     padding: 0.5625rem 0.625rem;
     vertical-align: middle;
   }
@@ -600,7 +573,7 @@
     gap: 0.125rem;
     border-radius: calc(var(--radius-control) + 2px);
     background: var(--muted);
-    border: 1px solid var(--color-line-soft);
+    border: 1px solid color-mix(in oklab, var(--border) 65%, transparent);
     padding: 0.1875rem;
   }
   .seg-item {

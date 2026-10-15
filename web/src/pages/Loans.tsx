@@ -69,19 +69,19 @@ export default function Loans() {
                     </span>
                     <div className="min-w-0">
                       <div className="text-base font-semibold tracking-tight">{l.name}</div>
-                      <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm text-zinc-500">{l.lender} · {l.type === 'mortgage' ? 'משכנתא' : 'הלוואה'} <MemberBadge id={l.ownerMemberId} />
+                      <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">{l.lender} · {l.type === 'mortgage' ? 'משכנתא' : 'הלוואה'} <MemberBadge id={l.ownerMemberId} />
                         {l.source === 'detected' && <span className="chip" title="נוצרה מההחזרים בדף הבנק — ההחזר החודשי מתעדכן אוטומטית">זוהתה מהבנק</span>}</div>
                     </div>
                   </div>
                   <button className="btn-ghost btn-icon -me-2 -mt-1" aria-label="עריכה" onClick={() => setEditing(l)}><Pencil /></button>
                 </div>
-                <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-line-soft pt-4">
+                <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-border/65 pt-4">
                 <div className="grid min-w-0 flex-1 basis-60 grid-cols-2 gap-x-3 gap-y-3.5 text-sm sm:grid-cols-3">
                   <div><div className="label">יתרה</div><Money value={balance} animated className="font-semibold" /></div>
                   <div><div className="label">החזר חודשי</div><Money value={l.monthlyPayment} /></div>
-                  <div><div className="label">ריבית</div><span className="num">{l.interestRate != null ? `${l.interestRate}%` : '—'}</span> <span className="text-xs text-zinc-500">{l.indexType ? INDEX_TYPES[l.indexType] : ''}</span></div>
-                  <div><div className="label">סיום</div>{day(l.endDate)}{monthsLeft != null && <div className="text-xs text-zinc-500">{monthsLeft} חודשים</div>}</div>
-                  <div><div className="label">יום חיוב</div>{l.paymentDay ?? '—'} <span className="text-xs text-zinc-500">{l.bankAccountId ? accountName(l.bankAccountId) : ''}</span></div>
+                  <div><div className="label">ריבית</div><span className="num">{l.interestRate != null ? `${l.interestRate}%` : '—'}</span> <span className="text-xs text-muted-foreground">{l.indexType ? INDEX_TYPES[l.indexType] : ''}</span></div>
+                  <div><div className="label">סיום</div>{day(l.endDate)}{monthsLeft != null && <div className="text-xs text-muted-foreground">{monthsLeft} חודשים</div>}</div>
+                  <div><div className="label">יום חיוב</div>{l.paymentDay ?? '—'} <span className="text-xs text-muted-foreground">{l.bankAccountId ? accountName(l.bankAccountId) : ''}</span></div>
                   <div><div className="label">סכום מקורי</div><Money value={l.originalPrincipal} /></div>
                 </div>
                 {paidPct != null && (
