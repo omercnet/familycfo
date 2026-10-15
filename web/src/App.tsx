@@ -24,6 +24,7 @@ import Trends from './pages/Trends';
 import Insurance from './pages/Insurance';
 import Pension from './pages/Pension';
 import Investments from './pages/Investments';
+import Kit from './pages/Kit';
 import { Picker, Segmented } from './components/ui';
 import { AgentChat } from './components/AgentChat';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/kit/tooltip';
@@ -264,6 +265,8 @@ export default function App() {
               <Route path="/loans" element={<Loans />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/settings" element={<Settings />} />
+              {/* design-system reference; intentionally not in NAV */}
+              <Route path="/kit" element={<Kit />} />
             </Routes>
           </div>
         </main>
