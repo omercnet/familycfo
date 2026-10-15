@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.app.json && vite build",
-    "typecheck": "tsc -p tsconfig.app.json"
+    "typecheck": "tsc -p tsconfig.app.json && node scripts/check-design.mjs",
+    "check:design": "node scripts/check-design.mjs --report"
   },
   "dependencies": {
     "@fontsource-variable/heebo": "^5.3.0",

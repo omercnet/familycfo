@@ -6,7 +6,7 @@
    Theme
    shadcn/ui tokens (--background, --primary, --chart-1…) are the source of truth; the app's own
    semantic tokens (surface, fg-muted, line…) are aliases of them, so kit components and
-   page-level utilities always agree. Dark mode follows the OS (prefers-color-scheme).
+   page-level utilities always agree. Dark mode follows the OS unless data-theme forces one (below).
    ========================================================================================= */
 :root {
   --radius: 0.875rem;
@@ -42,6 +42,20 @@
   --positive: oklch(0.62 0.15 162);
   --negative: oklch(0.6 0.21 18);
 
+  /* status tones: base (icons, dots, bars), -soft (tinted background), -strong (text on -soft).
+     strong-on-soft contrast, light / dark: positive 6.6 / 9.5, negative 6.5 / 9.2,
+     warning 6.4 / 9.8, info 6.2 / 9.3 (WCAG AA needs 4.5). Re-check when changing a value. */
+  --positive-soft: oklch(0.955 0.04 162);
+  --positive-strong: oklch(0.44 0.09 162);
+  --negative-soft: oklch(0.955 0.022 18);
+  --negative-strong: oklch(0.47 0.17 18);
+  --warning: oklch(0.78 0.16 75);
+  --warning-soft: oklch(0.965 0.04 88);
+  --warning-strong: oklch(0.47 0.1 60);
+  --info: oklch(0.68 0.15 235);
+  --info-soft: oklch(0.955 0.022 235);
+  --info-strong: oklch(0.46 0.11 245);
+
   /* the sidebar is always ink — it anchors the page */
   --sidebar: oklch(0.2 0.035 272);
   --sidebar-foreground: oklch(0.8 0.025 272);
@@ -55,8 +69,24 @@
   --shadow-overlay: 0 18px 44px -12px oklch(0.25 0.08 272 / 0.3), 0 4px 10px oklch(0.25 0.06 272 / 0.08);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+/* Dark mode follows the OS unless <html data-theme="light|dark"> forces one. The `dark` variant
+   below is the single switch: these tokens and any `dark:` utility both go through it. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+:root {
+  @variant dark {
     --background: oklch(0.165 0.02 272);
     --foreground: oklch(0.95 0.01 270);
     --card: oklch(0.205 0.025 272);
@@ -83,6 +113,16 @@
     --chart-8: oklch(0.75 0.15 50);
     --positive: oklch(0.74 0.15 162);
     --negative: oklch(0.7 0.19 18);
+    --positive-soft: oklch(0.29 0.05 162);
+    --positive-strong: oklch(0.86 0.12 162);
+    --negative-soft: oklch(0.29 0.06 18);
+    --negative-strong: oklch(0.86 0.065 18);
+    --warning: oklch(0.82 0.15 80);
+    --warning-soft: oklch(0.3 0.05 75);
+    --warning-strong: oklch(0.89 0.1 85);
+    --info: oklch(0.74 0.13 235);
+    --info-soft: oklch(0.29 0.05 240);
+    --info-strong: oklch(0.86 0.08 235);
     --sidebar: oklch(0.14 0.02 272);
     --sidebar-border: oklch(1 0 0 / 0.06);
     --sidebar-accent: oklch(0.24 0.04 272);
@@ -94,6 +134,14 @@
 
 @theme inline {
   --font-sans: "Heebo Variable", "Heebo", "Assistant", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* type steps added to Tailwind's scale: 11 / 12 / 14 / 15 / 18 / 20 / 26 px (body is text-sm) */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-md: 0.9375rem;
+  --text-md--line-height: 1.25rem;
+  --text-kpi: 1.625rem;
+  --text-kpi--line-height: 2rem;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -122,7 +170,17 @@
   --color-chart-7: var(--chart-7);
   --color-chart-8: var(--chart-8);
   --color-positive: var(--positive);
+  --color-positive-soft: var(--positive-soft);
+  --color-positive-strong: var(--positive-strong);
   --color-negative: var(--negative);
+  --color-negative-soft: var(--negative-soft);
+  --color-negative-strong: var(--negative-strong);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-strong: var(--warning-strong);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-strong: var(--info-strong);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-muted: var(--sidebar-muted);
