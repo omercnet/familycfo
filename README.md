@@ -13,11 +13,14 @@ a live stock portfolio, and an optional AI chat that answers questions about you
 > (SQLite), ומציגה תזרים, תקציב, תחזית יתרה, הוצאות קבועות ומנויים, שווי נקי, ביטוחים, פנסיה ותיק מניות בזמן אמת —
 > ועוזר AI (אופציונלי) שעונה על שאלות על הנתונים שלכם. אין שרת בענן ואין התחברות: הכול רץ על `127.0.0.1`.
 
+[![The overview page of the demo household: this month's cash flow, the expected end-of-month balance and the balance forecast](https://github.com/omercnet/familycfo/releases/download/readme-screenshots/dashboard.png)](https://github.com/omercnet/familycfo/releases/download/readme-screenshots/dashboard.png)
+
 ---
 
 ## Contents
 
 - [What it does](#what-it-does)
+- [Screenshots](#screenshots)
 - [Privacy and security](#privacy-and-security)
 - [Quick start — try the demo](#quick-start--try-the-demo)
 - [Setup with your own banks](#setup-with-your-own-banks)
@@ -62,6 +65,15 @@ It understands how Israeli money actually moves:
 - **Monthly cycle** can start on any day (e.g. the 10th, when the salary lands).
 - **Bit / PayBox paybacks** can be linked to the expense they repay, so splitting a dinner doesn't inflate spend.
 - **Household members**: every account and row belongs to a member or to the shared household; filter the whole app by member.
+
+## Screenshots
+
+From the demo household (`npm run demo`); all the data is invented.
+
+| | |
+|---|---|
+| [![Transactions: the month's rows with category, member and business, and totals for income, spend and net](https://github.com/omercnet/familycfo/releases/download/readme-screenshots/transactions.png)](https://github.com/omercnet/familycfo/releases/download/readme-screenshots/transactions.png) **תנועות** (Transactions) | [![Cash flow and forecast: a tight-month warning and the day-by-day balance forecast per bank account](https://github.com/omercnet/familycfo/releases/download/readme-screenshots/cashflow.png)](https://github.com/omercnet/familycfo/releases/download/readme-screenshots/cashflow.png) **תזרים ותחזית** (Cash flow and forecast) |
+| [![Insights and alerts: where you could save, and alerts that each link to where you act on them](https://github.com/omercnet/familycfo/releases/download/readme-screenshots/insights.png)](https://github.com/omercnet/familycfo/releases/download/readme-screenshots/insights.png) **תובנות והתראות** (Insights and alerts) | [![Investments: live portfolio value, gain, allocation and holdings](https://github.com/omercnet/familycfo/releases/download/readme-screenshots/investments.png)](https://github.com/omercnet/familycfo/releases/download/readme-screenshots/investments.png) **השקעות** (Investments) |
 
 ## Privacy and security
 
